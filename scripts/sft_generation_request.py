@@ -11,6 +11,7 @@ from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
+from sft_file_sequence import next_numbered_path
 
 try:
     from sft_taxonomy import (
@@ -290,9 +291,7 @@ def write_json(path: Path, data: dict[str, Any]) -> None:
 
 
 def make_default_output_path(output_dir: Path, raw_request: str) -> Path:
-    safe = raw_request.replace("/", "_").replace(".", "_").replace("-", "-")
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    return output_dir / f"generation_request_{timestamp}_{safe}.json"
+    return next_numbered_path(output_dir, "request", ".json")
 
 
 def main() -> None:

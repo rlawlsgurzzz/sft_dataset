@@ -10,6 +10,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional
+import hashlib
 
 try:
     from sft_taxonomy import DEFAULT_TAXONOMY_PATH, load_taxonomy, validate_metadata_against_taxonomy
@@ -22,6 +23,7 @@ except ImportError:
 DEFAULT_DATASET_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_ACCEPTED_DIR = DEFAULT_DATASET_ROOT / "accepted"
 DEFAULT_REJECTED_DIR = DEFAULT_DATASET_ROOT / "rejected"
+VALIDATION_INDEX_FILENAME = ".validated_inputs.json"
 
 MIN_WAIT_SECONDS = 1.0
 MAX_WAIT_SECONDS = 10.0
@@ -667,6 +669,42 @@ def append_jsonl(path: Path, records: list[dict[str, Any]]) -> None:
         for record in records:
             file.write(json.dumps(record, ensure_ascii=False, separators=(",", ":")) + "\n")
 
+def file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+
+    with path.open("rb") as file:
+        for chunk in iter(lambda: file.read(1024 * 1024), b""):
+            digest.update(chunk)
+
+    return digest.hexdigest()
+
+
+def load_validation_index(dataset_root: Path) -> dict[str, Any]:
+    path = dataset_root / VALIDATION_INDEX_FILENAME
+    if not path.exists():
+        return {"validated_inputs": {}}
+
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {"validated_inputs": {}}
+
+    if not isinstance(data, dict):
+        return {"validated_inputs": {}}
+
+    if not isinstance(data.get("validated_inputs"), dict):
+        data["validated_inputs"] = {}
+
+    return data
+
+
+def save_validation_index(dataset_root: Path, index: dict[str, Any]) -> None:
+    path = dataset_root / VALIDATION_INDEX_FILENAME
+    path.write_text(
+        json.dumps(index, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
 
 def validate_file(
     input_path: Path,
@@ -674,6 +712,23 @@ def validate_file(
     taxonomy_path: Path = DEFAULT_TAXONOMY_PATH,
     write_outputs: bool = True,
 ) -> dict[str, Any]:
+    input_hash = file_sha256(input_path)
+
+    if write_outputs:
+        validation_index = load_validation_index(dataset_root)
+        validated_inputs = validation_index["validated_inputs"]
+
+        if input_hash in validated_inputs:
+            return {
+                "input_path": str(input_path),
+                "input_hash": input_hash,
+                "skipped": True,
+                "reason": "INPUT_ALREADY_VALIDATED",
+                "previous_result": validated_inputs[input_hash],
+            }
+    else:
+        validation_index = {"validated_inputs": {}}
+
     taxonomy = load_taxonomy(taxonomy_path)
     samples, parse_failures = read_json_records_with_errors(input_path)
 
@@ -703,17 +758,24 @@ def validate_file(
     accepted_path = dataset_root / "accepted" / f"accepted_{timestamp}.jsonl"
     rejected_path = dataset_root / "rejected" / f"rejected_{timestamp}.jsonl"
 
-    if write_outputs:
-        append_jsonl(accepted_path, accepted)
-        append_jsonl(rejected_path, rejected)
-
-    return {
+    result = {
         "input_path": str(input_path),
+        "input_hash": input_hash,
+        "skipped": False,
         "accepted_count": len(accepted),
         "rejected_count": len(rejected),
         "accepted_path": str(accepted_path) if accepted else None,
         "rejected_path": str(rejected_path) if rejected else None,
     }
+
+    if write_outputs:
+        append_jsonl(accepted_path, accepted)
+        append_jsonl(rejected_path, rejected)
+
+        validation_index["validated_inputs"][input_hash] = result
+        save_validation_index(dataset_root, validation_index)
+
+    return result
 
 
 def main() -> None:
