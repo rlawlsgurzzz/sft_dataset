@@ -104,7 +104,7 @@ actor, target, action 의미 해석은 LLM이 한다.
 
 ```text
 - command_style 5종
-- topic 비율
+- intent_family 비율
 - actor_selection 비율
 - target_selection 비율
 - action_pattern 비율

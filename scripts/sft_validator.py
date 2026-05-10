@@ -46,32 +46,66 @@ class ValidationContext:
 
 def read_json_records_with_errors(path: Path) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     text = path.read_text(encoding="utf-8").strip()
+
     if not text:
         return [], []
 
     valid: list[dict[str, Any]] = []
     invalid: list[dict[str, Any]] = []
 
-    if text.startswith("["):
-        try:
-            data = json.loads(text)
-        except json.JSONDecodeError as error:
-            invalid.append({"raw": text, "failure_reasons": [f"JSON_PARSE_FAILED: {error}"]})
-            return valid, invalid
-        if not isinstance(data, list):
-            invalid.append({"raw": text, "failure_reasons": ["ROOT_ARRAY_EXPECTED"]})
-            return valid, invalid
-        for item in data:
-            if isinstance(item, dict):
-                valid.append(item)
-            else:
-                invalid.append({"raw": item, "failure_reasons": ["SAMPLE_NOT_OBJECT"]})
+    def add_json_value(value: Any, source_label: str) -> None:
+        if isinstance(value, list):
+            for index, item in enumerate(value, start=1):
+                if isinstance(item, dict):
+                    valid.append(item)
+                else:
+                    invalid.append(
+                        {
+                            "raw": item,
+                            "failure_reasons": [f"SAMPLE_NOT_OBJECT at {source_label}[{index}]"],
+                        }
+                    )
+            return
+
+        if isinstance(value, dict) and isinstance(value.get("samples"), list):
+            for index, item in enumerate(value["samples"], start=1):
+                if isinstance(item, dict):
+                    valid.append(item)
+                else:
+                    invalid.append(
+                        {
+                            "raw": item,
+                            "failure_reasons": [f"SAMPLE_NOT_OBJECT at {source_label}.samples[{index}]"],
+                        }
+                    )
+            return
+
+        if isinstance(value, dict):
+            valid.append(value)
+            return
+
+        invalid.append(
+            {
+                "raw": value,
+                "failure_reasons": [f"ROOT_NOT_SAMPLE_OR_SAMPLE_LIST at {source_label}"],
+            }
+        )
+
+    try:
+        parsed = json.loads(text)
+    except json.JSONDecodeError:
+        parsed = None
+
+    if parsed is not None:
+        add_json_value(parsed, "root")
         return valid, invalid
 
     for line_number, line in enumerate(text.splitlines(), start=1):
         stripped = line.strip()
+
         if not stripped:
             continue
+
         try:
             item = json.loads(stripped)
         except json.JSONDecodeError as error:
@@ -82,10 +116,8 @@ def read_json_records_with_errors(path: Path) -> tuple[list[dict[str, Any]], lis
                 }
             )
             continue
-        if isinstance(item, dict):
-            valid.append(item)
-        else:
-            invalid.append({"raw": item, "failure_reasons": ["SAMPLE_NOT_OBJECT"]})
+
+        add_json_value(item, f"line {line_number}")
 
     return valid, invalid
 

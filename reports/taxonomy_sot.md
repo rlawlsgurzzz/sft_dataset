@@ -4,7 +4,7 @@ Coverage taxonomy SOT for battle-command Synthetic SFT generation. Runtime input
 
 ## Global Targets
 
-### topic
+### intent_family
 
 | key | target | description |
 |---|---:|---|

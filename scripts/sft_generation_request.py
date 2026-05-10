@@ -100,7 +100,7 @@ def sample_command_style(sample: dict[str, Any]) -> str:
 
 def general_path_matches(sample: dict[str, Any], path: GeneralPath) -> bool:
     return get_general_path(sample) == (
-        path.topic,
+        path.intent_family,
         path.actor_selection,
         path.target_selection,
         path.action_pattern,
@@ -245,10 +245,10 @@ def build_generation_payload(
     )
 
     skill_path = parsed.skill_path
-    if skill_path is None and parsed.general_path.topic == "skill":
+    if skill_path is None and parsed.general_path.intent_family == "skill":
         skill_path = infer_skill_path_from_samples(command_slot_samples)
         if skill_path is None:
-            raise ValueError("Skill topic request requires skill_path or accepted samples with skill_case.")
+            raise ValueError("Skill intent_family request requires skill_path or accepted samples with skill_case.")
 
     selected_bucket = get_selected_bucket_descriptions(
         taxonomy=taxonomy,

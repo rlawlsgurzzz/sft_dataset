@@ -15,19 +15,26 @@ from typing import Any
 
 try:
     from sft_file_sequence import next_numbered_index, numbered_path
-    from sft_generation_request import build_generation_payload, make_default_output_path, write_json
-    from sft_teacher_client import MODEL_NAME, run_teacher_generation
+    from sft_generation_request import (
+        build_generation_payload,
+        make_default_output_path,
+        write_json,
+    )
     from sft_validator import validate_file
 except ImportError:
     sys.path.append(str(Path(__file__).resolve().parent))
     from sft_file_sequence import next_numbered_index, numbered_path
-    from sft_generation_request import build_generation_payload, make_default_output_path, write_json
-    from sft_teacher_client import MODEL_NAME, run_teacher_generation
+    from sft_generation_request import (
+        build_generation_payload,
+        make_default_output_path,
+        write_json,
+    )
     from sft_validator import validate_file
 
 
 DEFAULT_DATASET_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_TAXONOMY_PATH = DEFAULT_DATASET_ROOT / "config" / "taxonomy_sot.json"
+DEFAULT_TEACHER_MODEL = "google/gemma-4-31B-it"
 
 
 def run_report(dataset_root: Path, taxonomy_path: Path) -> None:
@@ -146,6 +153,16 @@ def run_generate(args: argparse.Namespace) -> None:
 
     write_json(request_path, payload)
 
+    try:
+        from sft_teacher_client import run_teacher_generation
+    except ModuleNotFoundError as error:
+        if error.name == "together":
+            print(
+                "generate failed: missing package 'together'. Install it with: python -m pip install together"
+            )
+            return
+        raise
+
     result = run_teacher_generation(
         input_path=request_path,
         output_path=raw_output_path,
@@ -188,22 +205,36 @@ def build_parser() -> argparse.ArgumentParser:
         func=lambda args: run_report(Path(args.dataset_root), Path(args.taxonomy))
     )
 
-    request_parser = subparsers.add_parser("request", help="Build teacher LLM generation request payload.")
-    request_parser.add_argument("request", help="Generation request path, e.g. c1-2-1-3-1-10.4")
+    request_parser = subparsers.add_parser(
+        "request", help="Build teacher LLM generation request payload."
+    )
+    request_parser.add_argument(
+        "request", help="Generation request path, e.g. c1-2-1-3-1-10.4"
+    )
     request_parser.add_argument("--output", default="")
     request_parser.add_argument("--print-json", action="store_true")
     request_parser.set_defaults(func=run_request)
 
-    generate_parser = subparsers.add_parser("generate", help="Build request payload and call teacher after confirmation.")
-    generate_parser.add_argument("request", help="Generation request path, e.g. c1-2-1-3-1-10.4")
-    generate_parser.add_argument("--output", default="", help="Optional request payload path.")
-    generate_parser.add_argument("--model", default=MODEL_NAME)
+    generate_parser = subparsers.add_parser(
+        "generate", help="Build request payload and call teacher after confirmation."
+    )
+    generate_parser.add_argument(
+        "request", help="Generation request path, e.g. c1-2-1-3-1-10.4"
+    )
+    generate_parser.add_argument(
+        "--output", default="", help="Optional request payload path."
+    )
+    generate_parser.add_argument("--model", default=DEFAULT_TEACHER_MODEL)
     generate_parser.add_argument("--max-tokens", type=int, default=12000)
     generate_parser.add_argument("--print-json", action="store_true")
     generate_parser.set_defaults(func=run_generate)
 
-    validate_parser = subparsers.add_parser("validate", help="Validate teacher output and split accepted/rejected.")
-    validate_parser.add_argument("--input", required=True, help="Teacher output JSON/JSONL path.")
+    validate_parser = subparsers.add_parser(
+        "validate", help="Validate teacher output and split accepted/rejected."
+    )
+    validate_parser.add_argument(
+        "--input", required=True, help="Teacher output JSON/JSONL path."
+    )
     validate_parser.add_argument("--dry-run", action="store_true")
     validate_parser.add_argument("--refresh-report", action="store_true")
     validate_parser.set_defaults(func=run_validate)

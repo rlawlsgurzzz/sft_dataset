@@ -16,11 +16,14 @@ DEFAULT_TAXONOMY_PATH = Path(__file__).resolve().parents[1] / "config" / "taxono
 REQUEST_PATTERN = re.compile(
     r"^c(?P<general>\d+-\d+-\d+-\d+-\d+-\d+)(?:/(?P<skill>\d+-\d+-\d+))?\.(?P<count>\d+)$"
 )
+STABLE_REQUEST_PATTERN = re.compile(
+    r"^(?P<general>[a-zA-Z0-9_]+\.[a-zA-Z0-9_]+\.[a-zA-Z0-9_]+\.[a-zA-Z0-9_]+\.[a-zA-Z0-9_]+)#(?P<slot>\d+)(?:/(?P<skill>[a-zA-Z0-9_]+\.[a-zA-Z0-9_]+(?:\.[a-zA-Z0-9_]+|\.null)))?\.(?P<count>\d+)$"
+)
 
 
 @dataclass(frozen=True)
 class GeneralPath:
-    topic: str
+    intent_family: str
     actor_selection: str
     target_selection: str
     action_pattern: str
@@ -31,7 +34,7 @@ class GeneralPath:
     def stable_path(self) -> str:
         return ".".join(
             [
-                self.topic,
+                self.intent_family,
                 self.actor_selection,
                 self.target_selection,
                 self.action_pattern,
@@ -103,10 +106,23 @@ def parse_generation_request(
     raw_request: str,
     taxonomy: dict[str, Any],
 ) -> ParsedGenerationRequest:
-    match = REQUEST_PATTERN.match(raw_request.strip())
+    stripped = raw_request.strip()
+
+    if stripped.startswith("c"):
+        return parse_numeric_generation_request(stripped, taxonomy)
+
+    return parse_stable_generation_request(stripped, taxonomy)
+
+def parse_numeric_generation_request(
+    raw_request: str,
+    taxonomy: dict[str, Any],
+) -> ParsedGenerationRequest:
+    match = REQUEST_PATTERN.match(raw_request)
+
     if not match:
         raise ValueError(
-            "Invalid request format. Expected: c1-2-1-3-1-10.4 or c1-2-1-3-1-10/2-3-1.7"
+            "Invalid numeric request format. "
+            "Expected: c1-2-1-3-1-10.4 or c1-2-1-3-1-10/2-3-1.7"
         )
 
     general_numbers = match.group("general").split("-")
@@ -116,27 +132,42 @@ def parse_generation_request(
     if count < 1:
         raise ValueError("count must be at least 1.")
 
-    topic = get_by_1_based_index(get_order(taxonomy, "topic"), general_numbers[0], "topic")
+    intent_family = get_by_1_based_index(
+        get_order(taxonomy, "intent_family"),
+        general_numbers[0],
+        "intent_family",
+    )
+
     actor_selection = get_by_1_based_index(
-        get_order(taxonomy, "actor_selection"), general_numbers[1], "actor_selection"
+        get_order(taxonomy, "actor_selection"),
+        general_numbers[1],
+        "actor_selection",
     )
+
     target_selection = get_by_1_based_index(
-        get_order(taxonomy, "target_selection"), general_numbers[2], "target_selection"
+        get_order(taxonomy, "target_selection"),
+        general_numbers[2],
+        "target_selection",
     )
+
     action_pattern = get_by_1_based_index(
-        get_order(taxonomy, "action_pattern"), general_numbers[3], "action_pattern"
+        get_order(taxonomy, "action_pattern"),
+        general_numbers[3],
+        "action_pattern",
     )
-    scenario_family = get_scenario_family_by_topic_index(
+
+    scenario_family = get_scenario_family_by_intent_family_index(
         taxonomy=taxonomy,
-        topic=topic,
+        intent_family=intent_family,
         index_text=general_numbers[4],
     )
+
     command_slot_index = int(general_numbers[5])
     if command_slot_index < 1:
         raise ValueError("command_slot_index must be at least 1.")
 
     general_path = GeneralPath(
-        topic=topic,
+        intent_family=intent_family,
         actor_selection=actor_selection,
         target_selection=target_selection,
         action_pattern=action_pattern,
@@ -145,17 +176,28 @@ def parse_generation_request(
     )
 
     skill_path = None
+
     if skill_numbers:
         skill_parts = skill_numbers.split("-")
+
         skill_family = get_by_1_based_index(
-            get_order(taxonomy, "skill_family"), skill_parts[0], "skill_family"
+            get_order(taxonomy, "skill_family"),
+            skill_parts[0],
+            "skill_family",
         )
+
         skill_target_kind = get_by_1_based_index(
-            get_order(taxonomy, "skill_target_kind"), skill_parts[1], "skill_target_kind"
+            get_order(taxonomy, "skill_target_kind"),
+            skill_parts[1],
+            "skill_target_kind",
         )
+
         conflict_value = get_by_1_based_index(
-            get_order(taxonomy, "conflict_type"), skill_parts[2], "conflict_type"
+            get_order(taxonomy, "conflict_type"),
+            skill_parts[2],
+            "conflict_type",
         )
+
         skill_path = SkillPath(
             skill_family=skill_family,
             skill_target_kind=skill_target_kind,
@@ -168,30 +210,87 @@ def parse_generation_request(
         skill_path=skill_path,
         count=count,
     )
+
     validate_generation_request(parsed, taxonomy)
     return parsed
 
 
-def get_scenario_family_by_topic_index(
+def parse_stable_generation_request(
+    raw_request: str,
     taxonomy: dict[str, Any],
-    topic: str,
+) -> ParsedGenerationRequest:
+    match = STABLE_REQUEST_PATTERN.match(raw_request)
+
+    if not match:
+        raise ValueError(
+            "Invalid stable request format. "
+            "Expected: attack.explicit_actor.explicit_enemy_target.attack_only.simple_clear_target#1.4 "
+            "or skill.explicit_actor.explicit_ally_target.skill_only.ally_skill_valid_target#1/ally_shield.ally_alive.null.4"
+        )
+
+    general_parts = match.group("general").split(".")
+    skill_text = match.group("skill")
+    command_slot_index = int(match.group("slot"))
+    count = int(match.group("count"))
+
+    if command_slot_index < 1:
+        raise ValueError("command_slot_index must be at least 1.")
+
+    if count < 1:
+        raise ValueError("count must be at least 1.")
+
+    general_path = GeneralPath(
+        intent_family=general_parts[0],
+        actor_selection=general_parts[1],
+        target_selection=general_parts[2],
+        action_pattern=general_parts[3],
+        scenario_family=general_parts[4],
+        command_slot_index=command_slot_index,
+    )
+
+    skill_path = None
+
+    if skill_text:
+        skill_parts = skill_text.split(".")
+        conflict_type = normalize_conflict_type(skill_parts[2])
+
+        skill_path = SkillPath(
+            skill_family=skill_parts[0],
+            skill_target_kind=skill_parts[1],
+            conflict_type=conflict_type,
+        )
+
+    parsed = ParsedGenerationRequest(
+        raw_request=raw_request,
+        general_path=general_path,
+        skill_path=skill_path,
+        count=count,
+    )
+
+    validate_generation_request(parsed, taxonomy)
+    return parsed
+
+
+def get_scenario_family_by_intent_family_index(
+    taxonomy: dict[str, Any],
+    intent_family: str,
     index_text: str,
 ) -> str:
-    matrix = get_general_topic_matrix(taxonomy, topic)
+    matrix = get_general_intent_family_matrix(taxonomy, intent_family)
     scenario_map = matrix.get("allowed_scenario_family", {})
     if not isinstance(scenario_map, dict):
-        raise ValueError(f"general_valid_matrix.{topic}.allowed_scenario_family must be an object.")
+        raise ValueError(f"general_valid_matrix.{intent_family}.allowed_scenario_family must be an object.")
 
     values = list(scenario_map.keys())
     return get_by_1_based_index(values, index_text, "scenario_family")
 
 
-def get_general_topic_matrix(taxonomy: dict[str, Any], topic: str) -> dict[str, Any]:
+def get_general_intent_family_matrix(taxonomy: dict[str, Any], intent_family: str) -> dict[str, Any]:
     matrix = taxonomy.get("general_valid_matrix", {})
-    topic_matrix = matrix.get(topic)
-    if not isinstance(topic_matrix, dict):
-        raise ValueError(f"Unknown topic in general_valid_matrix: {topic}")
-    return topic_matrix
+    intent_family_matrix = matrix.get(intent_family)
+    if not isinstance(intent_family_matrix, dict):
+        raise ValueError(f"Unknown intent_family in general_valid_matrix: {intent_family}")
+    return intent_family_matrix
 
 
 def validate_generation_request(
@@ -201,13 +300,14 @@ def validate_generation_request(
     validate_general_path(request.general_path, taxonomy)
 
     if request.skill_path is not None:
-        if request.general_path.topic != "skill":
-            raise ValueError("Skill override can only be used with topic=skill.")
+        if request.general_path.intent_family != "skill":
+            raise ValueError("Skill override can only be used with intent_family=skill.")
+
         validate_skill_path(request.skill_path, taxonomy)
 
 
 def validate_general_path(path: GeneralPath, taxonomy: dict[str, Any]) -> None:
-    topic_matrix = get_general_topic_matrix(taxonomy, path.topic)
+    intent_matrix = get_general_intent_family_matrix(taxonomy, path.intent_family)
 
     checks = [
         ("allowed_actor_selection", path.actor_selection),
@@ -217,12 +317,17 @@ def validate_general_path(path: GeneralPath, taxonomy: dict[str, Any]) -> None:
     ]
 
     for matrix_key, value in checks:
-        allowed = topic_matrix.get(matrix_key, {})
+        allowed = intent_matrix.get(matrix_key, {})
+
         if not isinstance(allowed, dict):
-            raise ValueError(f"general_valid_matrix.{path.topic}.{matrix_key} must be an object.")
+            raise ValueError(
+                f"general_valid_matrix.{path.intent_family}.{matrix_key} must be an object."
+            )
+
         if value not in allowed:
             raise ValueError(
-                f"Invalid general path: {path.stable_path}. {value} is not allowed in {path.topic}.{matrix_key}."
+                f"Invalid general path: {path.stable_path}. "
+                f"{value} is not allowed in {path.intent_family}.{matrix_key}."
             )
 
 
@@ -255,7 +360,7 @@ def validate_metadata_against_taxonomy(
     if not isinstance(metadata, dict):
         return ["metadata must be an object"]
 
-    topic = metadata.get("intent_family")
+    intent_family = metadata.get("intent_family")
     actor_selection = metadata.get("actor_selection")
     target_selection = metadata.get("target_selection")
     action_pattern = metadata.get("action_pattern")
@@ -263,7 +368,7 @@ def validate_metadata_against_taxonomy(
     command_style = metadata.get("command_style")
     edge_flags = metadata.get("edge_flags", [])
 
-    if not isinstance(topic, str):
+    if not isinstance(intent_family, str):
         errors.append("metadata.intent_family must be a string")
     if not isinstance(actor_selection, str):
         errors.append("metadata.actor_selection must be a string")
@@ -292,7 +397,7 @@ def validate_metadata_against_taxonomy(
         try:
             validate_general_path(
                 GeneralPath(
-                    topic=topic,
+                    intent_family=intent_family,
                     actor_selection=actor_selection,
                     target_selection=target_selection,
                     action_pattern=action_pattern,
@@ -306,8 +411,8 @@ def validate_metadata_against_taxonomy(
 
     skill_case = sample.get("skill_case")
     if skill_case is None:
-        if topic == "skill":
-            errors.append("skill topic sample must have non-null skill_case")
+        if intent_family == "skill":
+            errors.append("skill intent_family sample must have non-null skill_case")
         return errors
 
     if not isinstance(skill_case, dict):
@@ -349,8 +454,8 @@ def get_selected_bucket_descriptions(
 ) -> dict[str, Any]:
     descriptions = taxonomy.get("descriptions", {})
     selected: dict[str, Any] = {
-        "intent_family": general_path.topic,
-        "intent_family_description": descriptions.get("topic", {}).get(general_path.topic, ""),
+        "intent_family": general_path.intent_family,
+        "intent_family_description": descriptions.get("intent_family", {}).get(general_path.intent_family, ""),
         "actor_selection": general_path.actor_selection,
         "actor_selection_description": descriptions.get("actor_selection", {}).get(general_path.actor_selection, ""),
         "target_selection": general_path.target_selection,
@@ -399,8 +504,8 @@ def validate_taxonomy_shape(taxonomy: dict[str, Any]) -> None:
     if not isinstance(taxonomy.get("edge_flags"), list):
         raise ValueError("taxonomy.edge_flags must be a list.")
 
-    for topic in get_order(taxonomy, "topic"):
-        get_general_topic_matrix(taxonomy, topic)
+    for intent_family in get_order(taxonomy, "intent_family"):
+        get_general_intent_family_matrix(taxonomy, intent_family)
 
     for family in get_order(taxonomy, "skill_family"):
         skill_matrix = taxonomy.get("skill_valid_matrix", {})
@@ -421,7 +526,7 @@ def main() -> None:
         "raw_request": parsed.raw_request,
         "count": parsed.count,
         "general_path": {
-            "topic": parsed.general_path.topic,
+            "intent_family": parsed.general_path.intent_family,
             "actor_selection": parsed.general_path.actor_selection,
             "target_selection": parsed.general_path.target_selection,
             "action_pattern": parsed.general_path.action_pattern,

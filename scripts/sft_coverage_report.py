@@ -168,21 +168,21 @@ def format_ratio(current_count: int, total_count: int, target: Optional[float]) 
     return f"{current_ratio:.1f}%({target:g}%) / {current_count}"
 
 
-def get_topic_target(taxonomy: dict[str, Any], topic: str) -> Optional[float]:
-    value = taxonomy.get("global_targets", {}).get("topic", {}).get(topic)
+def get_intent_family_target(taxonomy: dict[str, Any], intent_family: str) -> Optional[float]:
+    value = taxonomy.get("global_targets", {}).get("intent_family", {}).get(intent_family)
     return float(value) if isinstance(value, (int, float)) else None
 
 
 def get_matrix_target(
     taxonomy: dict[str, Any],
-    topic: str,
+    intent_family: str,
     matrix_key: str,
     value: str,
 ) -> Optional[float]:
-    topic_matrix = taxonomy.get("general_valid_matrix", {}).get(topic, {})
-    if not isinstance(topic_matrix, dict):
+    intent_family_matrix = taxonomy.get("general_valid_matrix", {}).get(intent_family, {})
+    if not isinstance(intent_family_matrix, dict):
         return None
-    target_map = topic_matrix.get(matrix_key, {})
+    target_map = intent_family_matrix.get(matrix_key, {})
     if not isinstance(target_map, dict):
         return None
     target = target_map.get(value)
@@ -249,49 +249,49 @@ def render_general_coverage(samples: list[dict[str, Any]], taxonomy: dict[str, A
     total = len(samples)
     groups = group_rows(samples, skill_only=False)
 
-    topic_counts = count_by(samples, lambda sample: get_general_path(sample)[0])
+    intent_family_counts = count_by(samples, lambda sample: get_general_path(sample)[0])
 
-    for topic in taxonomy.get("orders", {}).get("topic", []):
-        topic_samples = [sample for sample in samples if get_general_path(sample)[0] == topic]
-        topic_count = topic_counts.get(topic, 0)
-        lines.append(f"{topic} [{format_ratio(topic_count, total, get_topic_target(taxonomy, topic))}]")
+    for intent_family in taxonomy.get("orders", {}).get("intent_family", []):
+        intent_family_samples = [sample for sample in samples if get_general_path(sample)[0] == intent_family]
+        intent_family_count = intent_family_counts.get(intent_family, 0)
+        lines.append(f"{intent_family} [{format_ratio(intent_family_count, total, get_intent_family_target(taxonomy, intent_family))}]")
 
-        actor_counts = count_by(topic_samples, lambda sample: get_general_path(sample)[1])
-        for actor in taxonomy.get("general_valid_matrix", {}).get(topic, {}).get("allowed_actor_selection", {}).keys():
-            actor_samples = [sample for sample in topic_samples if get_general_path(sample)[1] == actor]
+        actor_counts = count_by(intent_family_samples, lambda sample: get_general_path(sample)[1])
+        for actor in taxonomy.get("general_valid_matrix", {}).get(intent_family, {}).get("allowed_actor_selection", {}).keys():
+            actor_samples = [sample for sample in intent_family_samples if get_general_path(sample)[1] == actor]
             actor_count = actor_counts.get(actor, 0)
-            lines.append(f"  {actor} [{format_ratio(actor_count, topic_count, get_matrix_target(taxonomy, topic, 'allowed_actor_selection', actor))}]")
+            lines.append(f"  {actor} [{format_ratio(actor_count, intent_family_count, get_matrix_target(taxonomy, intent_family, 'allowed_actor_selection', actor))}]")
 
             target_counts = count_by(actor_samples, lambda sample: get_general_path(sample)[2])
-            for target in taxonomy.get("general_valid_matrix", {}).get(topic, {}).get("allowed_target_selection", {}).keys():
+            for target in taxonomy.get("general_valid_matrix", {}).get(intent_family, {}).get("allowed_target_selection", {}).keys():
                 target_samples = [sample for sample in actor_samples if get_general_path(sample)[2] == target]
                 target_count = target_counts.get(target, 0)
                 if target_count == 0:
-                    lines.append(f"    {target} [{format_ratio(0, actor_count, get_matrix_target(taxonomy, topic, 'allowed_target_selection', target))}]")
+                    lines.append(f"    {target} [{format_ratio(0, actor_count, get_matrix_target(taxonomy, intent_family, 'allowed_target_selection', target))}]")
                     continue
-                lines.append(f"    {target} [{format_ratio(target_count, actor_count, get_matrix_target(taxonomy, topic, 'allowed_target_selection', target))}]")
+                lines.append(f"    {target} [{format_ratio(target_count, actor_count, get_matrix_target(taxonomy, intent_family, 'allowed_target_selection', target))}]")
 
                 action_counts = count_by(target_samples, lambda sample: get_general_path(sample)[3])
-                for action in taxonomy.get("general_valid_matrix", {}).get(topic, {}).get("allowed_action_pattern", {}).keys():
+                for action in taxonomy.get("general_valid_matrix", {}).get(intent_family, {}).get("allowed_action_pattern", {}).keys():
                     action_samples = [sample for sample in target_samples if get_general_path(sample)[3] == action]
                     action_count = action_counts.get(action, 0)
                     if action_count == 0:
                         continue
-                    lines.append(f"      {action} [{format_ratio(action_count, target_count, get_matrix_target(taxonomy, topic, 'allowed_action_pattern', action))}]")
+                    lines.append(f"      {action} [{format_ratio(action_count, target_count, get_matrix_target(taxonomy, intent_family, 'allowed_action_pattern', action))}]")
 
                     scenario_counts = count_by(action_samples, lambda sample: get_general_path(sample)[4])
-                    for scenario in taxonomy.get("general_valid_matrix", {}).get(topic, {}).get("allowed_scenario_family", {}).keys():
+                    for scenario in taxonomy.get("general_valid_matrix", {}).get(intent_family, {}).get("allowed_scenario_family", {}).keys():
                         scenario_samples = [sample for sample in action_samples if get_general_path(sample)[4] == scenario]
                         scenario_count = scenario_counts.get(scenario, 0)
                         if scenario_count == 0:
                             continue
-                        lines.append(f"        {scenario} [{format_ratio(scenario_count, action_count, get_matrix_target(taxonomy, topic, 'allowed_scenario_family', scenario))}]")
+                        lines.append(f"        {scenario} [{format_ratio(scenario_count, action_count, get_matrix_target(taxonomy, intent_family, 'allowed_scenario_family', scenario))}]")
 
                         matching_rows = []
                         for key, grouped_samples in groups.items():
-                            key_topic, key_actor, key_target, key_action, key_scenario, command_text, edge_flags = key
+                            key_intent_family, key_actor, key_target, key_action, key_scenario, command_text, edge_flags = key
                             if (
-                                key_topic == topic
+                                key_intent_family == intent_family
                                 and key_actor == actor
                                 and key_target == target
                                 and key_action == action
@@ -361,7 +361,7 @@ def render_summary(samples: list[dict[str, Any]], taxonomy: dict[str, Any]) -> s
         lines.append("")
 
     global_targets = taxonomy.get("global_targets", {})
-    table("Topic", count_by(samples, lambda sample: get_general_path(sample)[0]), global_targets.get("topic", {}), total)
+    table("intent_family", count_by(samples, lambda sample: get_general_path(sample)[0]), global_targets.get("intent_family", {}), total)
     table("Actor Selection", count_by(samples, lambda sample: get_general_path(sample)[1]), global_targets.get("actor_selection", {}), total)
     table("Target Selection", count_by(samples, lambda sample: get_general_path(sample)[2]), global_targets.get("target_selection", {}), total)
     table("Action Pattern", count_by(samples, lambda sample: get_general_path(sample)[3]), global_targets.get("action_pattern", {}), total)
@@ -409,8 +409,8 @@ def render_taxonomy_sot(taxonomy: dict[str, Any]) -> str:
         lines.append("")
 
     lines.extend(["## General Valid Matrix", ""])
-    for topic, matrix in taxonomy.get("general_valid_matrix", {}).items():
-        lines.append(f"### {topic}")
+    for intent_family, matrix in taxonomy.get("general_valid_matrix", {}).items():
+        lines.append(f"### {intent_family}")
         lines.append("")
         for key in ["allowed_actor_selection", "allowed_target_selection", "allowed_action_pattern", "allowed_scenario_family"]:
             lines.append(f"- {key}")

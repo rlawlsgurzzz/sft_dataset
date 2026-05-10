@@ -1,6 +1,6 @@
 # Coverage Summary
 
-## Topic
+## intent_family
 
 | key | current_ratio | target_ratio | count |
 |---|---:|---:|---:|
