@@ -9,7 +9,7 @@
       "skill_fields": ["skillDescription", "IsSkillOnSelf", "IsSkillOnAlly", "isSkillAoe", "canSkillTargetDead"]
     },
     "global_targets": {
-      "topic": {
+      "intent_family": {
         "attack": 24,
         "move": 22,
         "skill": 26,
@@ -63,7 +63,7 @@
       }
     },
     "descriptions": {
-      "topic": {
+      "intent_family": {
         "attack": "기본 공격 또는 공격 중심 명령이다.",
         "move": "위치 이동, 후퇴, 접근, 지원, 전열 유지 명령이다.",
         "skill": "skill action을 사용하는 명령이다.",
@@ -255,7 +255,7 @@
       }
     },
     "orders": {
-      "topic": ["attack", "move", "skill", "skillControl", "wait", "empty"],
+      "intent_family": ["attack", "move", "skill", "skillControl", "wait", "empty"],
       "actor_selection": ["explicit_actor", "explicit_multi_actor", "global_condition", "global_role_based", "global_state_based", "no_valid_actor"],
       "target_selection": ["explicit_enemy_target", "explicit_ally_target", "nearest_enemy", "lowest_hp_enemy", "highest_threat_enemy", "role_based_enemy", "pressure_source_enemy", "safe_ally", "low_hp_ally", "backline_ally", "invalid_explicit_target", "none"],
       "action_pattern": ["attack_only", "move_only", "move_then_attack", "skill_only", "move_then_skill", "wait_only", "wait_then_attack", "wait_then_skill", "skillControl_defer", "skillControl_forbid", "multi_actor_same_target", "multi_actor_different_targets", "empty_action_expected"],

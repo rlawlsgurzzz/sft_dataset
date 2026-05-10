@@ -1,0 +1,40 @@
+{
+  "request": {
+    "raw_request": "c1-1-1-1-1-1.1",
+    "count_to_generate": 1,
+    "display_path": "1-1-1-1-1-1",
+    "stable_path": "attack.explicit_actor.explicit_enemy_target.attack_only.simple_clear_target",
+    "skill_stable_path": null,
+    "command_slot_index": 1,
+    "base_command_text": "A_01, E_02를 공격해."
+  },
+  "selected_bucket": {
+    "intent_family": "attack",
+    "intent_family_description": "기본 공격 또는 공격 중심 명령이다.",
+    "actor_selection": "explicit_actor",
+    "actor_selection_description": "명령에 단일 아군 actor가 직접 지목된다.",
+    "target_selection": "explicit_enemy_target",
+    "target_selection_description": "명령에 적 unitId가 직접 지목된다.",
+    "action_pattern": "attack_only",
+    "action_pattern_description": "정답 output이 attack action만 가진다.",
+    "scenario_family": "simple_clear_target",
+    "scenario_family_description": "명시 actor와 명시 target이 모두 유효한 단순 공격 상황이다.",
+    "edge_flags": [],
+    "edge_flag_descriptions": {},
+    "skill_case": null
+  },
+  "existing_valid_paraphrase_samples": [
+    {
+      "command_text": "A_01, E_02를 공격해.",
+      "command_style": "direct_korean"
+    }
+  ],
+  "count_to_generate": 1,
+  "generation_constraints": [
+    "Create new paraphrased commands and matching dataset samples for the selected_bucket only.",
+    "Preserve the same scenario meaning and edge_flags as selected_bucket.",
+    "Do not include source_ref in generated samples.",
+    "Do not invent taxonomy values outside selected_bucket.",
+    "Generated output labels must be raw valid assistant outputs, not sanitizer-repaired outputs."
+  ]
+}

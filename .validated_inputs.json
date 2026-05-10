@@ -1,0 +1,22 @@
+{
+  "validated_inputs": {
+    "dca4ba5c95ca9ec4b0220eaeba756fb4d7c043b39deba178f48cf582394c2b86": {
+      "input_path": "raw_generations\\seed_0001_raw.jsonl",
+      "input_hash": "dca4ba5c95ca9ec4b0220eaeba756fb4d7c043b39deba178f48cf582394c2b86",
+      "skipped": false,
+      "accepted_count": 10,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260511_022316.jsonl",
+      "rejected_path": null
+    },
+    "7354b8380e0938606c5b09466a9d559baff0a9461cd5a2f01b1908f493140024": {
+      "input_path": "raw_generations\\batch_0001_raw.jsonl",
+      "input_hash": "7354b8380e0938606c5b09466a9d559baff0a9461cd5a2f01b1908f493140024",
+      "skipped": false,
+      "accepted_count": 0,
+      "rejected_count": 1,
+      "accepted_path": null,
+      "rejected_path": "D:\\sftgit\\sft_dataset\\rejected\\rejected_20260511_025418.jsonl"
+    }
+  }
+}

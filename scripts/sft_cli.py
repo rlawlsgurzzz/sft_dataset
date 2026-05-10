@@ -170,6 +170,7 @@ def run_generate(args: argparse.Namespace) -> None:
         model_name=args.model,
         max_tokens=args.max_tokens,
         print_json=args.print_json,
+        stream_output=args.stream_output,
     )
 
     print(json.dumps(result, ensure_ascii=False, indent=2))
@@ -227,6 +228,11 @@ def build_parser() -> argparse.ArgumentParser:
     generate_parser.add_argument("--model", default=DEFAULT_TEACHER_MODEL)
     generate_parser.add_argument("--max-tokens", type=int, default=12000)
     generate_parser.add_argument("--print-json", action="store_true")
+    generate_parser.add_argument(
+        "--stream-output",
+        action="store_true",
+        help="Print teacher response chunks while generating.",
+    )
     generate_parser.set_defaults(func=run_generate)
 
     validate_parser = subparsers.add_parser(

@@ -47,20 +47,80 @@ validator_result는 만들지 않는다.
 taxonomy 밖 값을 만들지 않는다.
 output은 sanitizer가 고친 결과가 아니라, 처음부터 raw valid label이어야 한다.
 
-가능하면 다음 구조로 출력한다:
+아래 예시는 schema shape만 보여주는 최소 예시다.
+이 예시의 command_text, unitId, metadata 값, 전장 상황, output 의미를 복사하지 않는다.
+실제 생성값은 반드시 user payload의 selected_bucket, existing_valid_paraphrase_samples, count_to_generate를 따른다.
+
+schema shape example:
 {
-  "samples": [
-    {
-      "id": "...",
-      "split": "train",
-      "command_spec": {},
-      "metadata": {},
-      "skill_case": null,
-      "gold": {},
-      "input": {},
-      "output": {}
+  "id": "sample_example_0001",
+  "split": "train",
+  "command_spec": {
+    "command_text": "A_01, E_02를 공격해.",
+    "base_command_text": "A_01, E_02를 공격해."
+  },
+  "metadata": {
+    "intent_family": "attack",
+    "command_style": "direct_korean",
+    "actor_selection": "explicit_actor",
+    "target_selection": "explicit_enemy_target",
+    "action_pattern": "attack_only",
+    "scenario_family": "simple_clear_target",
+    "edge_flags": []
+  },
+  "skill_case": null,
+  "gold": {
+    "required_actors": ["A_01"],
+    "allowed_actors": ["A_01"],
+    "required_action_types": ["attack"],
+    "allowed_action_types": ["attack"],
+    "empty_action_allowed": false,
+    "expected_action_pattern": "attack_only",
+    "targets": {
+      "required": ["E_02"],
+      "allowed": ["E_02"],
+      "forbidden": []
     }
-  ]
+  },
+  "input": {
+    "input": {
+      "command": "A_01, E_02를 공격해.",
+      "area_situation": {
+        "allies": [],
+        "enemies": []
+      }
+    },
+    "commandAnalysis": {
+      "allowedActors": ["A_01"],
+      "allowedAttackTargets": ["E_02"],
+      "validMoveToUnits": [],
+      "invalidUnits": [],
+      "actionPolicy": {
+        "maxActionsPerActor": 3,
+        "sanitizerMode": "drop_invalid_runtime_actions_only"
+      }
+    }
+  },
+  "output": {
+    "thinking": "A_01이 유효한 적 E_02를 공격한다.",
+    "dialog": [
+      {
+        "unitId": "A_01",
+        "text": "E_02를 공격한다."
+      }
+    ],
+    "action": [
+      {
+        "unitId": "A_01",
+        "sequence": [
+          {
+            "type": "attack",
+            "target": "E_02"
+          }
+        ]
+      }
+    ]
+  }
 }
 
 한국어 명령에서 콤마와 unitId 나열만 보고 actor/target을 기계적으로 판단하지 않는다.
@@ -101,7 +161,7 @@ def load_json(path: Path) -> dict[str, Any]:
     return data
 
 
-def extract_stream_text(stream: Any) -> str:
+def extract_stream_text(stream: Any, stream_output: bool = False) -> str:
     chunks: list[str] = []
 
     for event in stream:
@@ -117,15 +177,31 @@ def extract_stream_text(stream: Any) -> str:
         if content:
             chunks.append(content)
 
+            if stream_output:
+                print(content, end="", flush=True)
+
+    if stream_output:
+        print()
+
     return "".join(chunks)
 
 
-def call_together(user_payload: dict[str, Any], model_name: str, max_tokens: int) -> str:
+def call_together(
+    user_payload: dict[str, Any],
+    model_name: str,
+    max_tokens: int,
+    stream_output: bool = False,
+) -> str:
     api_key = os.environ.get("TOGETHER_API_KEY")
     if not api_key:
         raise RuntimeError("TOGETHER_API_KEY environment variable is not set.")
 
     client = Together(api_key=api_key)
+
+    if stream_output:
+        print("generating with stream output...", flush=True)
+    else:
+        print("generating...", flush=True)
 
     stream = client.chat.completions.create(
         model=model_name,
@@ -145,9 +221,11 @@ def call_together(user_payload: dict[str, Any], model_name: str, max_tokens: int
         stream=True,
     )
 
-    text = extract_stream_text(stream).strip()
+    text = extract_stream_text(stream, stream_output=stream_output).strip()
     if not text:
         raise RuntimeError("Teacher response is empty.")
+
+    print("generation complete", flush=True)
 
     return text
 
@@ -197,7 +275,9 @@ def normalize_samples(parsed: Any) -> list[dict[str, Any]]:
     elif isinstance(parsed, dict):
         samples = [parsed]
     else:
-        raise ValueError("Teacher JSON root must be object, array, or object with samples.")
+        raise ValueError(
+            "Teacher JSON root must be object, array, or object with samples."
+        )
 
     normalized: list[dict[str, Any]] = []
     for index, sample in enumerate(samples, start=1):
@@ -216,7 +296,9 @@ def append_jsonl(path: Path, records: list[dict[str, Any]]) -> None:
 
     with path.open("a", encoding="utf-8", newline="\n") as file:
         for record in records:
-            file.write(json.dumps(record, ensure_ascii=False, separators=(",", ":")) + "\n")
+            file.write(
+                json.dumps(record, ensure_ascii=False, separators=(",", ":")) + "\n"
+            )
 
 
 def run_teacher_generation(
@@ -226,6 +308,7 @@ def run_teacher_generation(
     model_name: str = MODEL_NAME,
     max_tokens: int = 12000,
     print_json: bool = False,
+    stream_output: bool = False,
 ) -> dict[str, Any]:
     payload = load_json(input_path)
 
@@ -233,6 +316,7 @@ def run_teacher_generation(
         user_payload=payload,
         model_name=model_name,
         max_tokens=max_tokens,
+        stream_output=stream_output,
     )
 
     parsed = parse_teacher_json(raw_response)
@@ -294,6 +378,11 @@ def main() -> None:
         action="store_true",
         help="Print parsed samples.",
     )
+    parser.add_argument(
+        "--stream-output",
+        action="store_true",
+        help="Print teacher response chunks while generating.",
+    )
 
     args = parser.parse_args()
 
@@ -304,6 +393,7 @@ def main() -> None:
         model_name=args.model,
         max_tokens=args.max_tokens,
         print_json=args.print_json,
+        stream_output=args.stream_output,
     )
 
     print(json.dumps(result, ensure_ascii=False, indent=2))
