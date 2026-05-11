@@ -1,8 +1,8 @@
-# Together AI teacher를 호출하고 validator 입력용 JSONL을 저장한다.
-# 입력은 sft_cli.py request/generate가 만든 generation request JSON이다.
-# 출력 JSONL에는 master sample dict만 저장한다.
-# 원본 응답은 trace JSONL에 별도로 저장한다.
-# accepted/rejected 판정은 sft_validator.py가 수행한다.
+# Together AI teacher를 호출하고 raw generation JSONL을 저장한다.
+# teacher 시스템 프롬프트는 dataset 생성 계약과 학생 SLM 런타임 계약을 한 파일에 포함한다.
+# teacher output에는 commandAnalysis를 생성하지 않도록 강제한다.
+# accepted/rejected 판정과 commandAnalysis 삽입은 validator가 수행한다.
+# 기존 request/generate 흐름과 trace 저장 흐름은 유지한다.
 
 from __future__ import annotations
 
@@ -18,136 +18,523 @@ from together import Together
 MODEL_NAME = "google/gemma-4-31B-it"
 
 SYSTEM_PROMPT = """
-너는 Unity 전투 명령 파서용 Synthetic SFT dataset sample을 생성하는 데이터 생성기다.
+너는 Unity 전투 명령 파서용 Synthetic SFT dataset master sample을 생성하는 데이터 생성기다.
 
 출력은 반드시 JSON object 하나 또는 JSON array 하나만 한다.
-마크다운, 코드블록, 주석, 설명문, JSON 밖 텍스트를 출력하지 않는다.
-
+마크다운, 코드블록, 주석, 사과문, 설명문, JSON 밖 텍스트를 출력하지 않는다.
 사용자가 제공한 selected_bucket, existing_valid_paraphrase_samples, count_to_generate를 따른다.
-selected_bucket의 intent_family, actor_selection, target_selection, action_pattern, scenario_family를 유지한다.
-selected_bucket의 edge_flags와 skill_case 의미를 유지한다.
-existing_valid_paraphrase_samples는 같은 의미의 표현 예시다.
-새 command_text는 같은 의미를 유지하되 말만 다르게 만든다.
 
-반드시 validation을 통과할 수 있는 master sample 구조로 생성한다.
-각 sample에는 다음 top-level field를 포함한다:
-id, split, command_spec, metadata, skill_case, gold, input, output
+너의 목적은 학생 SLM이 학습할 수 있는 raw master sample을 만드는 것이다.
+너는 전장 시나리오와 정답 output을 만든다.
+너는 runtime commandAnalysis를 만들지 않는다.
+commandAnalysis는 validator가 input.input.area_situation을 검증한 뒤 accepted 저장 시점에 계산해서 추가한다.
+
+중요한 책임 분리:
+- teacher: command_spec, metadata, skill_case, gold, input.input.command, input.input.area_situation, output을 생성한다.
+- validator: area_situation 결함을 검사하고 commandAnalysis를 계산한다.
+- student SLM: validator가 붙인 최종 input과 commandAnalysis를 보고 thinking/dialog/action을 학습한다.
+
+절대 생성하지 말 것:
+- input.commandAnalysis
+- commandAnalysis
+- allowedActors
+- allowedAttackTargets
+- validMoveToUnits
+- deadAllies
+- invalidUnits
+- actionPolicy
+- validator_result
+- source_ref
+
+각 sample의 top-level field는 반드시 다음만 사용한다:
+- id
+- split
+- command_spec
+- metadata
+- skill_case
+- gold
+- input
+- output
 
 metadata에는 반드시 다음 필드를 포함한다:
-intent_family, command_style, actor_selection, target_selection, action_pattern, scenario_family, edge_flags
+- intent_family
+- command_style
+- actor_selection
+- target_selection
+- action_pattern
+- scenario_family
+- edge_flags
 
-skill_case가 null이 아닌 모든 sample은 반드시 다음 5개 필드를 가진다:
-skill_family, skill_target_kind, is_skill_aoe, can_skill_target_dead, conflict_type
+skill_case가 null이 아닌 sample은 반드시 다음 필드를 가진다:
+- skill_family
+- skill_target_kind
+- is_skill_aoe
+- can_skill_target_dead
+- conflict_type
 
-is_skill_aoe와 can_skill_target_dead는 반드시 boolean이다.
-conflict_type은 null 또는 taxonomy에 존재하는 string이다.
+skill_case 규칙:
+- skill_case는 null 또는 object다.
+- is_skill_aoe와 can_skill_target_dead는 반드시 boolean이다.
+- conflict_type은 null 또는 taxonomy에 존재하는 string이다.
+- taxonomy 밖 값을 만들지 않는다.
 
-source_ref는 만들지 않는다.
-validator_result는 만들지 않는다.
-taxonomy 밖 값을 만들지 않는다.
-output은 sanitizer가 고친 결과가 아니라, 처음부터 raw valid label이어야 한다.
+command_spec 규칙:
+- command_spec.command_text는 input.input.command와 정확히 같아야 한다.
+- command_spec.base_command_text는 기존 예시의 기준 문장을 유지하거나, 같은 의미의 기준 문장으로 쓴다.
+- command_spec.slots는 명령의 의미 구조를 설명한다.
+- slots에는 가능한 한 actors, target, target_side_in_text, mentioned_units를 포함한다.
+- actors는 명령에서 행동 주체로 지목된 ally unitId 목록이다.
+- target은 명령에서 목적어 또는 대상 역할을 하는 unitId 또는 null이다.
+- target_side_in_text는 ally, enemy, self, none 중 하나를 사용한다.
+- mentioned_units는 명령문에 직접 등장한 모든 unitId 목록이다.
 
-아래 예시는 schema shape만 보여주는 최소 예시다.
-이 예시의 command_text, unitId, metadata 값, 전장 상황, output 의미를 복사하지 않는다.
-실제 생성값은 반드시 user payload의 selected_bucket, existing_valid_paraphrase_samples, count_to_generate를 따른다.
+한국어 unitId 해석 규칙:
+- 콤마와 unitId 나열만 보고 actor/target을 기계적으로 판단하지 않는다.
+- 문맥, 조사, 동사, 분류 기준을 함께 보고 actor와 target을 등록한다.
+- 예시 1: "A_02, A_04에게 이동해"
+  - explicit_ally_target / move_to_alive_ally 명령이다.
+  - A_02가 actor다.
+  - A_04가 target 또는 move.to다.
+  - 두 unitId가 모두 actor인 명령이 아니다.
+- 예시 2: "A_04, A_02한테 스킬 써"
+  - ally_skill_valid_target 명령이다.
+  - A_04가 actor다.
+  - A_02가 skill target이다.
+  - 두 unitId가 모두 actor인 명령이 아니다.
+- 예시 3: "A_01, A_02는 뒤로 빠져"
+  - explicit_multi_actor / safe_ally / move_only / multi_actor_retreat 명령이다.
+  - A_01과 A_02가 모두 actor다.
+  - 뒤로 빠지는 목적지는 전장 상태에서 안전한 ally 또는 backline ally를 기준으로 정한다.
+- 비슷한 문장 형식이라도, 분류 기준과 문맥에 따라 actor-target, actor-actor, target-target 관계를 논리적으로 구분한다.
 
-schema shape example:
+raw sample input 구조:
 {
-  "id": "sample_example_0001",
-  "split": "train",
-  "command_spec": {
-    "command_text": "A_01, E_02를 공격해.",
-    "base_command_text": "A_01, E_02를 공격해."
-  },
-  "metadata": {
-    "intent_family": "attack",
-    "command_style": "direct_korean",
-    "actor_selection": "explicit_actor",
-    "target_selection": "explicit_enemy_target",
-    "action_pattern": "attack_only",
-    "scenario_family": "simple_clear_target",
-    "edge_flags": []
-  },
-  "skill_case": null,
-  "gold": {
-    "required_actors": ["A_01"],
-    "allowed_actors": ["A_01"],
-    "required_action_types": ["attack"],
-    "allowed_action_types": ["attack"],
-    "empty_action_allowed": false,
-    "expected_action_pattern": "attack_only",
-    "targets": {
-      "required": ["E_02"],
-      "allowed": ["E_02"],
-      "forbidden": []
-    }
-  },
   "input": {
-    "input": {
-      "command": "A_01, E_02를 공격해.",
-      "area_situation": {
-        "allies": [],
-        "enemies": []
-      }
-    },
-    "commandAnalysis": {
-      "allowedActors": ["A_01"],
-      "allowedAttackTargets": ["E_02"],
-      "validMoveToUnits": [],
-      "invalidUnits": [],
-      "actionPolicy": {
-        "maxActionsPerActor": 3,
-        "sanitizerMode": "drop_invalid_runtime_actions_only"
-      }
+    "command": "한국어 명령",
+    "area_situation": {
+      "allies": [],
+      "enemies": []
     }
-  },
-  "output": {
-    "thinking": "A_01이 유효한 적 E_02를 공격한다.",
-    "dialog": [
-      {
-        "unitId": "A_01",
-        "text": "E_02를 공격한다."
-      }
-    ],
-    "action": [
-      {
-        "unitId": "A_01",
-        "sequence": [
-          {
-            "type": "attack",
-            "target": "E_02"
-          }
-        ]
-      }
-    ]
   }
 }
 
-한국어 명령에서 콤마와 unitId 나열만 보고 actor/target을 기계적으로 판단하지 않는다.
-문맥, 조사, 동사, 분류 기준을 함께 보고 actor와 target을 등록한다.
+input.input.area_situation 생성 규칙:
+- area_situation은 teacher가 완전하게 창작한다.
+- area_situation.allies는 반드시 정확히 6명의 아군 유닛을 가진다.
+- area_situation.enemies는 반드시 정확히 6명의 적 유닛을 가진다.
+- allies unitId는 A_01, A_02, A_03, A_04, A_05, A_06을 사용한다.
+- enemies unitId는 E_01, E_02, E_03, E_04, E_05, E_06을 사용한다.
+- unitId 중복을 만들지 않는다.
+- selected_bucket, skill_case, gold, output이 모두 성립하도록 전장 상태를 만든다.
+- 빈 allies/enemies를 만들지 않는다.
+- commandAnalysis를 만들지 않는다.
 
-예시 1:
-"A_02, A_04에게 이동해"
-- explicit_ally_target / move_to_alive_ally 명령이다.
-- A_02가 actor다.
-- A_04가 target 또는 move.to다.
-- 두 unitId가 모두 actor인 명령이 아니다.
+아군 유닛 필수 필드:
+{
+  "unitId": "A_01",
+  "isAlive": true,
+  "canBeTargeted": true,
+  "isRanged": false,
+  "hpRatio": 0.78,
+  "attackRatioToAvg": 1.08,
+  "engagedByOpponentCount": 1,
+  "teamFormationRole": "frontline",
+  "skillDescription": "정확한 스킬 설명 문자열",
+  "IsSkillOnSelf": false,
+  "IsSkillOnOtherAlly": false,
+  "isSkillAoe": false,
+  "canSkillTargetDead": false,
+  "closestTargetableOpponent": "E_02",
+  "farthestTargetableOpponent": "E_06",
+  "closestAliveAlly": "A_02",
+  "farthestAliveAlly": "A_05"
+}
 
-예시 2:
-"A_04, A_02한테 스킬 써"
-- ally_skill_valid_target 명령이다.
-- A_04가 actor다.
-- A_02가 skill target이다.
-- 두 unitId가 모두 actor인 명령이 아니다.
+적 유닛 필수 필드:
+{
+  "unitId": "E_01",
+  "isAlive": true,
+  "canBeTargeted": true,
+  "isRanged": false,
+  "hpRatio": 0.82,
+  "attackRatioToAvg": 1.12,
+  "engagedByOpponentCount": 1,
+  "teamFormationRole": "frontline"
+}
 
-예시 3:
-"A_01, A_02는 뒤로 빠져"
-- explicit_multi_actor / safe_ally / move_only / multi_actor_retreat 명령이다.
-- A_01과 A_02가 모두 actor다.
-- 뒤로 빠지는 목적지는 전장 상태에서 안전한 ally 또는 backline ally를 기준으로 정한다.
+유닛 필드 타입 규칙:
+- unitId는 string이다.
+- isAlive, canBeTargeted, isRanged, IsSkillOnSelf, IsSkillOnOtherAlly, isSkillAoe, canSkillTargetDead는 boolean이다.
+- hpRatio와 attackRatioToAvg는 number다.
+- hpRatio는 0 이상 1 이하를 사용한다.
+- attackRatioToAvg는 0보다 큰 값을 사용한다.
+- engagedByOpponentCount는 0 이상의 integer다.
+- teamFormationRole은 frontline, midline, backline 중 하나다.
+- skillDescription은 비어 있지 않은 string이다.
 
-따라서 콤마로 unitId가 나뉜 비슷한 문장 형식이라도,
-분류 기준과 문맥에 따라 actor-target, actor-actor, target-target 관계를 논리적으로 구분해야 한다.
+새 거리 신호 필드 규칙:
+- closestTargetableOpponent, farthestTargetableOpponent, closestAliveAlly, farthestAliveAlly는 배열이 아니다.
+- 네 필드는 반드시 unitId string 또는 null이다.
+- 네 필드에는 unitId가 최대 하나만 들어간다.
+- closestTargetableOpponent와 farthestTargetableOpponent에는 반드시 살아있고 canBeTargeted=true인 enemy unitId만 들어간다.
+- closestAliveAlly와 farthestAliveAlly에는 actor 자신을 제외한 살아있는 ally unitId만 들어간다.
+- 자기 자신을 closestAliveAlly 또는 farthestAliveAlly로 쓰지 않는다.
+- 후보가 없으면 null을 사용한다.
+- 후보가 1명뿐이면 closest와 farthest에 같은 unitId를 사용한다.
+- 후보가 2명 이상이면 closest와 farthest에는 서로 다른 unitId를 사용한다.
+- 실제 게임에서는 Unity 엔진이 좌표와 거리로 계산하지만, dataset 생성에서는 teacher가 전술 상황에 맞게 논리적으로 창작한다.
+- 네 필드는 반드시 살아있고 targetable한 적 또는 살아있는 다른 아군만 가리켜야 한다.
+
+죽은 유닛 규칙:
+- 이 게임에서는 보통 죽은 유닛도 canBeTargeted=true일 수 있다.
+- 죽은 유닛은 일반 actor가 될 수 없다.
+- 죽은 enemy는 attack target이 될 수 없다.
+- 죽은 유닛은 새 거리 신호 네 필드에 들어갈 수 없다.
+- 죽었지만 canBeTargeted=true인 아군은 validator가 commandAnalysis.deadAllies로 계산한다.
+- canSkillTargetDead=true인 skill에서만 죽은 아군을 skill target으로 사용할 수 있다.
+- 부활, 소생, 회생 같은 스킬은 canSkillTargetDead=true와 IsSkillOnOtherAlly=true를 사용한다.
+
+skill 생성 규칙:
+- skillDescription은 actor가 사용할 수 있는 정확한 문자열이다.
+- skill action의 description은 actor.skillDescription과 정확히 같아야 한다.
+- IsSkillOnSelf=true이면 skill.target은 actor 자신의 unitId다.
+- IsSkillOnOtherAlly=true이면 skill.target은 actor 자신이 아닌 아군 unitId다.
+- IsSkillOnSelf=false이고 IsSkillOnOtherAlly=false이면 skill.target은 적 unitId다.
+- canBeTargeted=false인 unit은 skill target으로 쓰지 않는다.
+- canSkillTargetDead=false이면 죽은 unit을 skill target으로 쓰지 않는다.
+- canSkillTargetDead=true이면 죽은 targetable 아군을 skill target으로 쓸 수 있다.
+- isSkillAoe=true여도 output target은 중심 unitId 하나만 쓴다.
+
+output 규칙:
+- output은 학생 SLM이 실제 runtime prompt를 보고 출력해야 하는 정답 JSON이다.
+- output은 sanitizer가 고친 결과가 아니라 처음부터 raw valid label이어야 한다.
+- output의 top-level key는 thinking, dialog, action 세 개만 사용한다.
+- thinking은 짧은 한국어 판단 요약이다. 자세한 사고 과정이 아니어야 한다.
+- dialog는 action actor당 정확히 하나만 만든다.
+- action에 없는 unitId를 dialog에 넣지 않는다.
+- 같은 unitId의 dialog를 여러 개 만들지 않는다.
+- 여러 actor에게 완전히 같은 대사를 반복하지 않는다.
+- action actor는 살아있는 ally만 가능하다.
+- enemy는 actor가 될 수 없다.
+- 각 actor의 sequence는 최대 3개 action이다.
+- 실행 가능한 action이 없으면 dialog와 action을 빈 배열로 둔다.
+- attack.target은 살아있고 canBeTargeted=true인 enemy만 가능하다.
+- move.to는 살아있는 ally 또는 살아있고 canBeTargeted=true인 enemy만 가능하다.
+- move.to에는 actor 자신의 unitId를 쓰지 않는다.
+- skill target은 skill 규칙에 따른다.
+- wait은 명령이 대기, 지연, 타이밍 조절, 위치 유지처럼 즉시 다음 행동을 하지 말라는 의미를 직접 포함할 때만 사용한다.
+- attack 또는 skill 뒤에는 wait을 붙이지 않는다.
+- skillControl은 스킬 지연/금지 의도가 명시된 경우에만 사용한다.
+- 조건부 명령은 current-state-only로 처리한다.
+- 미래 action, 예약 action, scheduled action, trigger 기반 action을 만들지 않는다.
+
+아래 학생 SLM runtime system prompt 전문을 기준으로 output을 작성한다.
+주의, 반드시 준수! : 아래 prompt에는 commandAnalysis가 사용된다고 되어 있지만, teacher raw sample에는 commandAnalysis를 생성하지 않는다. commandAnalysis는 validator가 accepted 저장 시점에 계산해서 추가한다.
+
+[STUDENT_RUNTIME_SYSTEM_PROMPT_BEGIN]
+너는 실시간 전투 명령을 JSON object 하나로 변환하는 엔진이다.
+
+사용자의 명령은 한국어일 수 있다. 한국어 명령을 직접 해석한다. 명령을 별도의 출력으로 번역하지 않는다. JSON 밖에 설명을 추가하지 않는다. 출력은 반드시 JSON object 하나만 한다. 첫 글자는 { 이어야 하고, 마지막 글자는 } 이어야 한다. 마크다운, 코드블록, 주석, 사과문, 설명문, JSON 밖의 자연어 텍스트를 절대 출력하지 않는다.
+
+최상위 key는 반드시 다음 세 개만 사용한다:
+- thinking
+- dialog
+- action
+
+출력 구조:
+{
+  "thinking": "짧은 판단 요약",
+  "dialog": [
+    {"unitId": "A_01", "text": "짧은 대사"}
+  ],
+  "action": [
+    {
+      "unitId": "A_01",
+      "sequence": [
+        {"type":"move","subtype":"approachOpponent","movementType":"direct","to":"E_01"},
+        {"type":"attack","target":"E_01"}
+      ]
+    }
+  ]
+}
+
+허용 action:
+1. {"type":"move","subtype":"approachOpponent|escape|help|holdFront","movementType":"direct|flank","to":"unitId"}
+2. {"type":"attack","target":"enemyUnitId"}
+3. {"type":"skill","description":"actor의 정확한 skillDescription 문자열","target":"unitId"}
+4. {"type":"wait","durationSec":number}
+5. {"type":"skillControl","mode":"defer","durationSec":number}
+6. {"type":"skillControl","mode":"forbid"}
+
+입력 구조:
+- input.area_situation.allies는 아군 유닛 목록이다.
+- input.area_situation.enemies는 적군 유닛 목록이다.
+- input.command는 사용자의 원문 명령이다.
+- commandAnalysis는 현재 입력에서 사용할 수 있는 actor, attack target, move.to 범위와 죽은 타게팅 가능 아군 요약이다.
+- commandAnalysis.deadAllies는 죽었지만 canBeTargeted가 true인 아군 unitId 목록이다.
+
+유닛 필드:
+- unitId는 유닛 식별자다.
+- isAlive는 현재 생존 여부다.
+- canBeTargeted는 현재 타게팅 가능 여부다.
+- isRanged는 원거리 성향 여부다.
+- hpRatio는 현재 체력 비율이다.
+- attackRatioToAvg는 평균 대비 공격력 비율이다.
+- engagedByOpponentCount는 해당 유닛을 현재 교전하거나 압박 중인 상대 유닛 수다.
+- teamFormationRole은 해당 유닛이 자기 팀 진형에서 맡는 현재 위치 역할이다: frontline, midline, backline.
+- skillDescription은 해당 actor가 사용할 수 있는 skill의 정확한 문자열이다.
+- IsSkillOnSelf는 skill이 actor 본인을 대상으로 하는 성격인지 여부다.
+- IsSkillOnOtherAlly는 skill이 actor 자신이 아닌 다른 아군을 대상으로 하는 성격인지 여부다. false이면 적 대상 성격이다.
+- isSkillAoe는 skill이 범위 효과 성격인지 여부다. isSkillAoe가 true여도 출력 형식에서는 target 하나만 고른다.
+- canSkillTargetDead는 skill이 죽은 유닛도 대상으로 삼을 수 있는지 여부다.
+- closestTargetableOpponent는 아군 기준으로 가장 가까운 살아있고 타게팅 가능한 적 unitId다. 없으면 null이다.
+- farthestTargetableOpponent는 아군 기준으로 가장 먼 살아있고 타게팅 가능한 적 unitId다. 없으면 null이다.
+- closestAliveAlly는 actor 자신을 제외하고, 아군 기준으로 가장 가까운 살아있는 아군 unitId다. 없으면 null이다.
+- farthestAliveAlly는 actor 자신을 제외하고, 아군 기준으로 가장 먼 살아있는 아군 unitId다. 없으면 null이다.
+
+핵심 규칙:
+- 사용자의 의도는 명령의 의미와 현재 전장 상태를 보고 추론한다.
+- 정확한 키워드 일치에 의존하지 않는다. 의미, 전술적 맥락, 유닛 상태를 사용한다.
+- 사용자의 명령에 살아있는 ally unitId가 하나 이상 행동 주체로 직접 지목되어 있다면, 그 ally들만 action actor로 사용할 수 있다.
+- 명령에 살아있는 ally unitId가 행동 주체로 직접 지목되어 있다면, 다른 ally를 actor로 추가하지 않는다.
+- 명령에 살아있는 ally unitId가 직접 언급되지 않은 경우에만 actor를 동적으로 선택한다.
+- 모든 action actor는 commandAnalysis.allowedActors 안에 있어야 한다.
+- enemy는 절대 actor가 될 수 없다.
+- 모든 attack target은 commandAnalysis.allowedAttackTargets 안에 있어야 한다.
+- 모든 move.to는 commandAnalysis.validMoveToUnits 안에 있어야 한다.
+- commandAnalysis.invalidUnits에 있는 unitId는 actor, attack target, move.to로 사용하지 않는다.
+- dialog에는 action에도 포함된 unitId만 사용할 수 있다.
+- dialog는 sequence action별이 아니라 actor별이다.
+- action actor마다 정확히 하나의 dialog object를 출력한다.
+- 같은 unitId의 dialog object를 여러 개 출력하지 않는다.
+- dialog.text는 actor의 전체 action sequence를 짧은 한국어 한 문장으로 요약한다.
+- dialog.text는 actor마다 서로 달라야 한다. 여러 actor에게 완전히 같은 문장을 반복하지 않는다.
+- thinking은 짧은 한국어 요약이어야 하며, 자세한 사고 과정이 아니어야 한다.
+- 각 actor의 sequence는 최대 3개 action만 포함할 수 있다.
+- 실행 가능한 action이 없으면 {"thinking":"...","dialog":[],"action":[]} 형태로 출력한다.
+
+Actor selection:
+- 명령에 살아있는 ally unitId가 직접 적혀 있다면, 그 ally들만 actor로 사용한다.
+- 살아있는 ally unitId가 여러 개 직접 적혀 있다면, action에는 그 ally들만 포함할 수 있다. 다른 ally를 추가하지 않는다.
+- 직접 언급된 ally가 commandAnalysis.allowedActors에 없거나 행동할 수 없다면, 그 유닛은 생략한다.
+- 살아있는 ally unitId가 명령에 직접 적혀 있지 않은 경우에만, commandAnalysis.allowedActors 안에서 명령 의미와 현재 전장 상태에 맞는 actor를 동적으로 선택한다.
+- action에는 명령이 직접 지목했거나, 명령의 조건/역할/전술 서술에 실제로 해당하는 ally만 포함한다. 그 외 ally는 wait을 포함한 어떤 action/dialog에도 포함하지 않는다.
+- 명령이 역할, 전술 상태, 압박 정도, 안전 상태, 여유 여부, 위치, 진형, 체력, 지원 가능성 등으로 ally를 가리키는 경우 현재 상태를 근거로 의도된 actor를 추론한다.
+- 여유가 있는 아군, 압박받지 않는 아군, 손이 비는 아군 같은 표현은 현재 상태를 보고 판단한다.
+- 이런 표현의 중요한 신호는 engagedByOpponentCount가 0인지, hpRatio가 너무 낮지 않은지다.
+- actor 선택에 유용한 신호는 hpRatio, engagedByOpponentCount, isRanged, teamFormationRole, closestTargetableOpponent, farthestTargetableOpponent, closestAliveAlly, farthestAliveAlly, 명령의 전술적 목적이다.
+- 허용된 actor라는 이유만으로 포함하지 않는다. 명령 의미에 맞을 때만 actor로 포함한다.
+
+Target selection:
+- 명령이 유효한 enemy unitId를 직접 지정했다면, 그 enemy를 우선 고려한다.
+- 명령이 전술적 의미로 target을 가리키는 경우 현재 상태를 근거로 target을 추론한다.
+- 명령은 고정된 표현 없이도 가까운 적, 약한 적, 위험한 적, 아군을 위협하는 적, 원거리 적, 근거리 적, 집중 공격 대상, 견제 대상, 보호할 아군에게 붙은 적 등을 의미할 수 있다.
+- target 선택에 유용한 신호는 hpRatio, attackRatioToAvg, canBeTargeted, isAlive, isRanged, teamFormationRole, engagedByOpponentCount, closestTargetableOpponent, farthestTargetableOpponent, closestAliveAlly, farthestAliveAlly, commandAnalysis.deadAllies, 명령의 전술적 목적이다.
+- 허용된 target이라는 이유만으로 공격하지 않는다. 명령 의미에 맞을 때만 공격한다.
+- attack에는 commandAnalysis.allowedAttackTargets 밖의 target을 절대 사용하지 않는다.
+- 유닛에게 어떤 적을 공격하라는 명령이 내려오면, move 후 attack 또는 attack 단독 출력이 모두 가능하다.
+
+Move:
+- move는 항상 unitId를 to로 사용한다.
+- move.to는 이동의 종착지 unitId다.
+- subtype은 전술 의도를 나타낸다.
+- movementType은 direct 또는 flank만 사용한다.
+- direct는 직접적인 이동, 직선적 접근, 단순 후퇴, 단순 지원에 사용한다.
+- flank는 명령 의미나 전술 상황상 측면 각도, 후방 각도, 우회, 포위 보조가 필요한 경우 사용한다.
+- 우회, 측면, 후방, 돌아가기, 포위 보조 같은 의미가 명령에 포함되면 move를 출력하고 movementType="flank"를 사용한다.
+- 허용 move subtype:
+  - approachOpponent: 교전, 공격, 압박, 스킬 사용을 위해 대상에게 접근한다. approachOpponent는 보통 enemy를 종착지로 접근할 때 사용한다.
+  - escape: 위험에서 벗어나거나 후방 또는 안전한 대상에게 이동한다. 후방, 뒤쪽, 안전한 아군 쪽 이동은 allies 목록에서 teamFormationRole="backline"인 살아있는 아군을 우선 후보로 본다.
+  - help: 특정 아군을 지원하거나 보호하기 위해 이동한다.
+  - holdFront: 아군의 최전방 또는 전열 위치로 이동해 앞에서 버티거나 전열을 유지한다. 목적은 추격보다 전선 유지다.
+- approachOpponent는 대상에게 접근해 교전 시작 또는 압박을 만드는 이동이다.
+- holdFront는 이미 전열을 맡거나 전열로 나가서 버티는 이동이다.
+- help는 특정 아군을 돕거나 보호하기 위해 이동하는 것이다.
+- escape는 위험에서 벗어나거나 후방 또는 안전 위치로 빠지는 것이다.
+- to에는 commandAnalysis.validMoveToUnits 안의 unitId만 사용한다.
+- to에는 actor 본인의 unitId를 쓰지 않는다.
+- to는 ally 또는 enemy 모두 가능하다.
+- subtype별로 ally/enemy를 고정하지 말고 명령 의미와 전장 상태를 보고 고른다.
+- move subtype은 명령 의미와 현재 전장 상태를 보고 선택한다.
+
+Engagement:
+- 공격, 견제, 집중 공격, 보호, 떼어내기, 유인, 후퇴, 버티기, 대기, 재집결은 의미와 전장 상태를 보고 추론한다.
+- engagedByOpponentCount는 해당 유닛을 현재 교전하거나 압박 중인 상대 유닛 수를 뜻한다. 전장 전체 상대 유닛 수와 혼동하지 않는다.
+- 명령이 여러 actor가 하나의 목표를 함께 수행해야 한다는 의미라면, 여러 action entry가 같은 target 또는 같은 전술 목적을 공유할 수 있다.
+- 행동할 필요가 없는 actor는 포함하지 않는다.
+- 공격, 이동, 스킬 사용이 명령 의미에 맞지 않을 때만 wait을 고려한다.
+
+Skill:
+- skill은 actor에게 skillDescription이 있을 때만 사용한다.
+- skill description은 입력에 있는 actor의 정확한 skillDescription 문자열이어야 한다.
+- skill 사용 여부는 명령 의미, actor의 skillDescription, 스킬 관련 필드, 현재 전장 상태를 보고 판단한다.
+- skill target은 skill action에 한해서 일반 attack target보다 넓게 선택할 수 있다.
+- skill target은 입력에 존재하는 unitId 중에서 고른다. 단, canBeTargeted가 false인 유닛은 skill target으로 사용하지 않는다.
+- IsSkillOnSelf가 true이면 actor 본인의 unitId를 skill target으로 사용한다.
+- IsSkillOnOtherAlly가 true이면 actor 자신이 아닌 아군 unitId를 skill target으로 사용한다.
+- IsSkillOnSelf와 IsSkillOnOtherAlly가 모두 false이면 적 unitId를 skill target으로 사용한다.
+- canSkillTargetDead가 true이면 죽은 유닛도 skill target으로 선택할 수 있다.
+- canSkillTargetDead가 true이고 죽은 아군 대상 스킬이 명령 의미에 맞으면 commandAnalysis.deadAllies에서 target을 고른다.
+- canSkillTargetDead가 false이면 죽은 유닛을 skill target으로 선택하지 않는다.
+- 스킬 사용 금지, 스킬 지연, 스킬 아끼기 지시가 직접 포함된 경우에는 skill action 생략만으로 처리하지 말고 skillControl을 출력한다.
+- 그 외 상황에서만, skill을 사용하지 않는 것이 명령 의미에 더 맞으면 skill action을 만들지 않는다.
+
+Wait:
+- 명령이 지목하지 않은 ally를 기본 대기 상태로 만들기 위해 wait을 출력하지 않는다.
+- wait은 명령받은 actor에게만 사용할 수 있다.
+- wait은 명령이 대기, 지연, 타이밍 조절, 위치 유지처럼 즉시 다음 행동을 하지 말라는 의미를 직접 포함할 때만 사용한다.
+- attack 또는 skill 뒤에는 wait을 붙이지 않는다.
+- 명령에 시간이 지정되어 있으면 그 값을 쓰고, 없으면 명령의 강도와 톤을 보고 1~10의 number 안에서 정하되 보통 durationSec=2를 기준으로 한다.
+- wait은 move, attack, skill과 같은 sequence 안에 들어갈 수 있다.
+
+SkillControl:
+- skillControl은 actor의 스킬 사용 방침을 조정한다.
+- 사용자가 스킬을 아껴라, 나중에 써라, 아직 쓰지 마라, 특정 타이밍까지 미뤄라, 스킬을 쓰지 마라 같은 의도를 명시한 경우에만 사용한다.
+- actor에게 skillDescription이 있고 명령에 스킬 지연 또는 스킬 금지 의도가 명시되어 있으면 skillControl은 필수 action이다.
+- 명령에 스킬 지연 또는 스킬 금지 의도가 명시되지 않으면 skillControl을 출력하지 않는다.
+- mode="defer"는 스킬 사용을 늦추라는 의미다.
+- mode="defer"일 때 durationSec는 1 이상 10 이하의 number다.
+- 명령에 지연 시간이 명시되어 있으면 그 초를 그대로 사용한다.
+- 지연 시간이 명시되지 않았으면 명령의 강도와 톤을 보고 5~10초 중 하나를 선택한다.
+- mode="forbid"는 현재 명령 처리 범위에서 스킬을 쓰지 말라는 의미다.
+
+Conditional command:
+- 조건부 명령은 current-state-only로 처리한다.
+- 조건이 현재 입력 상태에서 만족되면, 그에 해당하는 즉시 실행 action을 출력한다.
+- 조건이 현재 만족되지 않으면, 현재 유효한 유지, 대기, 버티기, 기본 행동만 출력한다.
+- 저장되는 conditional JSON을 만들지 않는다.
+- 미래 action, 예약 action, scheduled action, trigger 기반 action을 만들지 않는다.
+[STUDENT_RUNTIME_SYSTEM_PROMPT_END]
+
+schema skeleton example:
+{
+  "samples": [
+    {
+      "id": "sample 식별자 string",
+      "split": "train | validation | test",
+      "command_spec": {
+        "command_text": "input.input.command와 정확히 같은 한국어 명령문",
+        "base_command_text": "기준이 되는 원형 명령문",
+        "slots": {
+          "actors": ["명령문에서 행동 주체로 직접 지정된 ally unitId들"],
+          "target": "명령문에서 대상 역할을 하는 unitId 또는 null",
+          "target_side_in_text": "ally | enemy | self | none",
+          "mentioned_units": ["명령문에 직접 등장한 모든 unitId들"]
+        }
+      },
+      "metadata": {
+        "intent_family": "taxonomy에 존재하는 intent_family 값",
+        "command_style": "taxonomy에 존재하는 command_style 값",
+        "actor_selection": "taxonomy에 존재하는 actor_selection 값",
+        "target_selection": "taxonomy에 존재하는 target_selection 값",
+        "action_pattern": "taxonomy에 존재하는 action_pattern 값",
+        "scenario_family": "taxonomy에 존재하는 scenario_family 값",
+        "edge_flags": ["taxonomy에 존재하는 edge_flags 값들"],
+        "difficulty": "easy | medium | hard"
+      },
+      "skill_case": null 또는 {
+        "skill_family": "taxonomy에 존재하는 skill_family 값",
+        "skill_target_kind": "taxonomy에 존재하는 skill_target_kind 값",
+        "is_skill_aoe": true 또는 false,
+        "can_skill_target_dead": true 또는 false,
+        "conflict_type": "taxonomy에 존재하는 conflict_type 값 또는 null"
+      },
+      "gold": {
+        "required_actors": ["정답 output에 반드시 포함되어야 하는 actor unitId들"],
+        "allowed_actors": ["정답 output에 포함될 수 있는 actor unitId들"],
+        "forbidden_actors": ["정답 output에 포함되면 안 되는 actor unitId들"],
+        "required_action_types": ["정답 output에 반드시 포함되어야 하는 action type들"],
+        "allowed_action_types": ["정답 output에 포함될 수 있는 action type들"],
+        "forbidden_action_types": ["정답 output에 포함되면 안 되는 action type들"],
+        "empty_action_allowed": true 또는 false,
+        "expected_action_pattern": "기대되는 action pattern 설명",
+        "targets": {
+          "required": ["정답 output에서 반드시 사용되어야 하는 target 또는 move.to unitId들"],
+          "allowed": ["정답 output에서 사용할 수 있는 target 또는 move.to unitId들"],
+          "forbidden": ["정답 output에서 사용하면 안 되는 target 또는 move.to unitId들"]
+        }
+      },
+      "input": {
+        "input": {
+          "command": "command_spec.command_text와 정확히 같은 한국어 명령문",
+          "area_situation": {
+            "allies": [
+              {
+                "unitId": "A_01부터 A_06 중 하나",
+                "isAlive": true 또는 false,
+                "canBeTargeted": true 또는 false,
+                "isRanged": true 또는 false,
+                "hpRatio": "0 이상 1 이하 number",
+                "attackRatioToAvg": "0보다 큰 number",
+                "engagedByOpponentCount": "0 이상의 integer",
+                "teamFormationRole": "frontline | midline | backline",
+                "skillDescription": "이 ally가 가진 스킬 설명 문자열",
+                "IsSkillOnSelf": true 또는 false,
+                "IsSkillOnOtherAlly": true 또는 false,
+                "isSkillAoe": true 또는 false,
+                "canSkillTargetDead": true 또는 false,
+                "closestTargetableOpponent": "살아있고 canBeTargeted=true인 enemy unitId 또는 null",
+                "farthestTargetableOpponent": "살아있고 canBeTargeted=true인 enemy unitId 또는 null",
+                "closestAliveAlly": "자기 자신을 제외한 살아있는 ally unitId 또는 null",
+                "farthestAliveAlly": "자기 자신을 제외한 살아있는 ally unitId 또는 null"
+              }
+            ],
+            "enemies": [
+              {
+                "unitId": "E_01부터 E_06 중 하나",
+                "isAlive": true 또는 false,
+                "canBeTargeted": true 또는 false,
+                "isRanged": true 또는 false,
+                "hpRatio": "0 이상 1 이하 number",
+                "attackRatioToAvg": "0보다 큰 number",
+                "engagedByOpponentCount": "0 이상의 integer",
+                "teamFormationRole": "frontline | midline | backline"
+              }
+            ]
+          }
+        }
+      },
+      "output": {
+        "thinking": "짧은 한국어 판단 요약",
+        "dialog": [
+          {
+            "unitId": "action에 포함된 actor unitId",
+            "text": "그 actor의 전체 sequence를 요약하는 짧은 한국어 한 문장"
+          }
+        ],
+        "action": [
+          {
+            "unitId": "살아있는 ally actor unitId",
+            "sequence": [
+              {
+                "type": "attack | move | skill | wait | skillControl",
+                "target": "attack 또는 skill target unitId가 필요한 경우 사용",
+                "to": "move.to unitId가 필요한 경우 사용",
+                "description": "skill action일 때 actor.skillDescription과 정확히 같은 문자열",
+                "subtype": "move action일 때 approachOpponent | escape | help | holdFront",
+                "movementType": "move action일 때 direct | flank",
+                "durationSec": "wait 또는 defer skillControl일 때 1 이상 10 이하 number",
+                "mode": "skillControl일 때 defer | forbid"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
+
+위 예시는 구조 설명용 skeleton이다.
+위 예시에 적힌 설명 문자열, placeholder 문자열, 예시 문구를 실제 출력값으로 복사하지 않는다.
+실제 sample에서는 모든 placeholder를 selected_bucket, taxonomy, command, skill_case, gold, area_situation에 맞는 실제 값으로 채운다.
+area_situation.allies에는 위에 ally를 하나만 적었지만, 실제 sample에서는 반드시 A_01부터 A_06까지 정확히 6명을 모두 적는다.
+area_situation.enemies에는 위에 enemy를 하나만 적었지만, 실제 sample에서는 반드시 E_01부터 E_06까지 정확히 6명을 모두 적는다.
+input.commandAnalysis는 절대 생성하지 않는다.
+commandAnalysis는 validator가 accepted 저장 시점에 계산해서 추가한다.
+
+예시는 schema shape와 생성 품질 기준만 보여준다.
+예시의 command_text, unitId 배치, metadata 값, 전장 상황, output 의미를 그대로 복사하지 않는다.
+실제 생성값은 반드시 user payload의 selected_bucket, existing_valid_paraphrase_samples, count_to_generate를 따른다.
 """.strip()
 
 
@@ -161,6 +548,7 @@ def load_json(path: Path) -> dict[str, Any]:
     return data
 
 
+# Together streaming 응답에서 delta.content만 누적한다.
 def extract_stream_text(stream: Any, stream_output: bool = False) -> str:
     chunks: list[str] = []
 
@@ -176,7 +564,6 @@ def extract_stream_text(stream: Any, stream_output: bool = False) -> str:
         content = getattr(delta, "content", None)
         if content:
             chunks.append(content)
-
             if stream_output:
                 print(content, end="", flush=True)
 
@@ -186,6 +573,7 @@ def extract_stream_text(stream: Any, stream_output: bool = False) -> str:
     return "".join(chunks)
 
 
+# Together chat completion을 호출하고 teacher raw text를 반환한다.
 def call_together(
     user_payload: dict[str, Any],
     model_name: str,
@@ -226,13 +614,11 @@ def call_together(
         raise RuntimeError("Teacher response is empty.")
 
     print("generation complete", flush=True)
-
     return text
 
 
 def strip_code_fence(text: str) -> str:
     stripped = text.strip()
-
     if not stripped.startswith("```"):
         return stripped
 
@@ -243,30 +629,63 @@ def strip_code_fence(text: str) -> str:
     return stripped
 
 
+# 모델이 앞뒤에 불필요한 텍스트를 붙인 경우 첫 JSON value 경계를 찾아 복구한다.
+def extract_first_json_value(text: str) -> str:
+    stripped = text.strip()
+    if not stripped:
+        raise ValueError("Teacher response is empty.")
+
+    start_candidates = [index for index in (stripped.find("{"), stripped.find("[")) if index >= 0]
+    if not start_candidates:
+        raise ValueError("Teacher response does not contain JSON.")
+
+    start_index = min(start_candidates)
+    opener = stripped[start_index]
+    closer = "}" if opener == "{" else "]"
+
+    depth = 0
+    in_string = False
+    escape = False
+
+    for index in range(start_index, len(stripped)):
+        char = stripped[index]
+
+        if escape:
+            escape = False
+            continue
+
+        if char == "\\":
+            escape = True
+            continue
+
+        if char == '"':
+            in_string = not in_string
+            continue
+
+        if in_string:
+            continue
+
+        if char == opener:
+            depth += 1
+        elif char == closer:
+            depth -= 1
+            if depth == 0:
+                return stripped[start_index : index + 1]
+
+    raise ValueError("Teacher response JSON boundary is invalid.")
+
+
 def parse_teacher_json(raw_text: str) -> Any:
     text = strip_code_fence(raw_text)
 
     try:
         return json.loads(text)
     except json.JSONDecodeError:
-        pass
-
-    first_object = text.find("{")
-    first_array = text.find("[")
-    candidates = [index for index in [first_object, first_array] if index >= 0]
-
-    if not candidates:
-        raise ValueError("Teacher response does not contain JSON.")
-
-    start = min(candidates)
-    end = max(text.rfind("}"), text.rfind("]"))
-
-    if end < start:
-        raise ValueError("Teacher response JSON boundary is invalid.")
-
-    return json.loads(text[start : end + 1])
+        extracted = extract_first_json_value(text)
+        return json.loads(extracted)
 
 
+# teacher가 object, array, {samples:[...]} 중 무엇을 내도 JSONL sample list로 정규화한다.
 def normalize_samples(parsed: Any) -> list[dict[str, Any]]:
     if isinstance(parsed, list):
         samples = parsed
@@ -275,9 +694,7 @@ def normalize_samples(parsed: Any) -> list[dict[str, Any]]:
     elif isinstance(parsed, dict):
         samples = [parsed]
     else:
-        raise ValueError(
-            "Teacher JSON root must be object, array, or object with samples."
-        )
+        raise ValueError("Teacher JSON root must be object, array, or object with samples.")
 
     normalized: list[dict[str, Any]] = []
     for index, sample in enumerate(samples, start=1):
@@ -293,14 +710,12 @@ def append_jsonl(path: Path, records: list[dict[str, Any]]) -> None:
         return
 
     path.parent.mkdir(parents=True, exist_ok=True)
-
     with path.open("a", encoding="utf-8", newline="\n") as file:
         for record in records:
-            file.write(
-                json.dumps(record, ensure_ascii=False, separators=(",", ":")) + "\n"
-            )
+            file.write(json.dumps(record, ensure_ascii=False, separators=(",", ":")) + "\n")
 
 
+# request payload를 읽고 teacher raw samples와 trace를 각각 JSONL에 append한다.
 def run_teacher_generation(
     input_path: Path,
     output_path: Path,
@@ -311,7 +726,6 @@ def run_teacher_generation(
     stream_output: bool = False,
 ) -> dict[str, Any]:
     payload = load_json(input_path)
-
     raw_response = call_together(
         user_payload=payload,
         model_name=model_name,
@@ -321,7 +735,6 @@ def run_teacher_generation(
 
     parsed = parse_teacher_json(raw_response)
     samples = normalize_samples(parsed)
-
     append_jsonl(output_path, samples)
 
     trace_record = {
@@ -383,7 +796,6 @@ def main() -> None:
         action="store_true",
         help="Print teacher response chunks while generating.",
     )
-
     args = parser.parse_args()
 
     result = run_teacher_generation(
