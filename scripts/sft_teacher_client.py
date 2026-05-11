@@ -139,7 +139,11 @@ input.input.area_situation 생성 규칙:
 - enemies unitId는 E_01, E_02, E_03, E_04, E_05, E_06을 사용한다.
 - unitId 중복을 만들지 않는다.
 - 여러 sample을 생성할 때 area_situation을 같은 template으로 반복하지 않는다.
-- 각 sample의 전장 상태, 생존/사망 상태, 체력, 교전 수, 진형 역할, skill 구성, closest/farthest 관계는 해당 command, selected_bucket, skill_case, gold, output이 성립하는 범위 안에서 자연스럽게 다르게 구성한다.
+- unitId는 고정 캐릭터가 아니다. 매 sample마다 A_01~A_06/E_01~E_06의 역할, 원거리 여부, 체력, 공격력, 교전 수, 진형, 스킬, 거리 관계를 새로 창작한다.
+- 이전 sample에서 같은 unitId에 붙었던 teamFormationRole, isRanged, skillDescription, skill target flags, 전술 역할을 다음 sample에 그대로 유지하지 않는다.
+- skillDescription과 IsSkillOnSelf/IsSkillOnOtherAlly/isSkillAoe/canSkillTargetDead는 unitId가 아니라 selected_bucket, skill_case, command, gold가 성립하도록 매 sample마다 새로 배정한다.
+- 명령이 특정 unitId를 actor로 지목하더라도, 그 unitId의 직업/역할/스킬은 이전 sample과 무관하게 새로 정한다.
+- 각 sample의 전장 상태, 생존/사망 상태, 체력, 교전 수, 진형 역할, skill 구성, closest/farthest 관계는 해당 command, selected_bucket, skill_case, gold, output이 성립하는 범위 안에서 다르게 구성한다.
 - 모든 sample이 서로 완전히 배타적인 전장 상태일 필요는 없지만, 같은 area_situation을 복사한 뒤 command와 output만 바꾸는 방식은 사용하지 않는다.
 - selected_bucket, skill_case, gold, output이 모두 성립하도록 전장 상태를 만든다.
 - 빈 allies/enemies를 만들지 않는다.
