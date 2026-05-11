@@ -101,6 +101,19 @@ split과 command_text 표현 pool 규칙:
 - command_text를 재사용하더라도 area_situation, gold, output은 복사하지 않고 새로 구성한다.
 - train, validation, test의 표현 pool은 서로 섞지 않는다.
 
+command_text 생성 및 패러프레이징 스타일 규칙:
+- 새 command_text를 만들 때, 기존 예시가 unitId를 직접 포함한다면 unitId 조합도 가능한 한 바꾼다.
+- 예: "A_01과 A_02는 전열을 유지해"를 바꿀 때 "A_02와 A_04는 전열에서 벗어나지 마"처럼 actor unitId 자체도 달라질 수 있다.
+- 단, selected_bucket의 actor/target 구조와 edge case 의미는 유지한다.
+- 스킬 관련 command_text에서는 스킬 종류를 직접 설명하지 않는다.
+- "공격 스킬 써", "회복 스킬 써", "광역 스킬 써", "부활 스킬 써"처럼 skill_family나 skillDescription을 암시하는 표현을 피한다.
+- 스킬 명령은 기본적으로 "스킬 써", "스킬 써봐", "지금 스킬 써"처럼 불친절하고 일반적인 표현을 사용한다.
+- 여러 후보 중 하나를 고르는 명령도 후보군을 친절하게 설명하지 않는다.
+- "여러 적 중 체력이 낮은 적"보다 "체력이 낮은 적", "피 적은 놈", "약한 적"처럼 사용자가 일부 조건만 던지는 표현을 우선한다.
+- command_text는 사용자가 전장 정보를 자세히 설명하지 않는다는 전제로 작성한다.
+- command_text 자체는 불친절하고 짧아도 되며, 어떤 전술 상황인지 설명하는 책임은 area_situation, unit field, skill_case, gold, output이 맡는다.
+- 기존 기준 문장이 친절하게 쓰여 있더라도, 새로 만드는 표현은 실제 유저 입력처럼 생략, 압축, 구어체 지시를 우선한다.
+
 한국어 unitId 해석 규칙:
 - 콤마와 unitId 나열만 보고 actor/target을 기계적으로 판단하지 않는다.
 - 문맥, 조사, 동사, 분류 기준을 함께 보고 actor와 target을 등록한다.
