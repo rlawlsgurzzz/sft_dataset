@@ -1,7 +1,7 @@
 # 입력 JSON의 전장 상황을 Gemma 4 Ollama에 보내 전투 명령 JSON 응답을 배치 평가한다.
 # LLM은 명령 의미, actor, target, wait, skillControl, move subtype을 판단한다.
 # Python은 런타임상 무효인 actor, attack target, move.to, skill target만 제거한다.
-# skill target은 스킬 필드에 따라 일반 attack target보다 넓게 허용한다.
+# 거리 신호는 최단/최장 단일 unitId 필드로 받고, 죽은 타게팅 가능 아군은 commandAnalysis에 둔다.
 
 import argparse
 import copy
@@ -16,7 +16,7 @@ import requests
 
 OLLAMA_CHAT_URL = "http://localhost:11434/api/chat"
 
-DEFAULT_INPUT_FILE = Path("test_inputs") / "battle_eval_cases15.json"
+DEFAULT_INPUT_FILE = Path("test_inputs") / "battle_eval_cases20.json"
 DEFAULT_OUTPUT_DIR = Path("test_outputs")
 
 DEFAULT_WAIT_SECONDS = 2.0
@@ -43,11 +43,13 @@ ALLY_MODEL_UNIT_FIELDS = {
     "teamFormationRole",
     "skillDescription",
     "IsSkillOnSelf",
-    "IsSkillOnAlly",
+    "IsSkillOnOtherAlly",
     "isSkillAoe",
     "canSkillTargetDead",
-    "targetableOpponentsByDistance",
-    "aliveAlliesByDistance",
+    "closestTargetableOpponent",
+    "farthestTargetableOpponent",
+    "closestAliveAlly",
+    "farthestAliveAlly",
 }
 
 ENEMY_MODEL_UNIT_FIELDS = {
@@ -108,7 +110,8 @@ JSON 밖에 설명을 추가하지 않는다.
 - input.area_situation.allies는 아군 유닛 목록이다.
 - input.area_situation.enemies는 적군 유닛 목록이다.
 - input.command는 사용자의 원문 명령이다.
-- commandAnalysis는 현재 입력에서 사용할 수 있는 actor, attack target, move.to 범위 요약이다.
+- commandAnalysis는 현재 입력에서 사용할 수 있는 actor, attack target, move.to 범위와 죽은 타게팅 가능 아군 요약이다.
+- commandAnalysis.deadAllies는 죽었지만 canBeTargeted가 true인 아군 unitId 목록이다.
 
 유닛 필드:
 - unitId는 유닛 식별자다.
@@ -121,11 +124,13 @@ JSON 밖에 설명을 추가하지 않는다.
 - teamFormationRole은 해당 유닛이 자기 팀 진형에서 맡는 현재 위치 역할이다: frontline, midline, backline.
 - skillDescription은 해당 actor가 사용할 수 있는 skill의 정확한 문자열이다.
 - IsSkillOnSelf는 skill이 actor 본인을 대상으로 하는 성격인지 여부다.
-- IsSkillOnAlly는 skill이 아군 대상 성격인지 여부다. false이면 적 대상 성격이다.
+- IsSkillOnOtherAlly는 skill이 actor 자신이 아닌 다른 아군을 대상으로 하는 성격인지 여부다. false이면 적 대상 성격이다.
 - isSkillAoe는 skill이 범위 효과 성격인지 여부다. isSkillAoe가 true여도 출력 형식에서는 target 하나만 고른다.
 - canSkillTargetDead는 skill이 죽은 유닛도 대상으로 삼을 수 있는지 여부다.
-- targetableOpponentsByDistance는 아군 기준으로 살아있고 타게팅 가능한 적 unitId를 가까운 순서로 정렬한 목록이다.
-- aliveAlliesByDistance는 아군 기준으로 살아있는 아군 unitId를 가까운 순서로 정렬한 목록이다.
+- closestTargetableOpponent는 아군 기준으로 가장 가까운 살아있고 타게팅 가능한 적 unitId다. 없으면 null이다.
+- farthestTargetableOpponent는 아군 기준으로 가장 먼 살아있고 타게팅 가능한 적 unitId다. 없으면 null이다.
+- closestAliveAlly는 actor 자신을 제외하고, 아군 기준으로 가장 가까운 살아있는 아군 unitId다. 없으면 null이다.
+- farthestAliveAlly는 actor 자신을 제외하고, 아군 기준으로 가장 먼 살아있는 아군 unitId다. 없으면 null이다.
 
 핵심 규칙:
 - 사용자의 의도는 명령의 의미와 현재 전장 상태를 보고 추론한다.
@@ -157,14 +162,14 @@ Actor selection:
 - 명령이 역할, 전술 상태, 압박 정도, 안전 상태, 여유 여부, 위치, 진형, 체력, 지원 가능성 등으로 ally를 가리키는 경우 현재 상태를 근거로 의도된 actor를 추론한다.
 - 여유가 있는 아군, 압박받지 않는 아군, 손이 비는 아군 같은 표현은 현재 상태를 보고 판단한다.
 - 이런 표현의 중요한 신호는 engagedByOpponentCount가 0인지, hpRatio가 너무 낮지 않은지다.
-- actor 선택에 유용한 신호는 hpRatio, engagedByOpponentCount, isRanged, teamFormationRole, targetableOpponentsByDistance, aliveAlliesByDistance, 명령의 전술적 목적이다.
+- actor 선택에 유용한 신호는 hpRatio, engagedByOpponentCount, isRanged, teamFormationRole, closestTargetableOpponent, farthestTargetableOpponent, closestAliveAlly, farthestAliveAlly, 명령의 전술적 목적이다.
 - 허용된 actor라는 이유만으로 포함하지 않는다. 명령 의미에 맞을 때만 actor로 포함한다.
 
 Target selection:
 - 명령이 유효한 enemy unitId를 직접 지정했다면, 그 enemy를 우선 고려한다.
 - 명령이 전술적 의미로 target을 가리키는 경우 현재 상태를 근거로 target을 추론한다.
 - 명령은 고정된 표현 없이도 가까운 적, 약한 적, 위험한 적, 아군을 위협하는 적, 원거리 적, 근거리 적, 집중 공격 대상, 견제 대상, 보호할 아군에게 붙은 적 등을 의미할 수 있다.
-- target 선택에 유용한 신호는 hpRatio, attackRatioToAvg, canBeTargeted, isAlive, isRanged, teamFormationRole, engagedByOpponentCount, targetableOpponentsByDistance, aliveAlliesByDistance, 명령의 전술적 목적이다.
+- target 선택에 유용한 신호는 hpRatio, attackRatioToAvg, canBeTargeted, isAlive, isRanged, teamFormationRole, engagedByOpponentCount, closestTargetableOpponent, farthestTargetableOpponent, closestAliveAlly, farthestAliveAlly, commandAnalysis.deadAllies, 명령의 전술적 목적이다.
 - 허용된 target이라는 이유만으로 공격하지 않는다. 명령 의미에 맞을 때만 공격한다.
 - attack에는 commandAnalysis.allowedAttackTargets 밖의 target을 절대 사용하지 않는다.
 - 유닛에게 어떤 적을 공격하라는 명령이 내려오면, move 후 attack 또는 attack 단독 출력이 모두 가능하다.
@@ -204,8 +209,12 @@ Skill:
 - skill 사용 여부는 명령 의미, actor의 skillDescription, 스킬 관련 필드, 현재 전장 상태를 보고 판단한다.
 - skill target은 skill action에 한해서 일반 attack target보다 넓게 선택할 수 있다.
 - skill target은 입력에 존재하는 unitId 중에서 고른다. 단, canBeTargeted가 false인 유닛은 skill target으로 사용하지 않는다.
-- canSkillTargetDead는 죽은 유닛을 skill target으로 선택할 수 있는지 판단하는 기준이다.
 - IsSkillOnSelf가 true이면 actor 본인의 unitId를 skill target으로 사용한다.
+- IsSkillOnOtherAlly가 true이면 actor 자신이 아닌 아군 unitId를 skill target으로 사용한다.
+- IsSkillOnSelf와 IsSkillOnOtherAlly가 모두 false이면 적 unitId를 skill target으로 사용한다.
+- canSkillTargetDead가 true이면 죽은 유닛도 skill target으로 선택할 수 있다.
+- canSkillTargetDead가 true이고 죽은 아군 대상 스킬이 명령 의미에 맞으면 commandAnalysis.deadAllies에서 target을 고른다.
+- canSkillTargetDead가 false이면 죽은 유닛을 skill target으로 선택하지 않는다.
 - 스킬 사용 금지, 스킬 지연, 스킬 아끼기 지시가 직접 포함된 경우에는 skill action 생략만으로 처리하지 말고 skillControl을 출력한다.
 - 그 외 상황에서만, skill을 사용하지 않는 것이 명령 의미에 더 맞으면 skill action을 만들지 않는다.
 
@@ -386,6 +395,16 @@ def get_valid_attack_targets(battle_context: dict[str, Any]) -> list[str]:
     ]
 
 
+def get_dead_targetable_allies(battle_context: dict[str, Any]) -> list[str]:
+    return [
+        unit["unitId"]
+        for unit in get_units_from_context(battle_context, "allies")
+        if isinstance(unit.get("unitId"), str)
+        and not is_alive(unit)
+        and is_targetable(unit)
+    ]
+
+
 def get_allowed_actors_from_runtime(
     _battle_context: dict[str, Any], alive_allies: list[str]
 ) -> list[str]:
@@ -436,6 +455,7 @@ def collect_invalid_runtime_units(
 
 def analyze_command(battle_context: dict[str, Any]) -> dict[str, Any]:
     alive_allies = get_alive_allies(battle_context)
+    dead_targetable_allies = get_dead_targetable_allies(battle_context)
     valid_attack_targets = get_valid_attack_targets(battle_context)
     allowed_actors = get_allowed_actors_from_runtime(battle_context, alive_allies)
     valid_move_to_units = alive_allies + valid_attack_targets
@@ -443,10 +463,11 @@ def analyze_command(battle_context: dict[str, Any]) -> dict[str, Any]:
 
     return {
         "analysisMode": "runtime_constraint_summary",
-        "description": "This object summarizes runtime-valid actors and targets. It does not parse or decide the user's intent.",
+        "description": "This object summarizes runtime-valid actors, targets, move destinations, and dead targetable allies. It does not parse or decide the user's intent.",
         "allowedActors": allowed_actors,
         "allowedAttackTargets": valid_attack_targets,
         "validMoveToUnits": valid_move_to_units,
+        "deadAllies": dead_targetable_allies,
         "invalidUnits": invalid_units,
         "actionPolicy": {
             "maxActionsPerActor": MAX_ACTIONS_PER_ACTOR,
@@ -507,8 +528,11 @@ def build_user_message(battle_context: dict[str, Any]) -> str:
             "attack.target은 commandAnalysis.allowedAttackTargets 안에서만 고른다.",
             "skill target은 skill action에 한해서 일반 attack target보다 넓게 선택할 수 있다.",
             "skill target은 입력에 존재하는 unitId 중에서 고른다. 단, canBeTargeted가 false인 유닛은 skill target으로 사용하지 않는다.",
-            "canSkillTargetDead는 죽은 유닛을 skill target으로 선택할 수 있는지 판단하는 기준이다.",
             "IsSkillOnSelf가 true일 때만 유일하게, actor 본인의 unitId를 skill target으로 사용한다.",
+            "IsSkillOnOtherAlly가 true이면 actor 자신이 아닌 아군 unitId를 skill target으로 사용한다.",
+            "IsSkillOnSelf와 IsSkillOnOtherAlly가 모두 false이면 적 unitId를 skill target으로 사용한다.",
+            "canSkillTargetDead가 true이고 죽은 아군 대상 스킬이 명령 의미에 맞으면 commandAnalysis.deadAllies에서 target을 고른다.",
+            "canSkillTargetDead가 false이면 죽은 유닛을 skill target으로 선택하지 않는다.",
             "move.to는 commandAnalysis.validMoveToUnits 안에서만 고른다.",
             "move.subtype은 approachOpponent, escape, help, holdFront 중 하나만 사용한다.",
             "move.movementType은 direct 또는 flank만 사용한다.",
@@ -676,7 +700,7 @@ def is_valid_skill_target(
         return False
 
     actor_skill_is_on_self = actor_unit.get("IsSkillOnSelf") is True
-    actor_skill_is_on_ally = actor_unit.get("IsSkillOnAlly") is True
+    actor_skill_is_on_other_ally = actor_unit.get("IsSkillOnOtherAlly") is True
     target_side = get_unit_side(battle_context, target_id)
 
     if actor_skill_is_on_self:
@@ -686,7 +710,7 @@ def is_valid_skill_target(
         if target_id == actor_id:
             return False
 
-        if actor_skill_is_on_ally:
+        if actor_skill_is_on_other_ally:
             if target_side != "ally":
                 return False
         elif target_side != "enemy":
@@ -1507,8 +1531,8 @@ def append_raw_parsed_unit_ids(
 def make_unit_table(units: list[dict[str, Any]], include_skill: bool) -> str:
     if include_skill:
         lines = [
-            "| unitId | isAlive | canBeTargeted | isRanged | hpRatio | attackRatioToAvg | engagedByOpponentCount | teamFormationRole | targetableOpponentsByDistance | aliveAlliesByDistance | skillDescription | IsSkillOnSelf | IsSkillOnAlly | isSkillAoe | canSkillTargetDead |",
-            "|---|---|---|---|---:|---:|---:|---|---|---|---|---|---|---|---|",
+            "| unitId | isAlive | canBeTargeted | isRanged | hpRatio | attackRatioToAvg | engagedByOpponentCount | teamFormationRole | closestTargetableOpponent | farthestTargetableOpponent | closestAliveAlly | farthestAliveAlly | skillDescription | IsSkillOnSelf | IsSkillOnOtherAlly | isSkillAoe | canSkillTargetDead |",
+            "|---|---|---|---|---:|---:|---:|---|---|---|---|---|---|---|---|---|---|",
         ]
     else:
         lines = [
@@ -1529,11 +1553,13 @@ def make_unit_table(units: list[dict[str, Any]], include_skill: bool) -> str:
         ]
 
         if include_skill:
-            row.append(compact_json_text(unit.get("targetableOpponentsByDistance", [])))
-            row.append(compact_json_text(unit.get("aliveAlliesByDistance", [])))
+            row.append(compact_json_text(unit.get("closestTargetableOpponent")))
+            row.append(compact_json_text(unit.get("farthestTargetableOpponent")))
+            row.append(compact_json_text(unit.get("closestAliveAlly")))
+            row.append(compact_json_text(unit.get("farthestAliveAlly")))
             row.append(unit_skill_label(unit))
             row.append(str(unit.get("IsSkillOnSelf", False)).lower())
-            row.append(str(unit.get("IsSkillOnAlly", False)).lower())
+            row.append(str(unit.get("IsSkillOnOtherAlly", False)).lower())
             row.append(str(unit.get("isSkillAoe", False)).lower())
             row.append(str(unit.get("canSkillTargetDead", False)).lower())
 

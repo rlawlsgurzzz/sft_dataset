@@ -25,21 +25,13 @@
                     "teamFormationRole": "frontline",
                     "skillDescription": "지정 대상에게 강한 검격을 가하고, 잠시 동안 대상의 방어력을 감소시킵니다.",
                     "IsSkillOnSelf": false,
-                    "IsSkillOnAlly": false,
                     "isSkillAoe": false,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_01",
-                      "E_02",
-                      "E_03",
-                      "E_04"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_02",
-                      "A_03",
-                      "A_04",
-                      "A_06"
-                    ]
+                    "IsSkillOnOtherAlly": false,
+                    "closestTargetableOpponent": "E_01",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_02",
+                    "farthestAliveAlly": "A_06"
                   },
                   {
                     "unitId": "A_02",
@@ -52,21 +44,13 @@
                     "teamFormationRole": "frontline",
                     "skillDescription": "지정 대상에게 방패 타격을 가하고, 잠시 동안 대상의 이동 속도를 감소시킵니다.",
                     "IsSkillOnSelf": false,
-                    "IsSkillOnAlly": false,
                     "isSkillAoe": false,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_02",
-                      "E_01",
-                      "E_03",
-                      "E_04"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_01",
-                      "A_03",
-                      "A_04",
-                      "A_06"
-                    ]
+                    "IsSkillOnOtherAlly": false,
+                    "closestTargetableOpponent": "E_02",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_01",
+                    "farthestAliveAlly": "A_06"
                   },
                   {
                     "unitId": "A_03",
@@ -79,21 +63,13 @@
                     "teamFormationRole": "frontline",
                     "skillDescription": "짧은 시간 동안 자신이 받는 피해를 감소시킵니다.",
                     "IsSkillOnSelf": true,
-                    "IsSkillOnAlly": false,
                     "isSkillAoe": false,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_02",
-                      "E_01",
-                      "E_03",
-                      "E_04"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_01",
-                      "A_02",
-                      "A_04",
-                      "A_06"
-                    ]
+                    "IsSkillOnOtherAlly": false,
+                    "closestTargetableOpponent": "E_02",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_01",
+                    "farthestAliveAlly": "A_06"
                   },
                   {
                     "unitId": "A_04",
@@ -106,21 +82,13 @@
                     "teamFormationRole": "backline",
                     "skillDescription": "지정 아군에게 보호막을 부여합니다.",
                     "IsSkillOnSelf": false,
-                    "IsSkillOnAlly": true,
                     "isSkillAoe": false,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_03",
-                      "E_04",
-                      "E_02",
-                      "E_01"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_01",
-                      "A_02",
-                      "A_03",
-                      "A_06"
-                    ]
+                    "IsSkillOnOtherAlly": true,
+                    "closestTargetableOpponent": "E_03",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_01",
+                    "farthestAliveAlly": "A_06"
                   },
                   {
                     "unitId": "A_06",
@@ -133,21 +101,13 @@
                     "teamFormationRole": "midline",
                     "skillDescription": "지정 대상 주변에 범위 피해를 입힙니다.",
                     "IsSkillOnSelf": false,
-                    "IsSkillOnAlly": false,
                     "isSkillAoe": true,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_02",
-                      "E_03",
-                      "E_01",
-                      "E_04"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_04",
-                      "A_03",
-                      "A_01",
-                      "A_02"
-                    ]
+                    "IsSkillOnOtherAlly": false,
+                    "closestTargetableOpponent": "E_02",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_04",
+                    "farthestAliveAlly": "A_02"
                   }
                 ],
                 "enemies": [
@@ -188,6 +148,26 @@
                     "isRanged": true,
                     "hpRatio": 0.91,
                     "attackRatioToAvg": 1.0,
+                    "engagedByOpponentCount": 0,
+                    "teamFormationRole": "backline"
+                  },
+                  {
+                    "unitId": "E_05",
+                    "isAlive": true,
+                    "canBeTargeted": true,
+                    "isRanged": false,
+                    "hpRatio": 0.64,
+                    "attackRatioToAvg": 0.96,
+                    "engagedByOpponentCount": 0,
+                    "teamFormationRole": "midline"
+                  },
+                  {
+                    "unitId": "E_06",
+                    "isAlive": true,
+                    "canBeTargeted": true,
+                    "isRanged": true,
+                    "hpRatio": 0.78,
+                    "attackRatioToAvg": 0.94,
                     "engagedByOpponentCount": 0,
                     "teamFormationRole": "backline"
                   }
@@ -221,21 +201,13 @@
                     "teamFormationRole": "frontline",
                     "skillDescription": "지정 대상에게 강한 검격을 가하고, 잠시 동안 대상의 방어력을 감소시킵니다.",
                     "IsSkillOnSelf": false,
-                    "IsSkillOnAlly": false,
                     "isSkillAoe": false,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_01",
-                      "E_02",
-                      "E_03",
-                      "E_04"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_02",
-                      "A_03",
-                      "A_04",
-                      "A_06"
-                    ]
+                    "IsSkillOnOtherAlly": false,
+                    "closestTargetableOpponent": "E_01",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_02",
+                    "farthestAliveAlly": "A_06"
                   },
                   {
                     "unitId": "A_02",
@@ -248,21 +220,13 @@
                     "teamFormationRole": "frontline",
                     "skillDescription": "지정 대상에게 방패 타격을 가하고, 잠시 동안 대상의 이동 속도를 감소시킵니다.",
                     "IsSkillOnSelf": false,
-                    "IsSkillOnAlly": false,
                     "isSkillAoe": false,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_02",
-                      "E_01",
-                      "E_03",
-                      "E_04"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_01",
-                      "A_03",
-                      "A_04",
-                      "A_06"
-                    ]
+                    "IsSkillOnOtherAlly": false,
+                    "closestTargetableOpponent": "E_02",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_01",
+                    "farthestAliveAlly": "A_06"
                   },
                   {
                     "unitId": "A_03",
@@ -275,21 +239,13 @@
                     "teamFormationRole": "frontline",
                     "skillDescription": "짧은 시간 동안 자신이 받는 피해를 감소시킵니다.",
                     "IsSkillOnSelf": true,
-                    "IsSkillOnAlly": false,
                     "isSkillAoe": false,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_02",
-                      "E_01",
-                      "E_03",
-                      "E_04"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_01",
-                      "A_02",
-                      "A_04",
-                      "A_06"
-                    ]
+                    "IsSkillOnOtherAlly": false,
+                    "closestTargetableOpponent": "E_02",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_01",
+                    "farthestAliveAlly": "A_06"
                   },
                   {
                     "unitId": "A_04",
@@ -302,21 +258,13 @@
                     "teamFormationRole": "backline",
                     "skillDescription": "지정 아군에게 보호막을 부여합니다.",
                     "IsSkillOnSelf": false,
-                    "IsSkillOnAlly": true,
                     "isSkillAoe": false,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_03",
-                      "E_04",
-                      "E_02",
-                      "E_01"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_01",
-                      "A_02",
-                      "A_03",
-                      "A_06"
-                    ]
+                    "IsSkillOnOtherAlly": true,
+                    "closestTargetableOpponent": "E_03",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_01",
+                    "farthestAliveAlly": "A_06"
                   },
                   {
                     "unitId": "A_06",
@@ -329,21 +277,13 @@
                     "teamFormationRole": "midline",
                     "skillDescription": "지정 대상 주변에 범위 피해를 입힙니다.",
                     "IsSkillOnSelf": false,
-                    "IsSkillOnAlly": false,
                     "isSkillAoe": true,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_02",
-                      "E_03",
-                      "E_01",
-                      "E_04"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_04",
-                      "A_03",
-                      "A_01",
-                      "A_02"
-                    ]
+                    "IsSkillOnOtherAlly": false,
+                    "closestTargetableOpponent": "E_02",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_04",
+                    "farthestAliveAlly": "A_02"
                   }
                 ],
                 "enemies": [
@@ -386,6 +326,26 @@
                     "attackRatioToAvg": 1.0,
                     "engagedByOpponentCount": 0,
                     "teamFormationRole": "backline"
+                  },
+                  {
+                    "unitId": "E_05",
+                    "isAlive": true,
+                    "canBeTargeted": true,
+                    "isRanged": false,
+                    "hpRatio": 0.64,
+                    "attackRatioToAvg": 0.96,
+                    "engagedByOpponentCount": 0,
+                    "teamFormationRole": "midline"
+                  },
+                  {
+                    "unitId": "E_06",
+                    "isAlive": true,
+                    "canBeTargeted": true,
+                    "isRanged": true,
+                    "hpRatio": 0.78,
+                    "attackRatioToAvg": 0.94,
+                    "engagedByOpponentCount": 0,
+                    "teamFormationRole": "backline"
                   }
                 ]
               },
@@ -396,7 +356,7 @@
       },
       {
         "commandId": "cmd_003_ally_shield_ordered_on_enemy",
-        "commandText": "A_04 use your skill on E_03",
+        "commandText": "A_04, E_03한테 스킬 써",
         "scenarios": [
           {
             "scenarioId": "scenario_003_ally_shield_ordered_on_enemy",
@@ -417,21 +377,13 @@
                     "teamFormationRole": "frontline",
                     "skillDescription": "지정 대상에게 강한 검격을 가하고, 잠시 동안 대상의 방어력을 감소시킵니다.",
                     "IsSkillOnSelf": false,
-                    "IsSkillOnAlly": false,
                     "isSkillAoe": false,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_01",
-                      "E_02",
-                      "E_03",
-                      "E_04"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_02",
-                      "A_03",
-                      "A_04",
-                      "A_06"
-                    ]
+                    "IsSkillOnOtherAlly": false,
+                    "closestTargetableOpponent": "E_01",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_02",
+                    "farthestAliveAlly": "A_06"
                   },
                   {
                     "unitId": "A_02",
@@ -444,21 +396,13 @@
                     "teamFormationRole": "frontline",
                     "skillDescription": "지정 대상에게 방패 타격을 가하고, 잠시 동안 대상의 이동 속도를 감소시킵니다.",
                     "IsSkillOnSelf": false,
-                    "IsSkillOnAlly": false,
                     "isSkillAoe": false,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_02",
-                      "E_01",
-                      "E_03",
-                      "E_04"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_01",
-                      "A_03",
-                      "A_04",
-                      "A_06"
-                    ]
+                    "IsSkillOnOtherAlly": false,
+                    "closestTargetableOpponent": "E_02",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_01",
+                    "farthestAliveAlly": "A_06"
                   },
                   {
                     "unitId": "A_03",
@@ -471,21 +415,13 @@
                     "teamFormationRole": "frontline",
                     "skillDescription": "짧은 시간 동안 자신이 받는 피해를 감소시킵니다.",
                     "IsSkillOnSelf": true,
-                    "IsSkillOnAlly": false,
                     "isSkillAoe": false,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_02",
-                      "E_01",
-                      "E_03",
-                      "E_04"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_01",
-                      "A_02",
-                      "A_04",
-                      "A_06"
-                    ]
+                    "IsSkillOnOtherAlly": false,
+                    "closestTargetableOpponent": "E_02",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_01",
+                    "farthestAliveAlly": "A_06"
                   },
                   {
                     "unitId": "A_04",
@@ -498,21 +434,13 @@
                     "teamFormationRole": "backline",
                     "skillDescription": "지정 아군에게 보호막을 부여합니다.",
                     "IsSkillOnSelf": false,
-                    "IsSkillOnAlly": true,
                     "isSkillAoe": false,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_03",
-                      "E_04",
-                      "E_02",
-                      "E_01"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_01",
-                      "A_02",
-                      "A_03",
-                      "A_06"
-                    ]
+                    "IsSkillOnOtherAlly": true,
+                    "closestTargetableOpponent": "E_03",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_01",
+                    "farthestAliveAlly": "A_06"
                   },
                   {
                     "unitId": "A_06",
@@ -525,21 +453,13 @@
                     "teamFormationRole": "midline",
                     "skillDescription": "지정 대상 주변에 범위 피해를 입힙니다.",
                     "IsSkillOnSelf": false,
-                    "IsSkillOnAlly": false,
                     "isSkillAoe": true,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_02",
-                      "E_03",
-                      "E_01",
-                      "E_04"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_04",
-                      "A_03",
-                      "A_01",
-                      "A_02"
-                    ]
+                    "IsSkillOnOtherAlly": false,
+                    "closestTargetableOpponent": "E_02",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_04",
+                    "farthestAliveAlly": "A_02"
                   }
                 ],
                 "enemies": [
@@ -582,10 +502,30 @@
                     "attackRatioToAvg": 1.0,
                     "engagedByOpponentCount": 0,
                     "teamFormationRole": "backline"
+                  },
+                  {
+                    "unitId": "E_05",
+                    "isAlive": true,
+                    "canBeTargeted": true,
+                    "isRanged": false,
+                    "hpRatio": 0.64,
+                    "attackRatioToAvg": 0.96,
+                    "engagedByOpponentCount": 0,
+                    "teamFormationRole": "midline"
+                  },
+                  {
+                    "unitId": "E_06",
+                    "isAlive": true,
+                    "canBeTargeted": true,
+                    "isRanged": true,
+                    "hpRatio": 0.78,
+                    "attackRatioToAvg": 0.94,
+                    "engagedByOpponentCount": 0,
+                    "teamFormationRole": "backline"
                   }
                 ]
               },
-              "command": "A_04 use your skill on E_03"
+              "command": "A_04, E_03한테 스킬 써"
             }
           }
         ]
@@ -613,21 +553,13 @@
                     "teamFormationRole": "frontline",
                     "skillDescription": "지정 대상에게 강한 검격을 가하고, 잠시 동안 대상의 방어력을 감소시킵니다.",
                     "IsSkillOnSelf": false,
-                    "IsSkillOnAlly": false,
                     "isSkillAoe": false,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_01",
-                      "E_02",
-                      "E_03",
-                      "E_04"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_02",
-                      "A_03",
-                      "A_04",
-                      "A_06"
-                    ]
+                    "IsSkillOnOtherAlly": false,
+                    "closestTargetableOpponent": "E_01",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_02",
+                    "farthestAliveAlly": "A_06"
                   },
                   {
                     "unitId": "A_02",
@@ -640,21 +572,13 @@
                     "teamFormationRole": "frontline",
                     "skillDescription": "지정 대상에게 방패 타격을 가하고, 잠시 동안 대상의 이동 속도를 감소시킵니다.",
                     "IsSkillOnSelf": false,
-                    "IsSkillOnAlly": false,
                     "isSkillAoe": false,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_02",
-                      "E_01",
-                      "E_03",
-                      "E_04"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_01",
-                      "A_03",
-                      "A_04",
-                      "A_06"
-                    ]
+                    "IsSkillOnOtherAlly": false,
+                    "closestTargetableOpponent": "E_02",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_01",
+                    "farthestAliveAlly": "A_06"
                   },
                   {
                     "unitId": "A_03",
@@ -667,21 +591,13 @@
                     "teamFormationRole": "frontline",
                     "skillDescription": "짧은 시간 동안 자신이 받는 피해를 감소시킵니다.",
                     "IsSkillOnSelf": true,
-                    "IsSkillOnAlly": false,
                     "isSkillAoe": false,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_02",
-                      "E_01",
-                      "E_03",
-                      "E_04"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_01",
-                      "A_02",
-                      "A_04",
-                      "A_06"
-                    ]
+                    "IsSkillOnOtherAlly": false,
+                    "closestTargetableOpponent": "E_02",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_01",
+                    "farthestAliveAlly": "A_06"
                   },
                   {
                     "unitId": "A_04",
@@ -694,21 +610,13 @@
                     "teamFormationRole": "backline",
                     "skillDescription": "지정 아군에게 보호막을 부여합니다.",
                     "IsSkillOnSelf": false,
-                    "IsSkillOnAlly": true,
                     "isSkillAoe": false,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_03",
-                      "E_04",
-                      "E_02",
-                      "E_01"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_01",
-                      "A_02",
-                      "A_03",
-                      "A_06"
-                    ]
+                    "IsSkillOnOtherAlly": true,
+                    "closestTargetableOpponent": "E_03",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_01",
+                    "farthestAliveAlly": "A_06"
                   },
                   {
                     "unitId": "A_06",
@@ -721,21 +629,13 @@
                     "teamFormationRole": "midline",
                     "skillDescription": "지정 대상 주변에 범위 피해를 입힙니다.",
                     "IsSkillOnSelf": false,
-                    "IsSkillOnAlly": false,
                     "isSkillAoe": true,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_02",
-                      "E_03",
-                      "E_01",
-                      "E_04"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_04",
-                      "A_03",
-                      "A_01",
-                      "A_02"
-                    ]
+                    "IsSkillOnOtherAlly": false,
+                    "closestTargetableOpponent": "E_02",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_04",
+                    "farthestAliveAlly": "A_02"
                   }
                 ],
                 "enemies": [
@@ -778,6 +678,26 @@
                     "attackRatioToAvg": 1.0,
                     "engagedByOpponentCount": 0,
                     "teamFormationRole": "backline"
+                  },
+                  {
+                    "unitId": "E_05",
+                    "isAlive": true,
+                    "canBeTargeted": true,
+                    "isRanged": false,
+                    "hpRatio": 0.64,
+                    "attackRatioToAvg": 0.96,
+                    "engagedByOpponentCount": 0,
+                    "teamFormationRole": "midline"
+                  },
+                  {
+                    "unitId": "E_06",
+                    "isAlive": true,
+                    "canBeTargeted": true,
+                    "isRanged": true,
+                    "hpRatio": 0.78,
+                    "attackRatioToAvg": 0.94,
+                    "engagedByOpponentCount": 0,
+                    "teamFormationRole": "backline"
                   }
                 ]
               },
@@ -788,7 +708,7 @@
       },
       {
         "commandId": "cmd_005_aoe_skill_on_clustered_enemies",
-        "commandText": "A_06, use your skill on clustered enemies",
+        "commandText": "A_06, 적이 모인 곳에 스킬 날려.",
         "scenarios": [
           {
             "scenarioId": "scenario_005_aoe_skill_on_clustered_enemies",
@@ -809,21 +729,13 @@
                     "teamFormationRole": "frontline",
                     "skillDescription": "지정 대상에게 강한 검격을 가하고, 잠시 동안 대상의 방어력을 감소시킵니다.",
                     "IsSkillOnSelf": false,
-                    "IsSkillOnAlly": false,
                     "isSkillAoe": false,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_01",
-                      "E_02",
-                      "E_03",
-                      "E_04"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_02",
-                      "A_03",
-                      "A_04",
-                      "A_06"
-                    ]
+                    "IsSkillOnOtherAlly": false,
+                    "closestTargetableOpponent": "E_01",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_02",
+                    "farthestAliveAlly": "A_06"
                   },
                   {
                     "unitId": "A_02",
@@ -836,21 +748,13 @@
                     "teamFormationRole": "frontline",
                     "skillDescription": "지정 대상에게 방패 타격을 가하고, 잠시 동안 대상의 이동 속도를 감소시킵니다.",
                     "IsSkillOnSelf": false,
-                    "IsSkillOnAlly": false,
                     "isSkillAoe": false,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_02",
-                      "E_01",
-                      "E_03",
-                      "E_04"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_01",
-                      "A_03",
-                      "A_04",
-                      "A_06"
-                    ]
+                    "IsSkillOnOtherAlly": false,
+                    "closestTargetableOpponent": "E_02",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_01",
+                    "farthestAliveAlly": "A_06"
                   },
                   {
                     "unitId": "A_03",
@@ -863,21 +767,13 @@
                     "teamFormationRole": "frontline",
                     "skillDescription": "짧은 시간 동안 자신이 받는 피해를 감소시킵니다.",
                     "IsSkillOnSelf": true,
-                    "IsSkillOnAlly": false,
                     "isSkillAoe": false,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_02",
-                      "E_01",
-                      "E_03",
-                      "E_04"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_01",
-                      "A_02",
-                      "A_04",
-                      "A_06"
-                    ]
+                    "IsSkillOnOtherAlly": false,
+                    "closestTargetableOpponent": "E_02",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_01",
+                    "farthestAliveAlly": "A_06"
                   },
                   {
                     "unitId": "A_04",
@@ -890,21 +786,13 @@
                     "teamFormationRole": "backline",
                     "skillDescription": "지정 아군에게 보호막을 부여합니다.",
                     "IsSkillOnSelf": false,
-                    "IsSkillOnAlly": true,
                     "isSkillAoe": false,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_03",
-                      "E_04",
-                      "E_02",
-                      "E_01"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_01",
-                      "A_02",
-                      "A_03",
-                      "A_06"
-                    ]
+                    "IsSkillOnOtherAlly": true,
+                    "closestTargetableOpponent": "E_03",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_01",
+                    "farthestAliveAlly": "A_06"
                   },
                   {
                     "unitId": "A_06",
@@ -917,21 +805,13 @@
                     "teamFormationRole": "midline",
                     "skillDescription": "지정 대상 주변에 범위 피해를 입힙니다.",
                     "IsSkillOnSelf": false,
-                    "IsSkillOnAlly": false,
                     "isSkillAoe": true,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_02",
-                      "E_03",
-                      "E_01",
-                      "E_04"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_04",
-                      "A_03",
-                      "A_01",
-                      "A_02"
-                    ]
+                    "IsSkillOnOtherAlly": false,
+                    "closestTargetableOpponent": "E_02",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_04",
+                    "farthestAliveAlly": "A_02"
                   }
                 ],
                 "enemies": [
@@ -974,10 +854,30 @@
                     "attackRatioToAvg": 0.98,
                     "engagedByOpponentCount": 0,
                     "teamFormationRole": "backline"
+                  },
+                  {
+                    "unitId": "E_05",
+                    "isAlive": true,
+                    "canBeTargeted": true,
+                    "isRanged": false,
+                    "hpRatio": 0.64,
+                    "attackRatioToAvg": 0.96,
+                    "engagedByOpponentCount": 0,
+                    "teamFormationRole": "midline"
+                  },
+                  {
+                    "unitId": "E_06",
+                    "isAlive": true,
+                    "canBeTargeted": true,
+                    "isRanged": true,
+                    "hpRatio": 0.78,
+                    "attackRatioToAvg": 0.94,
+                    "engagedByOpponentCount": 0,
+                    "teamFormationRole": "backline"
                   }
                 ]
               },
-              "command": "A_06, use your skill on clustered enemies"
+              "command": "A_06, 적이 모인 곳에 스킬 날려."
             }
           }
         ]
@@ -1005,20 +905,13 @@
                     "teamFormationRole": "frontline",
                     "skillDescription": "지정 대상에게 강한 검격을 가하고, 잠시 동안 대상의 방어력을 감소시킵니다.",
                     "IsSkillOnSelf": false,
-                    "IsSkillOnAlly": false,
                     "isSkillAoe": false,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_01",
-                      "E_02",
-                      "E_03",
-                      "E_04"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_03",
-                      "A_04",
-                      "A_06"
-                    ]
+                    "IsSkillOnOtherAlly": false,
+                    "closestTargetableOpponent": "E_01",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_03",
+                    "farthestAliveAlly": "A_06"
                   },
                   {
                     "unitId": "A_02",
@@ -1031,21 +924,13 @@
                     "teamFormationRole": "frontline",
                     "skillDescription": "지정 대상에게 방패 타격을 가하고, 잠시 동안 대상의 이동 속도를 감소시킵니다.",
                     "IsSkillOnSelf": false,
-                    "IsSkillOnAlly": false,
                     "isSkillAoe": false,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_02",
-                      "E_01",
-                      "E_03",
-                      "E_04"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_01",
-                      "A_03",
-                      "A_04",
-                      "A_06"
-                    ]
+                    "IsSkillOnOtherAlly": false,
+                    "closestTargetableOpponent": "E_02",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_01",
+                    "farthestAliveAlly": "A_06"
                   },
                   {
                     "unitId": "A_03",
@@ -1058,20 +943,13 @@
                     "teamFormationRole": "frontline",
                     "skillDescription": "짧은 시간 동안 자신이 받는 피해를 감소시킵니다.",
                     "IsSkillOnSelf": true,
-                    "IsSkillOnAlly": false,
                     "isSkillAoe": false,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_02",
-                      "E_01",
-                      "E_03",
-                      "E_04"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_01",
-                      "A_04",
-                      "A_06"
-                    ]
+                    "IsSkillOnOtherAlly": false,
+                    "closestTargetableOpponent": "E_02",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_01",
+                    "farthestAliveAlly": "A_06"
                   },
                   {
                     "unitId": "A_04",
@@ -1084,20 +962,13 @@
                     "teamFormationRole": "backline",
                     "skillDescription": "지정한 쓰러진 아군을 전투 가능 상태로 되살립니다.",
                     "IsSkillOnSelf": false,
-                    "IsSkillOnAlly": true,
                     "isSkillAoe": false,
                     "canSkillTargetDead": true,
-                    "targetableOpponentsByDistance": [
-                      "E_03",
-                      "E_04",
-                      "E_02",
-                      "E_01"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_01",
-                      "A_03",
-                      "A_06"
-                    ]
+                    "IsSkillOnOtherAlly": true,
+                    "closestTargetableOpponent": "E_03",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_01",
+                    "farthestAliveAlly": "A_06"
                   },
                   {
                     "unitId": "A_06",
@@ -1110,20 +981,13 @@
                     "teamFormationRole": "midline",
                     "skillDescription": "지정 대상 주변에 범위 피해를 입힙니다.",
                     "IsSkillOnSelf": false,
-                    "IsSkillOnAlly": false,
                     "isSkillAoe": true,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_02",
-                      "E_03",
-                      "E_01",
-                      "E_04"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_04",
-                      "A_03",
-                      "A_01"
-                    ]
+                    "IsSkillOnOtherAlly": false,
+                    "closestTargetableOpponent": "E_02",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_04",
+                    "farthestAliveAlly": "A_01"
                   }
                 ],
                 "enemies": [
@@ -1166,6 +1030,26 @@
                     "attackRatioToAvg": 1.0,
                     "engagedByOpponentCount": 0,
                     "teamFormationRole": "backline"
+                  },
+                  {
+                    "unitId": "E_05",
+                    "isAlive": true,
+                    "canBeTargeted": true,
+                    "isRanged": false,
+                    "hpRatio": 0.64,
+                    "attackRatioToAvg": 0.96,
+                    "engagedByOpponentCount": 0,
+                    "teamFormationRole": "midline"
+                  },
+                  {
+                    "unitId": "E_06",
+                    "isAlive": true,
+                    "canBeTargeted": true,
+                    "isRanged": true,
+                    "hpRatio": 0.78,
+                    "attackRatioToAvg": 0.94,
+                    "engagedByOpponentCount": 0,
+                    "teamFormationRole": "backline"
                   }
                 ]
               },
@@ -1176,7 +1060,7 @@
       },
       {
         "commandId": "cmd_007_resurrection_skill_ordered_on_enemy",
-        "commandText": "A_04, use your skill on E_02 now.",
+        "commandText": "A_04, E_02한테 스킬 써.",
         "scenarios": [
           {
             "scenarioId": "scenario_007_resurrection_skill_ordered_on_enemy",
@@ -1197,21 +1081,13 @@
                     "teamFormationRole": "frontline",
                     "skillDescription": "지정 대상에게 강한 검격을 가하고, 잠시 동안 대상의 방어력을 감소시킵니다.",
                     "IsSkillOnSelf": false,
-                    "IsSkillOnAlly": false,
                     "isSkillAoe": false,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_01",
-                      "E_02",
-                      "E_03",
-                      "E_04"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_02",
-                      "A_03",
-                      "A_04",
-                      "A_06"
-                    ]
+                    "IsSkillOnOtherAlly": false,
+                    "closestTargetableOpponent": "E_01",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_02",
+                    "farthestAliveAlly": "A_06"
                   },
                   {
                     "unitId": "A_02",
@@ -1224,21 +1100,13 @@
                     "teamFormationRole": "frontline",
                     "skillDescription": "지정 대상에게 방패 타격을 가하고, 잠시 동안 대상의 이동 속도를 감소시킵니다.",
                     "IsSkillOnSelf": false,
-                    "IsSkillOnAlly": false,
                     "isSkillAoe": false,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_02",
-                      "E_01",
-                      "E_03",
-                      "E_04"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_01",
-                      "A_03",
-                      "A_04",
-                      "A_06"
-                    ]
+                    "IsSkillOnOtherAlly": false,
+                    "closestTargetableOpponent": "E_02",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_01",
+                    "farthestAliveAlly": "A_06"
                   },
                   {
                     "unitId": "A_03",
@@ -1251,21 +1119,13 @@
                     "teamFormationRole": "frontline",
                     "skillDescription": "짧은 시간 동안 자신이 받는 피해를 감소시킵니다.",
                     "IsSkillOnSelf": true,
-                    "IsSkillOnAlly": false,
                     "isSkillAoe": false,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_02",
-                      "E_01",
-                      "E_03",
-                      "E_04"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_01",
-                      "A_02",
-                      "A_04",
-                      "A_06"
-                    ]
+                    "IsSkillOnOtherAlly": false,
+                    "closestTargetableOpponent": "E_02",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_01",
+                    "farthestAliveAlly": "A_06"
                   },
                   {
                     "unitId": "A_04",
@@ -1278,21 +1138,13 @@
                     "teamFormationRole": "backline",
                     "skillDescription": "지정한 쓰러진 아군을 전투 가능 상태로 되살립니다.",
                     "IsSkillOnSelf": false,
-                    "IsSkillOnAlly": true,
                     "isSkillAoe": false,
                     "canSkillTargetDead": true,
-                    "targetableOpponentsByDistance": [
-                      "E_03",
-                      "E_04",
-                      "E_02",
-                      "E_01"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_01",
-                      "A_02",
-                      "A_03",
-                      "A_06"
-                    ]
+                    "IsSkillOnOtherAlly": true,
+                    "closestTargetableOpponent": "E_03",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_01",
+                    "farthestAliveAlly": "A_06"
                   },
                   {
                     "unitId": "A_06",
@@ -1305,21 +1157,13 @@
                     "teamFormationRole": "midline",
                     "skillDescription": "지정 대상 주변에 범위 피해를 입힙니다.",
                     "IsSkillOnSelf": false,
-                    "IsSkillOnAlly": false,
                     "isSkillAoe": true,
                     "canSkillTargetDead": false,
-                    "targetableOpponentsByDistance": [
-                      "E_02",
-                      "E_03",
-                      "E_01",
-                      "E_04"
-                    ],
-                    "aliveAlliesByDistance": [
-                      "A_04",
-                      "A_03",
-                      "A_01",
-                      "A_02"
-                    ]
+                    "IsSkillOnOtherAlly": false,
+                    "closestTargetableOpponent": "E_02",
+                    "farthestTargetableOpponent": "E_06",
+                    "closestAliveAlly": "A_04",
+                    "farthestAliveAlly": "A_02"
                   }
                 ],
                 "enemies": [
@@ -1362,13 +1206,34 @@
                     "attackRatioToAvg": 1.0,
                     "engagedByOpponentCount": 0,
                     "teamFormationRole": "backline"
+                  },
+                  {
+                    "unitId": "E_05",
+                    "isAlive": true,
+                    "canBeTargeted": true,
+                    "isRanged": false,
+                    "hpRatio": 0.64,
+                    "attackRatioToAvg": 0.96,
+                    "engagedByOpponentCount": 0,
+                    "teamFormationRole": "midline"
+                  },
+                  {
+                    "unitId": "E_06",
+                    "isAlive": true,
+                    "canBeTargeted": true,
+                    "isRanged": true,
+                    "hpRatio": 0.78,
+                    "attackRatioToAvg": 0.94,
+                    "engagedByOpponentCount": 0,
+                    "teamFormationRole": "backline"
                   }
                 ]
               },
-              "command": "A_04, use your skill on E_02 now."
+              "command": "A_04, E_02한테 스킬 써."
             }
           }
         ]
       }
     ]
   }
+  
