@@ -71,6 +71,51 @@
       "rejected_count": 2,
       "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260512_032346.jsonl",
       "rejected_path": "D:\\sftgit\\sft_dataset\\rejected\\rejected_20260512_032346.jsonl"
+    },
+    "c2502c40bf2a86108cb2752cb6d2920567ca742a91b86eae0dfb2b838e01fec6": {
+      "input_path": "raw_generations\\seed_0007_raw.jsonl",
+      "input_hash": "c2502c40bf2a86108cb2752cb6d2920567ca742a91b86eae0dfb2b838e01fec6",
+      "skipped": false,
+      "accepted_count": 10,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260512_035433.jsonl",
+      "rejected_path": null
+    },
+    "24933d89907623208c06d93855478a6eb0916198167b16ce3db14cd9e692dd52": {
+      "input_path": "raw_generations\\seed_0008_raw.jsonl",
+      "input_hash": "24933d89907623208c06d93855478a6eb0916198167b16ce3db14cd9e692dd52",
+      "skipped": false,
+      "accepted_count": 7,
+      "rejected_count": 3,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260512_035437.jsonl",
+      "rejected_path": "D:\\sftgit\\sft_dataset\\rejected\\rejected_20260512_035437.jsonl"
+    },
+    "c033f25c465d356445d453b673625d51290fe8b611ea7c232eb3e6d3dfca571f": {
+      "input_path": "raw_generations\\seed_0009_raw.jsonl",
+      "input_hash": "c033f25c465d356445d453b673625d51290fe8b611ea7c232eb3e6d3dfca571f",
+      "skipped": false,
+      "accepted_count": 10,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260512_035440.jsonl",
+      "rejected_path": null
+    },
+    "5575d9494461d53002b927df938d7458181450923c216a834ee7586fd7139791": {
+      "input_path": "raw_generations\\seed_0010_raw.jsonl",
+      "input_hash": "5575d9494461d53002b927df938d7458181450923c216a834ee7586fd7139791",
+      "skipped": false,
+      "accepted_count": 10,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260512_035444.jsonl",
+      "rejected_path": null
+    },
+    "8b842f34d81149e1ab30597ea1cb3fc0df4ac94c3ad656afcef75d8bafcd169e": {
+      "input_path": "raw_generations\\seed_0011_raw.jsonl",
+      "input_hash": "8b842f34d81149e1ab30597ea1cb3fc0df4ac94c3ad656afcef75d8bafcd169e",
+      "skipped": false,
+      "accepted_count": 13,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260512_035448.jsonl",
+      "rejected_path": null
     }
   }
 }

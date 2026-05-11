@@ -4,105 +4,105 @@
 
 | key | current_ratio | target_ratio | count |
 |---|---:|---:|---:|
-| attack | 33.3% | 24% | 19 |
-| move | 29.8% | 22% | 17 |
-| skill | 33.3% | 26% | 19 |
-| skillControl | 1.8% | 8% | 1 |
-| wait | 1.8% | 8% | 1 |
-| empty | 0.0% | 12% | 0 |
+| attack | 17.8% | 24% | 19 |
+| move | 15.9% | 22% | 17 |
+| skill | 39.3% | 26% | 42 |
+| skillControl | 8.4% | 8% | 9 |
+| wait | 7.5% | 8% | 8 |
+| empty | 11.2% | 12% | 12 |
 
 ## Actor Selection
 
 | key | current_ratio | target_ratio | count |
 |---|---:|---:|---:|
-| explicit_actor | 71.9% | 40% | 41 |
-| explicit_multi_actor | 7.0% | 12% | 4 |
-| global_condition | 5.3% | 16% | 3 |
-| global_role_based | 7.0% | 12% | 4 |
-| global_state_based | 5.3% | 15% | 3 |
-| no_valid_actor | 3.5% | 5% | 2 |
+| explicit_actor | 74.8% | 40% | 80 |
+| explicit_multi_actor | 6.5% | 12% | 7 |
+| global_condition | 3.7% | 16% | 4 |
+| global_role_based | 4.7% | 12% | 5 |
+| global_state_based | 3.7% | 15% | 4 |
+| no_valid_actor | 6.5% | 5% | 7 |
 
 ## Target Selection
 
 | key | current_ratio | target_ratio | count |
 |---|---:|---:|---:|
-| explicit_enemy_target | 31.6% | 21% | 18 |
-| explicit_ally_target | 19.3% | 13% | 11 |
-| nearest_enemy | 3.5% | 8% | 2 |
-| lowest_hp_enemy | 3.5% | 8% | 2 |
-| highest_threat_enemy | 3.5% | 7% | 2 |
-| role_based_enemy | 8.8% | 8% | 5 |
-| pressure_source_enemy | 3.5% | 6% | 2 |
-| safe_ally | 8.8% | 6% | 5 |
-| low_hp_ally | 5.3% | 6% | 3 |
+| explicit_enemy_target | 29.9% | 21% | 32 |
+| explicit_ally_target | 21.5% | 13% | 23 |
+| nearest_enemy | 1.9% | 8% | 2 |
+| lowest_hp_enemy | 2.8% | 8% | 3 |
+| highest_threat_enemy | 1.9% | 7% | 2 |
+| role_based_enemy | 5.6% | 8% | 6 |
+| pressure_source_enemy | 1.9% | 6% | 2 |
+| safe_ally | 4.7% | 6% | 5 |
+| low_hp_ally | 2.8% | 6% | 3 |
 | backline_ally | 0.0% | 4% | 0 |
-| invalid_explicit_target | 0.0% | 7% | 0 |
-| none | 12.3% | 6% | 7 |
+| invalid_explicit_target | 1.9% | 7% | 2 |
+| none | 25.2% | 6% | 27 |
 
 ## Action Pattern
 
 | key | current_ratio | target_ratio | count |
 |---|---:|---:|---:|
-| attack_only | 17.5% | 13% | 10 |
-| move_only | 22.8% | 13% | 13 |
-| move_then_attack | 8.8% | 11% | 5 |
-| skill_only | 29.8% | 19% | 17 |
-| move_then_skill | 1.8% | 4% | 1 |
-| wait_only | 1.8% | 6% | 1 |
-| wait_then_attack | 0.0% | 3% | 0 |
-| wait_then_skill | 0.0% | 2% | 0 |
-| skillControl_defer | 1.8% | 4% | 1 |
-| skillControl_forbid | 0.0% | 4% | 0 |
-| multi_actor_same_target | 8.8% | 6% | 5 |
-| multi_actor_different_targets | 3.5% | 3% | 2 |
-| empty_action_expected | 3.5% | 12% | 2 |
+| attack_only | 9.3% | 13% | 10 |
+| move_only | 12.1% | 13% | 13 |
+| move_then_attack | 4.7% | 11% | 5 |
+| skill_only | 36.4% | 19% | 39 |
+| move_then_skill | 0.9% | 4% | 1 |
+| wait_only | 3.7% | 6% | 4 |
+| wait_then_attack | 0.9% | 3% | 1 |
+| wait_then_skill | 0.9% | 2% | 1 |
+| skillControl_defer | 3.7% | 4% | 4 |
+| skillControl_forbid | 3.7% | 4% | 4 |
+| multi_actor_same_target | 4.7% | 6% | 5 |
+| multi_actor_different_targets | 1.9% | 3% | 2 |
+| empty_action_expected | 16.8% | 12% | 18 |
 
 ## Command Style
 
 | key | current_ratio | target_ratio | count |
 |---|---:|---:|---:|
-| direct_korean | 33.3% | 35% | 19 |
-| casual_korean | 33.3% | 20% | 19 |
-| elliptical_korean | 1.8% | 20% | 1 |
-| tactical_korean | 31.6% | 15% | 18 |
+| direct_korean | 47.7% | 35% | 51 |
+| casual_korean | 32.7% | 20% | 35 |
+| elliptical_korean | 0.9% | 20% | 1 |
+| tactical_korean | 18.7% | 15% | 20 |
 | rough_korean | 0.0% | 10% | 0 |
 
 ## Skill Family
 
 | key | current_ratio | target_ratio | count |
 |---|---:|---:|---:|
-| enemy_single_target_attack | 21.1% | 18% | 4 |
-| self_buff | 15.8% | 14% | 3 |
-| ally_shield | 15.8% | 13% | 3 |
-| ally_heal | 10.5% | 11% | 2 |
-| ally_resurrection | 10.5% | 13% | 2 |
-| enemy_aoe_attack | 10.5% | 12% | 2 |
-| enemy_debuff | 5.3% | 8% | 1 |
-| mobility_skill | 0.0% | 5% | 0 |
-| no_skill | 10.5% | 6% | 2 |
+| enemy_single_target_attack | 15.6% | 18% | 7 |
+| self_buff | 15.6% | 14% | 7 |
+| ally_shield | 15.6% | 13% | 7 |
+| ally_heal | 13.3% | 11% | 6 |
+| ally_resurrection | 8.9% | 13% | 4 |
+| enemy_aoe_attack | 8.9% | 12% | 4 |
+| enemy_debuff | 8.9% | 8% | 4 |
+| mobility_skill | 4.4% | 5% | 2 |
+| no_skill | 8.9% | 6% | 4 |
 
 ## Skill Target Kind
 
 | key | current_ratio | target_ratio | count |
 |---|---:|---:|---:|
-| enemy_alive | 31.6% | 36% | 6 |
-| ally_alive | 26.3% | 22% | 5 |
-| self | 15.8% | 16% | 3 |
-| ally_dead | 10.5% | 12% | 2 |
-| enemy_dead | 5.3% | 5% | 1 |
-| none | 10.5% | 9% | 2 |
+| enemy_alive | 28.9% | 36% | 13 |
+| ally_alive | 24.4% | 22% | 11 |
+| self | 17.8% | 16% | 8 |
+| ally_dead | 13.3% | 12% | 6 |
+| enemy_dead | 6.7% | 5% | 3 |
+| none | 8.9% | 9% | 4 |
 
 ## Conflict Type
 
 | key | current_ratio | target_ratio | count |
 |---|---:|---:|---:|
-| null | 57.9% | 48% | 11 |
-| text_enemy_target_but_self_skill | 5.3% | 8% | 1 |
-| text_enemy_target_but_ally_skill | 5.3% | 9% | 1 |
-| text_ally_target_but_enemy_skill | 5.3% | 9% | 1 |
-| text_dead_target_but_skill_cannot_target_dead | 10.5% | 8% | 2 |
-| text_living_target_but_resurrection_skill | 5.3% | 6% | 1 |
-| skill_actor_has_no_skill | 10.5% | 7% | 2 |
+| null | 48.9% | 48% | 22 |
+| text_enemy_target_but_self_skill | 4.4% | 8% | 2 |
+| text_enemy_target_but_ally_skill | 6.7% | 9% | 3 |
+| text_ally_target_but_enemy_skill | 8.9% | 9% | 4 |
+| text_dead_target_but_skill_cannot_target_dead | 15.6% | 8% | 7 |
+| text_living_target_but_resurrection_skill | 4.4% | 6% | 2 |
+| skill_actor_has_no_skill | 8.9% | 7% | 4 |
 
 ## Taxonomy Errors
 
