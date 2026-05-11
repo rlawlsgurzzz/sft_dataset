@@ -1,7 +1,8 @@
 # accepted 샘플에서 기준 command slot을 찾고 teacher 생성 요청 payload를 만든다.
 # 숫자 path는 sft_taxonomy.py로 검증하고 내부 처리는 stable path 기준으로 수행한다.
 # selected_bucket에는 분류 기준, edge, skill_case, 생성 계약을 포함한다.
-# existing_valid_paraphrase_samples에는 표현 예시와 command_style만 포함한다.
+# existing_valid_paraphrase_samples에는 요청 split의 cycle 가능 표현만 포함한다.
+# other_split_reserved_command_texts에는 다른 split의 중복 금지 표현만 포함한다.
 # commandAnalysis는 teacher 생성 대상이 아니며 validator가 accepted 저장 시 계산한다.
 
 from __future__ import annotations
@@ -60,9 +61,9 @@ DEFAULT_TARGET_SPLIT = "train"
 VALID_SPLITS = ("train", "validation", "test")
 
 SPLIT_EXPRESSION_POOL_LIMITS: dict[str, int] = {
-    "train": 8,
-    "validation": 4,
-    "test": 4,
+    "train": 7,
+    "validation": 3,
+    "test": 3,
 }
 
 
@@ -257,7 +258,7 @@ def attach_skill_case_fields(
     return selected_bucket
 
 
-# teacher에게는 기존 valid 표현과 command_style만 전달한다.
+# 요청 split 안에서 cycle 가능한 기존 표현 pool을 만든다.
 def build_existing_paraphrase_samples(
     samples: list[dict[str, Any]],
     target_split: str,
@@ -293,15 +294,52 @@ def build_existing_paraphrase_samples(
     return result
 
 
+# 다른 split에 이미 존재하는 표현을 중복 금지 목록으로 만든다.
+def build_other_split_reserved_command_texts(
+    samples: list[dict[str, Any]],
+    target_split: str,
+) -> list[dict[str, str]]:
+    target_split = normalize_target_split(target_split)
+
+    seen: set[tuple[str, str, str]] = set()
+    result: list[dict[str, str]] = []
+
+    for sample in samples:
+        split = sample_split(sample)
+
+        if split == target_split:
+            continue
+
+        command_text = sample_command_text(sample)
+        command_style = sample_command_style(sample)
+        key = (split, command_text, command_style)
+
+        if key in seen:
+            continue
+
+        seen.add(key)
+        result.append(
+            {
+                "split": split,
+                "command_text": command_text,
+                "command_style": command_style,
+            }
+        )
+
+    return result
+
+
+# split별 표현 pool 생성/순환 정책을 payload에 명시한다.
 def build_command_text_policy(
     existing_paraphrase_samples: list[dict[str, str]],
+    other_split_reserved_command_texts: list[dict[str, str]],
     target_split: str,
     count_to_generate: int,
 ) -> dict[str, Any]:
     target_split = normalize_target_split(target_split)
     pool_limit = get_expression_pool_limit(target_split)
-    existing_count = len(existing_paraphrase_samples)
 
+    existing_count = len(existing_paraphrase_samples)
     new_unique_count = max(0, min(count_to_generate, pool_limit - existing_count))
     cycle_count = max(0, count_to_generate - new_unique_count)
 
@@ -309,14 +347,20 @@ def build_command_text_policy(
         "target_split": target_split,
         "same_split_expression_pool_size": pool_limit,
         "existing_same_split_expression_count": existing_count,
+        "other_split_reserved_expression_count": len(other_split_reserved_command_texts),
         "new_unique_command_texts_to_create": new_unique_count,
-        "samples_using_existing_cycle": cycle_count,
+        "samples_using_same_split_cycle": cycle_count,
+        "cycle_source": "existing_valid_paraphrase_samples plus newly created unique command_texts in this request",
         "rules": [
             "같은 split 안에서 command_text 표현 pool을 관리한다.",
             "표현 pool이 가득 차기 전에는 새 command_text를 만든다.",
-            "표현 pool이 가득 찬 뒤에는 같은 split의 기존 command_text를 순환 재사용할 수 있다.",
+            "새 command_text는 existing_valid_paraphrase_samples와 exact duplicate이면 안 된다.",
+            "새 command_text는 other_split_reserved_command_texts와 exact duplicate이면 안 된다.",
+            "표현 pool이 가득 찬 뒤에는 같은 split 표현 pool 안에서만 command_text를 순환 재사용할 수 있다.",
+            "같은 요청에서 새로 만든 unique command_text도 이후 cycle source로 사용할 수 있다.",
+            "other_split_reserved_command_texts는 cycle source가 아니다.",
             "command_text를 재사용하더라도 area_situation, gold, output은 새로 구성한다.",
-            "다른 split의 command_text 표현 pool을 섞지 않는다.",
+            "다른 split의 command_text 표현 pool을 cycle 대상으로 섞지 않는다.",
         ],
     }
 
@@ -471,7 +515,13 @@ def build_generation_constraints(target_split: str = DEFAULT_TARGET_SPLIT) -> li
         f"각 sample.split은 반드시 {target_split}이다.",
         "새 command는 selected_bucket의 command slot 의미와 edge_flags를 유지한다.",
         "command_text_policy를 따른다.",
-        "표현 pool이 가득 찬 뒤에는 같은 split의 existing_valid_paraphrase_samples command_text를 순환 재사용할 수 있다.",
+        "existing_valid_paraphrase_samples는 요청 split의 cycle 가능 표현 pool이다.",
+        "other_split_reserved_command_texts는 다른 split의 중복 금지 표현 목록이다.",
+        "새 command_text는 existing_valid_paraphrase_samples와 exact duplicate이면 안 된다.",
+        "새 command_text는 other_split_reserved_command_texts와 exact duplicate이면 안 된다.",
+        "표현 pool이 가득 찬 뒤에는 같은 split 표현 pool 안에서만 command_text를 순환 재사용할 수 있다.",
+        "같은 요청에서 새로 만든 unique command_text도 이후 cycle source로 사용할 수 있다.",
+        "other_split_reserved_command_texts는 cycle source가 아니다.",
         "command_text를 재사용하더라도 area_situation, gold, output은 복사하지 않고 새로 구성한다.",
         "taxonomy 밖 값을 만들지 않는다.",
         "source_ref를 생성하지 않는다.",
@@ -536,8 +586,14 @@ def build_generation_payload(
         target_split=target_split,
     )
 
+    other_split_reserved_command_texts = build_other_split_reserved_command_texts(
+        samples=command_slot_samples,
+        target_split=target_split,
+    )
+
     command_text_policy = build_command_text_policy(
         existing_paraphrase_samples=existing_paraphrase_samples,
+        other_split_reserved_command_texts=other_split_reserved_command_texts,
         target_split=target_split,
         count_to_generate=parsed.count,
     )
@@ -555,6 +611,7 @@ def build_generation_payload(
         "target_split": target_split,
         "selected_bucket": selected_bucket,
         "existing_valid_paraphrase_samples": existing_paraphrase_samples,
+        "other_split_reserved_command_texts": other_split_reserved_command_texts,
         "command_text_policy": command_text_policy,
         "count_to_generate": parsed.count,
         "runtime_generation_contract": build_runtime_generation_contract(),

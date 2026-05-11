@@ -5,11 +5,11 @@ attack [30.0%(24%) / 3]
     explicit_enemy_target [50.0%(30%) / 1]
       attack_only [100.0%(45%) / 1]
         simple_clear_target [100.0%(18%) / 1]
- "A_01, E_02를 공격해." @ 1 @ [] @ accepted_20260512_005252.jsonl_seed_master_0001
+          "A_01, E_02를 공격해." @ 1 @ [] @ accepted_20260512_005252.jsonl_seed_master_0001
     nearest_enemy [50.0%(15%) / 1]
       attack_only [100.0%(45%) / 1]
         nearest_target_clear [100.0%(8%) / 1]
- "A_02, 가장 가까운 적을 공격해." @ 1 @ [] @ accepted_20260512_005252.jsonl_seed_master_0002
+          "A_02, 가장 가까운 적을 공격해." @ 1 @ [] @ accepted_20260512_005252.jsonl_seed_master_0002
     lowest_hp_enemy [0.0%(15%) / 0]
     highest_threat_enemy [0.0%(12%) / 0]
     role_based_enemy [0.0%(12%) / 0]
@@ -27,7 +27,7 @@ attack [30.0%(24%) / 3]
     explicit_enemy_target [100.0%(30%) / 1]
       multi_actor_same_target [100.0%(18%) / 1]
         focus_fire_clear [100.0%(8%) / 1]
- "손이 비는 아군은 전부 E_01을 집중 공격해." @ 1 @ free_actor_selection @ accepted_20260512_005252.jsonl_seed_master_0003
+          "손이 비는 아군은 전부 E_01을 집중 공격해." @ 1 @ free_actor_selection @ accepted_20260512_005252.jsonl_seed_master_0003
     nearest_enemy [0.0%(15%) / 0]
     lowest_hp_enemy [0.0%(15%) / 0]
     highest_threat_enemy [0.0%(12%) / 0]
@@ -56,7 +56,7 @@ move [20.0%(22%) / 2]
     explicit_ally_target [100.0%(22%) / 1]
       move_only [100.0%(55%) / 1]
         move_to_alive_ally [100.0%(10%) / 1]
- "A_02, A_04에게 이동해." @ 1 @ [] @ accepted_20260512_005252.jsonl_seed_master_0004
+          "A_02, A_04에게 이동해." @ 1 @ [] @ accepted_20260512_005252.jsonl_seed_master_0004
     explicit_enemy_target [0.0%(18%) / 0]
     safe_ally [0.0%(16%) / 0]
     low_hp_ally [0.0%(12%) / 0]
@@ -70,7 +70,7 @@ move [20.0%(22%) / 2]
     safe_ally [100.0%(16%) / 1]
       move_only [100.0%(55%) / 1]
         retreat_to_backline_ally [100.0%(12%) / 1]
- "A_01, A_02는 뒤로 빠져." @ 1 @ retreat_to_safe_ally @ accepted_20260512_005252.jsonl_seed_master_0005
+          "A_01, A_02는 뒤로 빠져." @ 1 @ retreat_to_safe_ally @ accepted_20260512_005252.jsonl_seed_master_0005
     low_hp_ally [0.0%(12%) / 0]
     backline_ally [0.0%(10%) / 0]
     role_based_enemy [0.0%(5%) / 0]
@@ -119,19 +119,19 @@ skill [30.0%(26%) / 3]
     explicit_ally_target [33.3%(22%) / 1]
       skill_only [100.0%(70%) / 1]
         ally_skill_valid_target [100.0%(10%) / 1]
- "A_04, A_02한테 스킬 써." @ 1 @ [] @ accepted_20260512_005252.jsonl_seed_master_0007
+          "A_04, A_02한테 스킬 써." @ 1 @ [] @ accepted_20260512_005252.jsonl_seed_master_0007
     lowest_hp_enemy [0.0%(8%) / 0]
     nearest_enemy [0.0%(5%) / 0]
     role_based_enemy [33.3%(8%) / 1]
       skill_only [100.0%(70%) / 1]
         aoe_skill_center_selection [100.0%(8%) / 1]
- "A_06, 적들이 뭉친 쪽에 스킬 써." @ 1 @ aoe_skill_requires_single_center_target @ accepted_20260512_005252.jsonl_seed_master_0008
+          "A_06, 적들이 뭉친 쪽에 스킬 써." @ 1 @ aoe_skill_requires_single_center_target @ accepted_20260512_005252.jsonl_seed_master_0008
     low_hp_ally [0.0%(10%) / 0]
     invalid_explicit_target [0.0%(13%) / 0]
     none [33.3%(8%) / 1]
       skill_only [100.0%(70%) / 1]
         self_skill_no_target [100.0%(8%) / 1]
- "A_03, 지금 스킬 써." @ 1 @ self_skill_without_explicit_target @ accepted_20260512_005252.jsonl_seed_master_0006
+          "A_03, 지금 스킬 써." @ 1 @ self_skill_without_explicit_target @ accepted_20260512_005252.jsonl_seed_master_0006
   explicit_multi_actor [0.0%(10%) / 0]
     explicit_enemy_target [0.0%(26%) / 0]
     explicit_ally_target [0.0%(22%) / 0]
@@ -183,7 +183,7 @@ skillControl [10.0%(8%) / 1]
     none [100.0%(100%) / 1]
       skillControl_defer [100.0%(55%) / 1]
         explicit_defer_skill [100.0%(25%) / 1]
- "A_03, 스킬은 아직 쓰지 말고 5초 후로 미뤄." @ 1 @ [] @ accepted_20260512_005252.jsonl_seed_master_0009
+          "A_03, 스킬은 아직 쓰지 말고 5초 후로 미뤄." @ 1 @ [] @ accepted_20260512_005252.jsonl_seed_master_0009
   explicit_multi_actor [0.0%(20%) / 0]
     none [0.0%(100%) / 0]
   no_valid_actor [0.0%(10%) / 0]
@@ -195,7 +195,7 @@ wait [10.0%(8%) / 1]
     none [100.0%(90%) / 1]
       wait_only [100.0%(65%) / 1]
         explicit_wait_duration [100.0%(20%) / 1]
- "A_04, 5초만 기다려." @ 1 @ explicit_wait_duration @ accepted_20260512_005252.jsonl_seed_master_0010
+          "A_04, 5초만 기다려." @ 1 @ explicit_wait_duration @ accepted_20260512_005252.jsonl_seed_master_0010
   explicit_multi_actor [0.0%(15%) / 0]
     explicit_enemy_target [0.0%(10%) / 0]
     none [0.0%(90%) / 0]

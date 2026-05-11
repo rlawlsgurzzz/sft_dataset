@@ -68,6 +68,46 @@ def build_payload_or_print_error(args: argparse.Namespace) -> dict[str, Any] | N
         print(f"request failed: {error}")
         return None
 
+PRINT_COMMAND_TEXT_POLICY_KEYS = (
+    "target_split",
+    "same_split_expression_pool_size",
+    "existing_same_split_expression_count",
+    "other_split_reserved_expression_count",
+    "new_unique_command_texts_to_create",
+    "samples_using_same_split_cycle",
+)
+
+
+def build_print_payload(payload: dict[str, Any]) -> dict[str, Any]:
+    command_text_policy = payload.get("command_text_policy", {})
+
+    if isinstance(command_text_policy, dict):
+        compact_command_text_policy = {
+            key: command_text_policy[key]
+            for key in PRINT_COMMAND_TEXT_POLICY_KEYS
+            if key in command_text_policy
+        }
+    else:
+        compact_command_text_policy = {}
+
+    return {
+        "request": payload.get("request", {}),
+        "target_split": payload.get("target_split"),
+        "selected_bucket": payload.get("selected_bucket", {}),
+        "existing_valid_paraphrase_samples": payload.get(
+            "existing_valid_paraphrase_samples",
+            [],
+        ),
+        "other_split_reserved_command_texts": payload.get(
+            "other_split_reserved_command_texts",
+            [],
+        ),
+        "command_text_policy": compact_command_text_policy,
+    }
+
+
+def print_payload_json(payload: dict[str, Any]) -> None:
+    print(json.dumps(build_print_payload(payload), ensure_ascii=False, indent=2))
 
 def run_request(args: argparse.Namespace) -> None:
     dataset_root = Path(args.dataset_root)
@@ -86,7 +126,7 @@ def run_request(args: argparse.Namespace) -> None:
     print(f"generation_request: {output_path}")
 
     if args.print_json:
-        print(json.dumps(payload, ensure_ascii=False, indent=2))
+        print_payload_json(payload)
 
 
 def print_generation_plan(
@@ -114,12 +154,18 @@ def print_generation_plan(
     print(f"target_split: {target_split}")
 
     if command_text_policy:
+        cycle_count = command_text_policy.get(
+            "samples_using_same_split_cycle",
+            command_text_policy.get("samples_using_existing_cycle"),
+        )
+
         print(
             "command_text_policy: "
             f"pool={command_text_policy.get('same_split_expression_pool_size')}, "
-            f"existing={command_text_policy.get('existing_same_split_expression_count')}, "
+            f"existing_same_split={command_text_policy.get('existing_same_split_expression_count')}, "
+            f"reserved_other_split={command_text_policy.get('other_split_reserved_expression_count')}, "
             f"new={command_text_policy.get('new_unique_command_texts_to_create')}, "
-            f"cycle={command_text_policy.get('samples_using_existing_cycle')}"
+            f"cycle={cycle_count}"
         )
 
     edge_flags = selected_bucket.get("edge_flags")
@@ -161,7 +207,7 @@ def run_generate(args: argparse.Namespace) -> None:
     )
 
     if args.print_json:
-        print(json.dumps(payload, ensure_ascii=False, indent=2))
+        print_payload_json(payload)
 
     answer = input("type y to continue, n to cancel: ").strip().lower()
     if answer != "y":
@@ -186,7 +232,8 @@ def run_generate(args: argparse.Namespace) -> None:
         trace_path=trace_output_path,
         model_name=args.model,
         max_tokens=args.max_tokens,
-        print_json=args.print_json,
+        print_json=False,
+        #print_json=args.print_json, 이면 llm 출력 결과도 모두 보임
         stream_output=args.stream_output,
     )
 

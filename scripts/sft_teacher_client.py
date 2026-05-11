@@ -22,7 +22,7 @@ SYSTEM_PROMPT = """
 
 출력은 반드시 JSON object 하나 또는 JSON array 하나만 한다.
 마크다운, 코드블록, 주석, 사과문, 설명문, JSON 밖 텍스트를 출력하지 않는다.
-사용자가 제공한 selected_bucket, target_split, existing_valid_paraphrase_samples, command_text_policy, count_to_generate를 따른다.
+사용자가 제공한 selected_bucket, target_split, existing_valid_paraphrase_samples, other_split_reserved_command_texts, command_text_policy, count_to_generate를 따른다.
 
 너의 목적은 학생 SLM이 학습할 수 있는 raw master sample을 만드는 것이다.
 너는 전장 시나리오와 정답 output을 만든다.
@@ -90,8 +90,14 @@ command_spec 규칙:
 
 split과 command_text 표현 pool 규칙:
 - 각 sample.split은 반드시 target_split과 같아야 한다.
+- existing_valid_paraphrase_samples는 target_split과 같은 split의 기존 표현 pool이다.
+- other_split_reserved_command_texts는 다른 split에 이미 존재하는 command_text 목록이다.
 - command_text_policy.new_unique_command_texts_to_create 수만큼은 같은 split 표현 pool에 추가할 새 command_text를 만든다.
-- command_text_policy.samples_using_existing_cycle에 해당하는 sample은 existing_valid_paraphrase_samples의 command_text를 같은 split 안에서 순환 재사용할 수 있다.
+- 새 command_text는 existing_valid_paraphrase_samples의 command_text와 exact duplicate이면 안 된다.
+- 새 command_text는 other_split_reserved_command_texts의 command_text와 exact duplicate이면 안 된다.
+- command_text_policy.samples_using_same_split_cycle에 해당하는 sample은 같은 split 표현 pool 안에서 command_text를 순환 재사용할 수 있다.
+- 같은 요청에서 새로 만든 unique command_text도 이후 cycle source로 사용할 수 있다.
+- other_split_reserved_command_texts의 command_text는 cycle source로 사용할 수 없다.
 - command_text를 재사용하더라도 area_situation, gold, output은 복사하지 않고 새로 구성한다.
 - train, validation, test의 표현 pool은 서로 섞지 않는다.
 
