@@ -125,6 +125,9 @@ input.input.area_situation 생성 규칙:
 - allies unitId는 A_01, A_02, A_03, A_04, A_05, A_06을 사용한다.
 - enemies unitId는 E_01, E_02, E_03, E_04, E_05, E_06을 사용한다.
 - unitId 중복을 만들지 않는다.
+- 여러 sample을 생성할 때 area_situation을 같은 template으로 반복하지 않는다.
+- 각 sample의 전장 상태, 생존/사망 상태, 체력, 교전 수, 진형 역할, skill 구성, closest/farthest 관계는 해당 command, selected_bucket, skill_case, gold, output이 성립하는 범위 안에서 자연스럽게 다르게 구성한다.
+- 모든 sample이 서로 완전히 배타적인 전장 상태일 필요는 없지만, 같은 area_situation을 복사한 뒤 command와 output만 바꾸는 방식은 사용하지 않는다.
 - selected_bucket, skill_case, gold, output이 모두 성립하도록 전장 상태를 만든다.
 - 빈 allies/enemies를 만들지 않는다.
 - commandAnalysis를 만들지 않는다.
