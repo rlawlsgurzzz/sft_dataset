@@ -4,20 +4,20 @@
 
 | key | current_ratio | target_ratio | count |
 |---|---:|---:|---:|
-| attack | 30.0% | 24% | 3 |
-| move | 20.0% | 22% | 2 |
-| skill | 30.0% | 26% | 3 |
-| skillControl | 10.0% | 8% | 1 |
-| wait | 10.0% | 8% | 1 |
+| attack | 63.2% | 24% | 12 |
+| move | 10.5% | 22% | 2 |
+| skill | 15.8% | 26% | 3 |
+| skillControl | 5.3% | 8% | 1 |
+| wait | 5.3% | 8% | 1 |
 | empty | 0.0% | 12% | 0 |
 
 ## Actor Selection
 
 | key | current_ratio | target_ratio | count |
 |---|---:|---:|---:|
-| explicit_actor | 80.0% | 40% | 8 |
-| explicit_multi_actor | 10.0% | 12% | 1 |
-| global_condition | 10.0% | 16% | 1 |
+| explicit_actor | 89.5% | 40% | 17 |
+| explicit_multi_actor | 5.3% | 12% | 1 |
+| global_condition | 5.3% | 16% | 1 |
 | global_role_based | 0.0% | 12% | 0 |
 | global_state_based | 0.0% | 15% | 0 |
 | no_valid_actor | 0.0% | 5% | 0 |
@@ -26,34 +26,34 @@
 
 | key | current_ratio | target_ratio | count |
 |---|---:|---:|---:|
-| explicit_enemy_target | 20.0% | 21% | 2 |
-| explicit_ally_target | 20.0% | 13% | 2 |
-| nearest_enemy | 10.0% | 8% | 1 |
-| lowest_hp_enemy | 0.0% | 8% | 0 |
-| highest_threat_enemy | 0.0% | 7% | 0 |
-| role_based_enemy | 10.0% | 8% | 1 |
-| pressure_source_enemy | 0.0% | 6% | 0 |
-| safe_ally | 10.0% | 6% | 1 |
+| explicit_enemy_target | 26.3% | 21% | 5 |
+| explicit_ally_target | 10.5% | 13% | 2 |
+| nearest_enemy | 10.5% | 8% | 2 |
+| lowest_hp_enemy | 5.3% | 8% | 1 |
+| highest_threat_enemy | 5.3% | 7% | 1 |
+| role_based_enemy | 15.8% | 8% | 3 |
+| pressure_source_enemy | 5.3% | 6% | 1 |
+| safe_ally | 5.3% | 6% | 1 |
 | low_hp_ally | 0.0% | 6% | 0 |
 | backline_ally | 0.0% | 4% | 0 |
 | invalid_explicit_target | 0.0% | 7% | 0 |
-| none | 30.0% | 6% | 3 |
+| none | 15.8% | 6% | 3 |
 
 ## Action Pattern
 
 | key | current_ratio | target_ratio | count |
 |---|---:|---:|---:|
-| attack_only | 20.0% | 13% | 2 |
-| move_only | 20.0% | 13% | 2 |
-| move_then_attack | 0.0% | 11% | 0 |
-| skill_only | 30.0% | 19% | 3 |
+| attack_only | 47.4% | 13% | 9 |
+| move_only | 10.5% | 13% | 2 |
+| move_then_attack | 10.5% | 11% | 2 |
+| skill_only | 15.8% | 19% | 3 |
 | move_then_skill | 0.0% | 4% | 0 |
-| wait_only | 10.0% | 6% | 1 |
+| wait_only | 5.3% | 6% | 1 |
 | wait_then_attack | 0.0% | 3% | 0 |
 | wait_then_skill | 0.0% | 2% | 0 |
-| skillControl_defer | 10.0% | 4% | 1 |
+| skillControl_defer | 5.3% | 4% | 1 |
 | skillControl_forbid | 0.0% | 4% | 0 |
-| multi_actor_same_target | 10.0% | 6% | 1 |
+| multi_actor_same_target | 5.3% | 6% | 1 |
 | multi_actor_different_targets | 0.0% | 3% | 0 |
 | empty_action_expected | 0.0% | 12% | 0 |
 
@@ -61,10 +61,10 @@
 
 | key | current_ratio | target_ratio | count |
 |---|---:|---:|---:|
-| direct_korean | 50.0% | 35% | 5 |
-| casual_korean | 30.0% | 20% | 3 |
-| elliptical_korean | 10.0% | 20% | 1 |
-| tactical_korean | 10.0% | 15% | 1 |
+| direct_korean | 57.9% | 35% | 11 |
+| casual_korean | 15.8% | 20% | 3 |
+| elliptical_korean | 5.3% | 20% | 1 |
+| tactical_korean | 21.1% | 15% | 4 |
 | rough_korean | 0.0% | 10% | 0 |
 
 ## Skill Family

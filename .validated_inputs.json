@@ -26,6 +26,15 @@
       "rejected_count": 0,
       "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260512_005252.jsonl",
       "rejected_path": null
+    },
+    "69facc4a62ade1a5b87273c2db2083ab766f804328ced6aa1f6e3b5ac55736a9": {
+      "input_path": "raw_generations\\seed_0002_raw.jsonl",
+      "input_hash": "69facc4a62ade1a5b87273c2db2083ab766f804328ced6aa1f6e3b5ac55736a9",
+      "skipped": false,
+      "accepted_count": 9,
+      "rejected_count": 1,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260512_023750.jsonl",
+      "rejected_path": "D:\\sftgit\\sft_dataset\\rejected\\rejected_20260512_023750.jsonl"
     }
   }
 }
