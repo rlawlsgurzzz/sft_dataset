@@ -1,8 +1,8 @@
 # SFT dataset 관리 작업의 단일 진입점이다.
-# report 생성, generation request payload 생성, teacher 호출, validator 실행을 묶는다.
-# request/generate 출력 파일명은 raw_generations의 다음 순번을 사용한다.
-# generate는 payload 생성 후 사용자 확인을 받고 teacher를 호출한다.
-# 세부 검증 기준은 taxonomy_sot.json과 validator에 위임한다.
+# request는 teacher LLM에 보낼 generation payload를 만든다.
+# generate는 payload 생성 후 사용자 확인을 받고 teacher raw output을 저장한다.
+# validate는 teacher raw output을 검증하고 accepted 저장 시 commandAnalysis를 계산해 추가한다.
+# report는 accepted sample 기준으로 taxonomy coverage 문서를 재생성한다.
 
 from __future__ import annotations
 
@@ -195,19 +195,25 @@ def run_validate(args: argparse.Namespace) -> None:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Synthetic SFT dataset management CLI")
+    parser = argparse.ArgumentParser(
+        description="Synthetic SFT dataset request/generate/validate/report CLI"
+    )
     parser.add_argument("--dataset-root", default=str(DEFAULT_DATASET_ROOT))
     parser.add_argument("--taxonomy", default=str(DEFAULT_TAXONOMY_PATH))
 
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    report_parser = subparsers.add_parser("report", help="Regenerate coverage reports.")
+    report_parser = subparsers.add_parser(
+        "report",
+        help="Regenerate taxonomy coverage reports from accepted samples.",
+    )
     report_parser.set_defaults(
         func=lambda args: run_report(Path(args.dataset_root), Path(args.taxonomy))
     )
 
     request_parser = subparsers.add_parser(
-        "request", help="Build teacher LLM generation request payload."
+        "request",
+        help="Build teacher LLM generation request payload.",
     )
     request_parser.add_argument(
         "request", help="Generation request path, e.g. c1-2-1-3-1-10.4"
@@ -217,7 +223,8 @@ def build_parser() -> argparse.ArgumentParser:
     request_parser.set_defaults(func=run_request)
 
     generate_parser = subparsers.add_parser(
-        "generate", help="Build request payload and call teacher after confirmation."
+        "generate",
+        help="Build request payload and save teacher raw output after confirmation.",
     )
     generate_parser.add_argument(
         "request", help="Generation request path, e.g. c1-2-1-3-1-10.4"
@@ -236,10 +243,13 @@ def build_parser() -> argparse.ArgumentParser:
     generate_parser.set_defaults(func=run_generate)
 
     validate_parser = subparsers.add_parser(
-        "validate", help="Validate teacher output and split accepted/rejected."
+        "validate",
+        help="Validate teacher raw output, compute commandAnalysis, and split accepted/rejected.",
     )
     validate_parser.add_argument(
-        "--input", required=True, help="Teacher output JSON/JSONL path."
+        "--input",
+        required=True,
+        help="Teacher raw output JSON/JSONL path.",
     )
     validate_parser.add_argument("--dry-run", action="store_true")
     validate_parser.add_argument("--refresh-report", action="store_true")

@@ -1,7 +1,7 @@
 # accepted JSONL 샘플을 읽어 general/skill coverage markdown을 재생성한다.
-# taxonomy_sot.json의 목표 비율과 현재 비율/개수를 함께 표시한다.
-# taxonomy_sot.md와 coverage_summary.md도 같은 SOT 기준으로 생성한다.
-# command_style은 coverage row에 쓰지 않고, accepted sample 내부 metadata로만 집계한다.
+# coverage 기준은 taxonomy_sot.json의 metadata/skill_case 경로다.
+# accepted sample의 validator_result와 input.commandAnalysis는 coverage row 기준으로 쓰지 않는다.
+# report 내부 참조명은 파일명과 sample id를 결합한 표시용 값이다.
 
 from __future__ import annotations
 
@@ -74,7 +74,7 @@ def load_accepted_samples(accepted_dir: Path) -> list[dict[str, Any]]:
     for path in sorted(accepted_dir.glob("*.jsonl")):
         for sample in read_json_records(path):
             sample = dict(sample)
-            sample["__source_file"] = path.name
+            sample["__report_file"] = path.name
             samples.append(sample)
     return samples
 
@@ -96,11 +96,11 @@ def get_sample_id(sample: dict[str, Any], fallback_index: int = 0) -> str:
     return f"sample_missing_id_{fallback_index:06d}"
 
 
-def get_source_ref(sample: dict[str, Any], fallback_index: int = 0) -> str:
-    source_file = sample.get("__source_file")
-    if not isinstance(source_file, str) or not source_file:
-        source_file = "unknown.jsonl"
-    return f"{source_file}_{get_sample_id(sample, fallback_index)}"
+def get_report_sample_ref(sample: dict[str, Any], fallback_index: int = 0) -> str:
+    report_file = sample.get("__report_file")
+    if not isinstance(report_file, str) or not report_file:
+        report_file = "unknown.jsonl"
+    return f"{report_file}_{get_sample_id(sample, fallback_index)}"
 
 
 def get_base_command_text(sample: dict[str, Any]) -> str:
@@ -229,11 +229,13 @@ def render_row(
     edge_flags: tuple[str, ...],
     grouped_samples: list[dict[str, Any]],
 ) -> str:
-    refs = [get_source_ref(sample, index) for index, sample in enumerate(grouped_samples, start=1)]
+    report_refs = [
+        get_report_sample_ref(sample, index)
+        for index, sample in enumerate(grouped_samples, start=1)
+    ]
     edge_text = ", ".join(edge_flags) if edge_flags else "[]"
-    ref_text = ", ".join(refs) if refs else "{}"
-    return f'          "{command_text}" @ {len(grouped_samples)} @ {edge_text} @ {ref_text}'
-
+    report_ref_text = ", ".join(report_refs) if report_refs else "{}"
+    return f' "{command_text}" @ {len(grouped_samples)} @ {edge_text} @ {report_ref_text}'
 
 def count_by(samples: Iterable[dict[str, Any]], extractor) -> Counter[str]:
     counter: Counter[str] = Counter()
@@ -390,7 +392,7 @@ def collect_taxonomy_errors(samples: list[dict[str, Any]], taxonomy: dict[str, A
     for index, sample in enumerate(samples, start=1):
         sample_errors = validate_metadata_against_taxonomy(sample, taxonomy)
         if sample_errors:
-            errors.append((get_source_ref(sample, index), sample_errors))
+            errors.append((get_report_sample_ref(sample, index), sample_errors))
     return errors
 
 
