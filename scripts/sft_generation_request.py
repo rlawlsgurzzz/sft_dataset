@@ -56,9 +56,21 @@ except ImportError:
 
 
 DEFAULT_REQUEST_OUTPUT_DIR = DEFAULT_DATASET_ROOT / "raw_generations"
+DEFAULT_TARGET_SPLIT = "train"
+VALID_SPLITS = ("train", "validation", "test")
+
+SPLIT_EXPRESSION_POOL_LIMITS: dict[str, int] = {
+    "train": 8,
+    "validation": 4,
+    "test": 4,
+}
+
 
 DEFAULT_SKILL_FLAGS: dict[str, dict[str, bool]] = {
-    "enemy_single_target_attack": {"is_skill_aoe": False, "can_skill_target_dead": False},
+    "enemy_single_target_attack": {
+        "is_skill_aoe": False,
+        "can_skill_target_dead": False,
+    },
     "self_buff": {"is_skill_aoe": False, "can_skill_target_dead": False},
     "ally_shield": {"is_skill_aoe": False, "can_skill_target_dead": False},
     "ally_heal": {"is_skill_aoe": False, "can_skill_target_dead": False},
@@ -96,6 +108,24 @@ def sample_command_style(sample: dict[str, Any]) -> str:
     if isinstance(value, str) and value:
         return value
     return "direct_korean"
+
+
+def normalize_target_split(value: str) -> str:
+    if value not in VALID_SPLITS:
+        raise ValueError(f"split must be one of {VALID_SPLITS}: {value}")
+    return value
+
+
+def sample_split(sample: dict[str, Any]) -> str:
+    value = sample.get("split")
+    if isinstance(value, str) and value:
+        return value
+    return DEFAULT_TARGET_SPLIT
+
+
+def get_expression_pool_limit(target_split: str) -> int:
+    target_split = normalize_target_split(target_split)
+    return SPLIT_EXPRESSION_POOL_LIMITS[target_split]
 
 
 def general_path_matches(sample: dict[str, Any], path: GeneralPath) -> bool:
@@ -137,7 +167,9 @@ def get_command_slot_samples(
     index = path.command_slot_index
 
     if not rows:
-        raise ValueError(f"No accepted command slots found for general path: {path.stable_path}")
+        raise ValueError(
+            f"No accepted command slots found for general path: {path.stable_path}"
+        )
     if index < 1 or index > len(rows):
         raise ValueError(
             f"command_slot_index out of range for {path.stable_path}: {index}. "
@@ -155,7 +187,9 @@ def infer_skill_path_from_samples(samples: list[dict[str, Any]]) -> Optional[Ski
     if not skill_paths:
         return None
     if len(skill_paths) > 1:
-        raise ValueError("Selected command slot contains multiple skill paths. Use an explicit skill override.")
+        raise ValueError(
+            "Selected command slot contains multiple skill paths. Use an explicit skill override."
+        )
 
     family, target_kind, conflict_key = next(iter(skill_paths))
     return SkillPath(
@@ -224,16 +258,27 @@ def attach_skill_case_fields(
 
 
 # teacher에게는 기존 valid 표현과 command_style만 전달한다.
-def build_existing_paraphrase_samples(samples: list[dict[str, Any]]) -> list[dict[str, str]]:
+def build_existing_paraphrase_samples(
+    samples: list[dict[str, Any]],
+    target_split: str,
+) -> list[dict[str, str]]:
+    target_split = normalize_target_split(target_split)
+    pool_limit = get_expression_pool_limit(target_split)
+
     seen: set[tuple[str, str]] = set()
     result: list[dict[str, str]] = []
 
     for sample in samples:
+        if sample_split(sample) != target_split:
+            continue
+
         command_text = sample_command_text(sample)
         command_style = sample_command_style(sample)
         key = (command_text, command_style)
+
         if key in seen:
             continue
+
         seen.add(key)
         result.append(
             {
@@ -242,7 +287,38 @@ def build_existing_paraphrase_samples(samples: list[dict[str, Any]]) -> list[dic
             }
         )
 
+        if len(result) >= pool_limit:
+            break
+
     return result
+
+
+def build_command_text_policy(
+    existing_paraphrase_samples: list[dict[str, str]],
+    target_split: str,
+    count_to_generate: int,
+) -> dict[str, Any]:
+    target_split = normalize_target_split(target_split)
+    pool_limit = get_expression_pool_limit(target_split)
+    existing_count = len(existing_paraphrase_samples)
+
+    new_unique_count = max(0, min(count_to_generate, pool_limit - existing_count))
+    cycle_count = max(0, count_to_generate - new_unique_count)
+
+    return {
+        "target_split": target_split,
+        "same_split_expression_pool_size": pool_limit,
+        "existing_same_split_expression_count": existing_count,
+        "new_unique_command_texts_to_create": new_unique_count,
+        "samples_using_existing_cycle": cycle_count,
+        "rules": [
+            "같은 split 안에서 command_text 표현 pool을 관리한다.",
+            "표현 pool이 가득 차기 전에는 새 command_text를 만든다.",
+            "표현 pool이 가득 찬 뒤에는 같은 split의 기존 command_text를 순환 재사용할 수 있다.",
+            "command_text를 재사용하더라도 area_situation, gold, output은 새로 구성한다.",
+            "다른 split의 command_text 표현 pool을 섞지 않는다.",
+        ],
+    }
 
 
 def build_runtime_generation_contract() -> dict[str, Any]:
@@ -387,10 +463,16 @@ def build_output_contract() -> dict[str, Any]:
     }
 
 
-def build_generation_constraints() -> list[str]:
+def build_generation_constraints(target_split: str = DEFAULT_TARGET_SPLIT) -> list[str]:
+    target_split = normalize_target_split(target_split)
+
     return [
         "selected_bucket만 따른다.",
-        "새 command는 existing_valid_paraphrase_samples와 같은 command slot 의미와 edge_flags를 유지한다.",
+        f"각 sample.split은 반드시 {target_split}이다.",
+        "새 command는 selected_bucket의 command slot 의미와 edge_flags를 유지한다.",
+        "command_text_policy를 따른다.",
+        "표현 pool이 가득 찬 뒤에는 같은 split의 existing_valid_paraphrase_samples command_text를 순환 재사용할 수 있다.",
+        "command_text를 재사용하더라도 area_situation, gold, output은 복사하지 않고 새로 구성한다.",
         "taxonomy 밖 값을 만들지 않는다.",
         "source_ref를 생성하지 않는다.",
         "validator_result를 생성하지 않는다.",
@@ -413,7 +495,10 @@ def build_generation_payload(
     raw_request: str,
     dataset_root: Path = DEFAULT_DATASET_ROOT,
     taxonomy_path: Path = DEFAULT_TAXONOMY_PATH,
+    target_split: str = DEFAULT_TARGET_SPLIT,
 ) -> dict[str, Any]:
+    target_split = normalize_target_split(target_split)
+
     taxonomy = load_taxonomy(taxonomy_path)
     parsed = parse_generation_request(raw_request, taxonomy)
     samples = load_accepted_samples(dataset_root / "accepted")
@@ -424,10 +509,14 @@ def build_generation_payload(
     )
 
     skill_path = parsed.skill_path
+
     if skill_path is None and parsed.general_path.intent_family == "skill":
         skill_path = infer_skill_path_from_samples(command_slot_samples)
-        if skill_path is None:
-            raise ValueError("Skill intent_family request requires skill_path or accepted samples with skill_case.")
+
+    if skill_path is None and parsed.general_path.intent_family == "skill":
+        raise ValueError(
+            "Skill intent_family request requires skill_path or accepted samples with skill_case."
+        )
 
     selected_bucket = get_selected_bucket_descriptions(
         taxonomy=taxonomy,
@@ -435,10 +524,22 @@ def build_generation_payload(
         skill_path=skill_path,
         edge_flags=list(edge_flags),
     )
+
     selected_bucket = attach_skill_case_fields(
         selected_bucket=selected_bucket,
         skill_path=skill_path,
         samples=command_slot_samples,
+    )
+
+    existing_paraphrase_samples = build_existing_paraphrase_samples(
+        samples=command_slot_samples,
+        target_split=target_split,
+    )
+
+    command_text_policy = build_command_text_policy(
+        existing_paraphrase_samples=existing_paraphrase_samples,
+        target_split=target_split,
+        count_to_generate=parsed.count,
     )
 
     return {
@@ -451,13 +552,15 @@ def build_generation_payload(
             "command_slot_index": parsed.general_path.command_slot_index,
             "base_command_text": base_command_text,
         },
+        "target_split": target_split,
         "selected_bucket": selected_bucket,
-        "existing_valid_paraphrase_samples": build_existing_paraphrase_samples(command_slot_samples),
+        "existing_valid_paraphrase_samples": existing_paraphrase_samples,
+        "command_text_policy": command_text_policy,
         "count_to_generate": parsed.count,
         "runtime_generation_contract": build_runtime_generation_contract(),
         "area_situation_contract": build_area_situation_contract(),
         "assistant_output_contract": build_output_contract(),
-        "generation_constraints": build_generation_constraints(),
+        "generation_constraints": build_generation_constraints(target_split),
     }
 
 
@@ -481,6 +584,7 @@ def main() -> None:
     parser.add_argument("--taxonomy", default=str(DEFAULT_TAXONOMY_PATH))
     parser.add_argument("--output", default="")
     parser.add_argument("--print-json", action="store_true")
+    parser.add_argument("--split", choices=VALID_SPLITS, default=DEFAULT_TARGET_SPLIT)
     args = parser.parse_args()
 
     dataset_root = Path(args.dataset_root)
@@ -488,12 +592,15 @@ def main() -> None:
         raw_request=args.request,
         dataset_root=dataset_root,
         taxonomy_path=Path(args.taxonomy),
+        target_split=args.split,
     )
 
     if args.output:
         output_path = Path(args.output)
     else:
-        output_path = make_default_output_path(dataset_root / "raw_generations", args.request)
+        output_path = make_default_output_path(
+            dataset_root / "raw_generations", args.request
+        )
 
     write_json(output_path, payload)
     print(f"generation_request: {output_path}")

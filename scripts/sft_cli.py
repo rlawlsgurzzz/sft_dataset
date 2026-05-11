@@ -16,6 +16,8 @@ from typing import Any
 try:
     from sft_file_sequence import next_numbered_index, numbered_path
     from sft_generation_request import (
+        DEFAULT_TARGET_SPLIT,
+        VALID_SPLITS,
         build_generation_payload,
         make_default_output_path,
         write_json,
@@ -25,6 +27,8 @@ except ImportError:
     sys.path.append(str(Path(__file__).resolve().parent))
     from sft_file_sequence import next_numbered_index, numbered_path
     from sft_generation_request import (
+        DEFAULT_TARGET_SPLIT,
+        VALID_SPLITS,
         build_generation_payload,
         make_default_output_path,
         write_json,
@@ -58,6 +62,7 @@ def build_payload_or_print_error(args: argparse.Namespace) -> dict[str, Any] | N
             raw_request=args.request,
             dataset_root=Path(args.dataset_root),
             taxonomy_path=Path(args.taxonomy),
+            target_split=getattr(args, "split", DEFAULT_TARGET_SPLIT),
         )
     except Exception as error:
         print(f"request failed: {error}")
@@ -97,6 +102,8 @@ def print_generation_plan(
     skill_stable_path = request_info.get("skill_stable_path")
     count_to_generate = payload.get("count_to_generate")
     base_command_text = request_info.get("base_command_text")
+    target_split = payload.get("target_split", DEFAULT_TARGET_SPLIT)
+    command_text_policy = payload.get("command_text_policy", {})
 
     print("request ok")
     print(f"stable_path: {stable_path}")
@@ -104,6 +111,16 @@ def print_generation_plan(
         print(f"skill_stable_path: {skill_stable_path}")
     print(f"base_command_text: {base_command_text}")
     print(f"count_to_generate: {count_to_generate}")
+    print(f"target_split: {target_split}")
+
+    if command_text_policy:
+        print(
+            "command_text_policy: "
+            f"pool={command_text_policy.get('same_split_expression_pool_size')}, "
+            f"existing={command_text_policy.get('existing_same_split_expression_count')}, "
+            f"new={command_text_policy.get('new_unique_command_texts_to_create')}, "
+            f"cycle={command_text_policy.get('samples_using_existing_cycle')}"
+        )
 
     edge_flags = selected_bucket.get("edge_flags")
     if edge_flags:
@@ -220,6 +237,12 @@ def build_parser() -> argparse.ArgumentParser:
     )
     request_parser.add_argument("--output", default="")
     request_parser.add_argument("--print-json", action="store_true")
+    request_parser.add_argument(
+        "--split",
+        choices=VALID_SPLITS,
+        default=DEFAULT_TARGET_SPLIT,
+        help="Target dataset split for generated samples.",
+    )
     request_parser.set_defaults(func=run_request)
 
     generate_parser = subparsers.add_parser(
@@ -235,6 +258,12 @@ def build_parser() -> argparse.ArgumentParser:
     generate_parser.add_argument("--model", default=DEFAULT_TEACHER_MODEL)
     generate_parser.add_argument("--max-tokens", type=int, default=12000)
     generate_parser.add_argument("--print-json", action="store_true")
+    generate_parser.add_argument(
+        "--split",
+        choices=VALID_SPLITS,
+        default=DEFAULT_TARGET_SPLIT,
+        help="Target dataset split for generated samples.",
+    )
     generate_parser.add_argument(
         "--stream-output",
         action="store_true",
