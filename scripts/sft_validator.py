@@ -73,15 +73,6 @@ ENEMY_UNIT_FIELDS = {
     "teamFormationRole",
 }
 
-LEGACY_OR_FORBIDDEN_UNIT_FIELDS = {
-    "IsSkillOnAlly",
-    "targetableOpponentsByDistance",
-    "aliveAlliesByDistance",
-    "nearestOpponentId",
-    "nearestOpponentDistance",
-    "opponentsInAttackRange",
-    "attackRange",
-}
 
 RAW_FORBIDDEN_KEYS = {
     "commandAnalysis",
@@ -455,13 +446,12 @@ def validate_unit_key_sets(ctx: ValidationContext) -> None:
             keys = set(unit.keys())
             missing = expected_fields - keys
             extra = keys - expected_fields
-            legacy = keys & LEGACY_OR_FORBIDDEN_UNIT_FIELDS
+            
             if missing:
                 ctx.add("UNIT_FIELD_MISSING", f"{label}: {sorted(missing)}")
             if extra:
                 ctx.add("UNIT_FIELD_UNEXPECTED", f"{label}: {sorted(extra)}")
-            if legacy:
-                ctx.add("LEGACY_UNIT_FIELD_PRESENT", f"{label}: {sorted(legacy)}")
+            
 
             validate_unit_common_fields(ctx, unit, side)
 
@@ -530,7 +520,7 @@ def validate_ally_distance_fields(ctx: ValidationContext) -> None:
         if isinstance(unit.get("unitId"), str) and is_alive(unit)
     }
 
-    for ally_id in sorted(ally_ids):
+    for ally_id in sorted(alive_ally_ids):
         validate_single_distance_pair(
             ctx=ctx,
             unit_id=ally_id,

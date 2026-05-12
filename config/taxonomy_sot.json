@@ -6,7 +6,7 @@
       "action_types": ["move", "attack", "skill", "wait", "skillControl"],
       "move_subtypes": ["approachOpponent", "escape", "help", "holdFront"],
       "movement_types": ["direct", "flank"],
-      "skill_fields": ["skillDescription", "IsSkillOnSelf", "IsSkillOnAlly", "isSkillAoe", "canSkillTargetDead"]
+      "skill_fields": ["skillDescription", "IsSkillOnSelf", "IsSkillOnOtherAlly", "isSkillAoe", "canSkillTargetDead"]
     },
     "global_targets": {
       "intent_family": {

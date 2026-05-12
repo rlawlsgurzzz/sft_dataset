@@ -325,15 +325,6 @@ farthestAliveAlly
 실제 거리 계산은 런타임 엔진에서 수행한다.  
 Synthetic dataset에서는 teacher가 전술 상황에 맞는 논리적 거리 관계를 만든다.
 
-사용하지 않는 필드는 다음이다.
-
-```text
-targetableOpponentsByDistance
-aliveAlliesByDistance
-IsSkillOnAlly
-```
-
-아군 대상 skill 여부는 `IsSkillOnOtherAlly`를 기준으로 한다.
 
 ---
 

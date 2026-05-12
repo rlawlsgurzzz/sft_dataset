@@ -195,6 +195,7 @@ input.input.area_situation 생성 규칙:
   "teamFormationRole": "frontline"
 }
 
+아군/적 unit object는 위에 명시된 필드만 사용한다. 설명용 필드, 임의 보조 필드 등을 추가하지 않는다.
 유닛 필드 타입 규칙:
 - unitId는 string이다.
 - isAlive, canBeTargeted, isRanged, IsSkillOnSelf, IsSkillOnOtherAlly, isSkillAoe, canSkillTargetDead는 boolean이다.
@@ -260,6 +261,9 @@ output 규칙:
 - skillControl은 스킬 지연/금지 의도가 명시된 경우에만 사용한다.
 - 조건부 명령은 current-state-only로 처리한다.
 - 미래 action, 예약 action, scheduled action, trigger 기반 action을 만들지 않는다.
+- gold는 output.action만 검증하는 semantic constraint이며, thinking/dialog와 직접 비교되지 않는다.
+- gold의 required/allowed/forbidden 계열 값은 사용할 경우 반드시 string array로 작성하고, 제한하지 않을 항목은 null이 아니라 key 자체를 생략한다.
+- gold에 적은 actor/action type/target/세부 조건은 실제 output.action이 반드시 만족하도록 작성한다.
 
 아래 학생 SLM runtime system prompt 전문을 기준으로 output을 작성한다.
 주의, 반드시 준수! : 아래 prompt에는 commandAnalysis가 사용된다고 되어 있지만, teacher raw sample에는 commandAnalysis를 생성하지 않는다. commandAnalysis는 validator가 accepted 저장 시점에 계산해서 추가한다.

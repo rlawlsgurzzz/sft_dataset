@@ -154,10 +154,7 @@ def print_generation_plan(
     print(f"target_split: {target_split}")
 
     if command_text_policy:
-        cycle_count = command_text_policy.get(
-            "samples_using_same_split_cycle",
-            command_text_policy.get("samples_using_existing_cycle"),
-        )
+        cycle_count = command_text_policy.get("samples_using_same_split_cycle")
 
         print(
             "command_text_policy: "

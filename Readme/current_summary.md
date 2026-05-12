@@ -325,15 +325,6 @@ farthestAliveAlly
 실제 거리 계산은 런타임 엔진에서 수행한다.  
 Synthetic dataset에서는 teacher가 전술 상황에 맞는 논리적 거리 관계를 만든다.
 
-사용하지 않는 필드는 다음이다.
-
-```text
-targetableOpponentsByDistance
-aliveAlliesByDistance
-IsSkillOnAlly
-```
-
-아군 대상 skill 여부는 `IsSkillOnOtherAlly`를 기준으로 한다.
 
 ---
 
@@ -1034,6 +1025,14 @@ py -3.11 scripts/sft_cli.py validate --input raw_generations/batch_0001_raw.json
 ```powershell
 py -3.11 scripts/sft_cli.py validate --input raw_generations/batch_0001_raw.jsonl --dry-run
 ```
+
+### 15.5 jsonl pretty
+
+jsonl 파일, 또는 파일 안의 하나의 시나리오의 id를 호출하여 가독성이 높은 형태로 터미널에 출력한다.
+
+파일: python scripts/jsonl_pretty.py accepted_20260512_005252
+파일: python scripts/jsonl_pretty.py accepted/accepted_20260512_005252.jsonl
+시나리오 id: python scripts/jsonl_pretty.py seed_master_0001
 
 ---
 
