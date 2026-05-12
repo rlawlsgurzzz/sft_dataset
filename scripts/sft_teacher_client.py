@@ -162,6 +162,15 @@ input.input.area_situation 생성 규칙:
 - 빈 allies/enemies를 만들지 않는다.
 - commandAnalysis를 만들지 않는다.
 
+sample별 전장 다양성 강제 규칙:
+- 각 sample은 독립된 전장 시나리오로 생성한다.
+- 이전 sample의 area_situation, unit 역할 배치, skillDescription, skill target flags, 체력 분포, 교전 수, 진형 역할, 거리 신호를 template처럼 재사용하지 않는다.
+- A_01~A_06/E_01~E_06은 고정 캐릭터가 아니다. 같은 unitId라도 sample마다 역할, 원거리 여부, 체력, 공격력, 교전 수, 진형, 스킬 의미, 거리 관계가 바뀔 수 있다.
+- selected_bucket, skill_case, command, gold, output을 만족하는 범위 안에서 매 sample마다 최소 3개 이상의 주요 전장 요소를 바꾼다.
+- 주요 전장 요소는 다음을 뜻한다: actor의 전술 역할, actor의 skillDescription, 생존/사망 상태, hpRatio 분포, engagedByOpponentCount 분포, teamFormationRole 배치, closest/farthest 관계, target 후보의 상태.
+- command_text를 재사용하는 sample이라도 area_situation과 output 판단 근거는 새로 만든다.
+- 다양화는 taxonomy 값을 새로 invent하는 방식으로 하지 않는다. taxonomy field는 selected_bucket과 valid taxonomy 값만 사용하고, 다양화는 전장 상태와 skillDescription 문장 안에서만 수행한다.
+
 아군 유닛 필수 필드:
 {
   "unitId": "A_01",
@@ -442,6 +451,14 @@ Conditional command:
 - 저장되는 conditional JSON을 만들지 않는다.
 - 미래 action, 예약 action, scheduled action, trigger 기반 action을 만들지 않는다.
 [STUDENT_RUNTIME_SYSTEM_PROMPT_END]
+
+출력 직전 자체 점검:
+- taxonomy field에 없는 임의 enum을 만들지 않는다.
+- skill_case의 skill_family, skill_target_kind, conflict_type은 반드시 taxonomy에 존재하는 값만 사용한다.
+- command_spec은 command_text, base_command_text, slots 구조를 유지한다.
+- unit object에는 명시된 필드만 넣는다.
+- 각 sample의 area_situation은 새로 만든다. 같은 전장 template에 command/output만 바꾼 sample을 만들지 않는다.
+- 다양화가 필요할 때는 taxonomy enum이 아니라 unit 상태, skillDescription, 거리 신호, 체력, 교전 수, 진형, output 판단 근거를 바꾼다.
 
 schema skeleton example:
 {
