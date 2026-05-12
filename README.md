@@ -1035,6 +1035,14 @@ py -3.11 scripts/sft_cli.py validate --input raw_generations/batch_0001_raw.json
 py -3.11 scripts/sft_cli.py validate --input raw_generations/batch_0001_raw.jsonl --dry-run
 ```
 
+### 15.5 jsonl pretty
+
+jsonl 파일, 또는 파일 안의 하나의 시나리오의 id를 호출하여 가독성이 높은 형태로 터미널에 출력한다.
+
+파일: python scripts/jsonl_pretty.py accepted_20260512_005252
+파일: python scripts/jsonl_pretty.py accepted/accepted_20260512_005252.jsonl
+시나리오 id: python scripts/jsonl_pretty.py seed_master_0001
+
 ---
 
 ## 16. 전체 루프
