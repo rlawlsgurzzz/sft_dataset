@@ -1,6 +1,6 @@
 # General Coverage
 
-attack [26.7%(24%) / 44]
+attack [21.3%(24%) / 44]
   explicit_actor [59.1%(35%) / 26]
     explicit_enemy_target [26.9%(30%) / 7]
       attack_only [57.1%(45%) / 4]
@@ -157,7 +157,7 @@ attack [26.7%(24%) / 44]
           "지원 가능한 아군은 아군을 압박하는 적을 같이 공격해." @ 1 @ pressure_source_target_clear @ accepted_20260512_230932.jsonl_seed_master_0139
     invalid_explicit_target [0.0%(6%) / 0]
 
-move [24.2%(22%) / 40]
+move [19.3%(22%) / 40]
   explicit_actor [57.5%(45%) / 23]
     explicit_ally_target [30.4%(22%) / 7]
       move_only [57.1%(55%) / 4]
@@ -321,9 +321,9 @@ move [24.2%(22%) / 40]
         no_matching_actor [100.0%(5%) / 1]
           "움직일 수 있는 아군은 전부 후퇴해." @ 1 @ no_matching_actor @ accepted_20260512_231741.jsonl_seed_master_0162
 
-skill [31.5%(26%) / 52]
-  explicit_actor [92.3%(55%) / 48]
-    explicit_enemy_target [33.3%(26%) / 16]
+skill [32.4%(26%) / 67]
+  explicit_actor [76.1%(55%) / 51]
+    explicit_enemy_target [31.4%(26%) / 16]
       skill_only [93.8%(70%) / 15]
         enemy_skill_valid_target [26.7%(10%) / 4]
           "A_01, E_02에게 도약기로 붙어." @ 1 @ mobility_skill_enemy_approach @ accepted_20260512_035448.jsonl_seed_master_0112
@@ -346,7 +346,7 @@ skill [31.5%(26%) / 52]
       move_then_skill [6.2%(10%) / 1]
         approach_then_skill [100.0%(4%) / 1]
           "A_03, E_02에게 접근해서 스킬 써." @ 1 @ [] @ accepted_20260512_031947.jsonl_seed_master_0048
-    explicit_ally_target [33.3%(22%) / 16]
+    explicit_ally_target [31.4%(22%) / 16]
       skill_only [100.0%(70%) / 16]
         ally_skill_valid_target [25.0%(10%) / 4]
           "A_04, A_02한테 보호 스킬 써." @ 1 @ [] @ accepted_20260512_035444.jsonl_seed_master_0095
@@ -367,13 +367,13 @@ skill [31.5%(26%) / 52]
         dead_target_forbidden [18.8%(6%) / 3]
           "A_04, 쓰러진 A_02한테 보호 스킬 써." @ 2 @ skill_target_dead_not_allowed @ accepted_20260512_032346.jsonl_seed_master_0053, accepted_20260512_035444.jsonl_seed_master_0097
           "A_04, 죽은 A_02한테 회복 스킬 써." @ 1 @ skill_target_dead_not_allowed @ accepted_20260512_035444.jsonl_seed_master_0100
-    lowest_hp_enemy [4.2%(8%) / 2]
+    lowest_hp_enemy [3.9%(8%) / 2]
       skill_only [100.0%(70%) / 2]
         enemy_skill_valid_target [50.0%(10%) / 1]
           "A_03, 체력이 제일 낮은 적에게 스킬 써." @ 1 @ [] @ accepted_20260512_233755.jsonl_seed_master_0165
         aoe_skill_center_selection [50.0%(8%) / 1]
           "A_06, 체력이 제일 낮은 적을 중심으로 스킬 써." @ 1 @ aoe_skill_requires_single_center_target @ accepted_20260512_233755.jsonl_seed_master_0166
-    nearest_enemy [6.2%(5%) / 3]
+    nearest_enemy [5.9%(5%) / 3]
       skill_only [66.7%(70%) / 2]
         enemy_skill_valid_target [50.0%(10%) / 1]
           "A_03, 가장 가까운 적에게 스킬 써." @ 1 @ [] @ accepted_20260512_233755.jsonl_seed_master_0168
@@ -382,7 +382,7 @@ skill [31.5%(26%) / 52]
       move_then_skill [33.3%(10%) / 1]
         approach_then_skill [100.0%(4%) / 1]
           "A_03, 가장 가까운 적에게 접근해서 스킬 써." @ 1 @ [] @ accepted_20260512_233755.jsonl_seed_master_0167
-    role_based_enemy [8.3%(8%) / 4]
+    role_based_enemy [7.8%(8%) / 4]
       skill_only [75.0%(70%) / 3]
         enemy_skill_valid_target [33.3%(10%) / 1]
           "A_03, 적 후열에게 스킬 써." @ 1 @ target_role_backline_enemy @ accepted_20260512_233755.jsonl_seed_master_0171
@@ -392,38 +392,75 @@ skill [31.5%(26%) / 52]
       move_then_skill [25.0%(10%) / 1]
         approach_then_skill [100.0%(4%) / 1]
           "A_03, 적 후열에게 접근해서 스킬 써." @ 1 @ target_role_backline_enemy @ accepted_20260512_233755.jsonl_seed_master_0172
-    low_hp_ally [2.1%(10%) / 1]
+    low_hp_ally [2.0%(10%) / 1]
       skill_only [100.0%(70%) / 1]
         ally_skill_valid_target [100.0%(10%) / 1]
           "A_04, 체력이 낮은 아군에게 스킬 써." @ 1 @ low_hp_ally_target @ accepted_20260512_233755.jsonl_seed_master_0173
-    invalid_explicit_target [0.0%(13%) / 0]
-    none [12.5%(8%) / 6]
-      skill_only [100.0%(70%) / 6]
+    invalid_explicit_target [3.9%(13%) / 2]
+      empty_action_expected [100.0%(10%) / 2]
+        dead_target_forbidden [50.0%(6%) / 1]
+          "A_03, 죽은 E_02한테 스킬 써." @ 1 @ skill_target_dead_not_allowed @ accepted_20260512_234353.jsonl_seed_master_0174
+        no_valid_skill_target [50.0%(4%) / 1]
+          "A_03, 죽은 E_02한테 스킬 써." @ 1 @ named_target_dead, no_valid_skill_target @ accepted_20260512_234353.jsonl_seed_master_0175
+    none [13.7%(8%) / 7]
+      skill_only [85.7%(70%) / 6]
         self_skill_no_target [66.7%(8%) / 4]
           "A_01, 도약기로 빠져." @ 1 @ mobility_skill_self_escape @ accepted_20260512_035448.jsonl_seed_master_0111
           "A_03, 지금 스킬 써." @ 3 @ self_skill_without_explicit_target @ accepted_20260512_005252.jsonl_seed_master_0006, accepted_20260512_032346.jsonl_seed_master_0054, accepted_20260512_035444.jsonl_seed_master_0092
         aoe_skill_center_selection [33.3%(8%) / 2]
           "A_06, 적들이 뭉친 쪽에 광역 스킬 써." @ 1 @ aoe_skill_requires_single_center_target @ accepted_20260512_035448.jsonl_seed_master_0109
           "A_06, 적들이 뭉친 쪽에 스킬 써." @ 1 @ aoe_skill_requires_single_center_target @ accepted_20260512_032346.jsonl_seed_master_0055
-  explicit_multi_actor [0.0%(10%) / 0]
-    explicit_enemy_target [0.0%(26%) / 0]
-    explicit_ally_target [0.0%(22%) / 0]
+      empty_action_expected [14.3%(10%) / 1]
+        actor_has_no_skill [100.0%(8%) / 1]
+          "A_03, 지금 스킬 써." @ 1 @ actor_has_no_skill @ accepted_20260512_234353.jsonl_seed_master_0176
+  explicit_multi_actor [11.9%(10%) / 8]
+    explicit_enemy_target [37.5%(26%) / 3]
+      multi_actor_same_target [66.7%(7%) / 2]
+        enemy_skill_valid_target [50.0%(10%) / 1]
+          "A_03과 A_06은 E_02에게 스킬을 써." @ 1 @ [] @ accepted_20260512_234353.jsonl_seed_master_0177
+        aoe_skill_center_selection [50.0%(8%) / 1]
+          "A_03과 A_06은 E_02 주변에 스킬을 써." @ 1 @ aoe_skill_requires_single_center_target @ accepted_20260512_234353.jsonl_seed_master_0178
+      multi_actor_different_targets [33.3%(3%) / 1]
+        enemy_skill_valid_target [100.0%(10%) / 1]
+          "A_03은 E_01에게, A_06은 E_03에게 스킬을 써." @ 1 @ [] @ accepted_20260512_234353.jsonl_seed_master_0179
+    explicit_ally_target [25.0%(22%) / 2]
+      multi_actor_same_target [50.0%(7%) / 1]
+        ally_skill_valid_target [100.0%(10%) / 1]
+          "A_04와 A_05는 A_02에게 스킬을 써." @ 1 @ [] @ accepted_20260512_234353.jsonl_seed_master_0180
+      multi_actor_different_targets [50.0%(3%) / 1]
+        ally_skill_valid_target [100.0%(10%) / 1]
+          "A_04는 A_01에게, A_05는 A_02에게 스킬을 써." @ 1 @ [] @ accepted_20260512_234353.jsonl_seed_master_0181
     lowest_hp_enemy [0.0%(8%) / 0]
     nearest_enemy [0.0%(5%) / 0]
-    role_based_enemy [0.0%(8%) / 0]
-    low_hp_ally [0.0%(10%) / 0]
+    role_based_enemy [12.5%(8%) / 1]
+      multi_actor_different_targets [100.0%(3%) / 1]
+        enemy_skill_valid_target [100.0%(10%) / 1]
+          "A_03은 적 전열에, A_06은 적 후열에 스킬을 써." @ 1 @ target_role_backline_enemy @ accepted_20260512_234353.jsonl_seed_master_0182
+    low_hp_ally [12.5%(10%) / 1]
+      multi_actor_same_target [100.0%(7%) / 1]
+        ally_skill_valid_target [100.0%(10%) / 1]
+          "A_04와 A_05는 체력이 제일 낮은 아군에게 스킬을 써." @ 1 @ low_hp_ally_target @ accepted_20260512_234353.jsonl_seed_master_0183
     invalid_explicit_target [0.0%(13%) / 0]
-    none [0.0%(8%) / 0]
-  global_condition [0.0%(10%) / 0]
+    none [12.5%(8%) / 1]
+      empty_action_expected [100.0%(10%) / 1]
+        no_valid_skill_actor [100.0%(4%) / 1]
+          "A_03과 A_04는 지금 스킬 써." @ 1 @ no_valid_skill_actor @ accepted_20260512_234703.jsonl_seed_master_0184
+  global_condition [3.0%(10%) / 2]
     explicit_enemy_target [0.0%(26%) / 0]
     explicit_ally_target [0.0%(22%) / 0]
-    lowest_hp_enemy [0.0%(8%) / 0]
+    lowest_hp_enemy [50.0%(8%) / 1]
+      skill_only [100.0%(70%) / 1]
+        enemy_skill_valid_target [100.0%(10%) / 1]
+          "스킬 쓸 수 있는 아군은 체력 낮은 적에게 스킬 써." @ 1 @ [] @ accepted_20260512_234703.jsonl_seed_master_0185
     nearest_enemy [0.0%(5%) / 0]
     role_based_enemy [0.0%(8%) / 0]
-    low_hp_ally [0.0%(10%) / 0]
+    low_hp_ally [50.0%(10%) / 1]
+      skill_only [100.0%(70%) / 1]
+        ally_skill_valid_target [100.0%(10%) / 1]
+          "회복 가능한 아군은 체력이 낮은 아군에게 스킬 써." @ 1 @ low_hp_ally_target @ accepted_20260512_234703.jsonl_seed_master_0186
     invalid_explicit_target [0.0%(13%) / 0]
     none [0.0%(8%) / 0]
-  global_role_based [1.9%(10%) / 1]
+  global_role_based [1.5%(10%) / 1]
     explicit_enemy_target [0.0%(26%) / 0]
     explicit_ally_target [0.0%(22%) / 0]
     lowest_hp_enemy [0.0%(8%) / 0]
@@ -435,24 +472,27 @@ skill [31.5%(26%) / 52]
     low_hp_ally [0.0%(10%) / 0]
     invalid_explicit_target [0.0%(13%) / 0]
     none [0.0%(8%) / 0]
-  global_state_based [1.9%(10%) / 1]
-    explicit_enemy_target [0.0%(26%) / 0]
+  global_state_based [3.0%(10%) / 2]
+    explicit_enemy_target [50.0%(26%) / 1]
+      skill_only [100.0%(70%) / 1]
+        enemy_skill_valid_target [100.0%(10%) / 1]
+          "스킬을 쓰기 안전한 아군은 E_02에게 스킬 써." @ 1 @ healthy_actor_selection @ accepted_20260512_234703.jsonl_seed_master_0187
     explicit_ally_target [0.0%(22%) / 0]
     lowest_hp_enemy [0.0%(8%) / 0]
     nearest_enemy [0.0%(5%) / 0]
     role_based_enemy [0.0%(8%) / 0]
-    low_hp_ally [100.0%(10%) / 1]
+    low_hp_ally [50.0%(10%) / 1]
       skill_only [100.0%(70%) / 1]
         ally_skill_valid_target [100.0%(10%) / 1]
           "회복 스킬이 있는 아군은 체력이 낮은 아군에게 스킬 써." @ 1 @ low_hp_ally_target @ accepted_20260512_032346.jsonl_seed_master_0059
     invalid_explicit_target [0.0%(13%) / 0]
     none [0.0%(8%) / 0]
-  no_valid_actor [3.8%(5%) / 2]
-    explicit_enemy_target [50.0%(26%) / 1]
+  no_valid_actor [4.5%(5%) / 3]
+    explicit_enemy_target [33.3%(26%) / 1]
       empty_action_expected [100.0%(10%) / 1]
         no_valid_skill_actor [100.0%(4%) / 1]
           "스킬 가능한 아군은 E_02에게 스킬 써." @ 1 @ no_valid_skill_actor @ accepted_20260512_032346.jsonl_seed_master_0060
-    explicit_ally_target [50.0%(22%) / 1]
+    explicit_ally_target [33.3%(22%) / 1]
       empty_action_expected [100.0%(10%) / 1]
         no_valid_skill_target [100.0%(4%) / 1]
           "회복 스킬이 있는 아군은 체력이 낮은 아군에게 스킬 써." @ 1 @ no_valid_skill_target @ accepted_20260512_035433.jsonl_seed_master_0061
@@ -461,61 +501,104 @@ skill [31.5%(26%) / 52]
     role_based_enemy [0.0%(8%) / 0]
     low_hp_ally [0.0%(10%) / 0]
     invalid_explicit_target [0.0%(13%) / 0]
-    none [0.0%(8%) / 0]
+    none [33.3%(8%) / 1]
+      empty_action_expected [100.0%(10%) / 1]
+        no_valid_skill_actor [100.0%(4%) / 1]
+          "스킬 가능한 아군은 지금 스킬 써." @ 1 @ no_valid_skill_actor @ accepted_20260512_234703.jsonl_seed_master_0188
 
-skillControl [5.5%(8%) / 9]
-  explicit_actor [66.7%(70%) / 6]
-    none [100.0%(100%) / 6]
-      skillControl_defer [50.0%(55%) / 3]
+skillControl [6.8%(8%) / 14]
+  explicit_actor [50.0%(70%) / 7]
+    none [100.0%(100%) / 7]
+      skillControl_defer [42.9%(55%) / 3]
         explicit_defer_skill [66.7%(25%) / 2]
           "A_03, 스킬은 아직 쓰지 말고 5초 후로 미뤄." @ 2 @ [] @ accepted_20260512_005252.jsonl_seed_master_0009, accepted_20260512_035433.jsonl_seed_master_0062
         defer_without_duration [33.3%(15%) / 1]
           "A_03, 스킬은 좀 아껴." @ 1 @ skillControl_duration_unspecified @ accepted_20260512_035433.jsonl_seed_master_0063
-      skillControl_forbid [50.0%(35%) / 3]
+      skillControl_forbid [42.9%(35%) / 3]
         explicit_forbid_skill [33.3%(25%) / 1]
           "A_03, 지금은 스킬 쓰지 마." @ 1 @ [] @ accepted_20260512_035433.jsonl_seed_master_0064
         forbid_without_duration [33.3%(10%) / 1]
           "A_03, 스킬 쓰지 말고 있어." @ 1 @ [] @ accepted_20260512_035433.jsonl_seed_master_0065
         actor_has_no_skill [33.3%(5%) / 1]
           "A_03, 스킬 쓰지 마." @ 1 @ actor_has_no_skill @ accepted_20260512_035433.jsonl_seed_master_0066
-  explicit_multi_actor [22.2%(20%) / 2]
-    none [100.0%(100%) / 2]
-      skillControl_defer [50.0%(55%) / 1]
+      empty_action_expected [14.3%(10%) / 1]
+        selected_actor_dead [100.0%(5%) / 1]
+          "A_03, 스킬 쓰지 말고 있어." @ 1 @ named_actor_dead @ accepted_20260512_234703.jsonl_seed_master_0189
+  explicit_multi_actor [28.6%(20%) / 4]
+    none [100.0%(100%) / 4]
+      skillControl_defer [25.0%(55%) / 1]
         multi_actor_defer_skill [100.0%(10%) / 1]
           "A_03과 A_04는 스킬을 아껴." @ 1 @ multi_actor_skillControl @ accepted_20260512_035433.jsonl_seed_master_0067
-      skillControl_forbid [50.0%(35%) / 1]
+      skillControl_forbid [25.0%(35%) / 1]
         multi_actor_forbid_skill [100.0%(5%) / 1]
           "A_03과 A_04는 지금 스킬 쓰지 마." @ 1 @ multi_actor_skillControl @ accepted_20260512_035433.jsonl_seed_master_0068
-  no_valid_actor [11.1%(10%) / 1]
-    none [100.0%(100%) / 1]
-      empty_action_expected [100.0%(10%) / 1]
-        selected_actor_dead [100.0%(5%) / 1]
+      empty_action_expected [50.0%(10%) / 2]
+        actor_has_no_skill [50.0%(5%) / 1]
+          "A_03과 A_04는 지금 스킬 쓰지 마." @ 1 @ actor_has_no_skill @ accepted_20260512_234703.jsonl_seed_master_0191
+        selected_actor_dead [50.0%(5%) / 1]
+          "A_03과 A_04는 스킬 쓰지 말고 있어." @ 1 @ named_actor_dead @ accepted_20260512_234703.jsonl_seed_master_0190
+  no_valid_actor [21.4%(10%) / 3]
+    none [100.0%(100%) / 3]
+      empty_action_expected [100.0%(10%) / 3]
+        actor_has_no_skill [33.3%(5%) / 1]
+          "스킬이 없는 A_03은 지금 스킬 쓰지 마." @ 1 @ actor_has_no_skill @ accepted_20260512_234703.jsonl_seed_master_0193
+        selected_actor_dead [66.7%(5%) / 2]
           "A_03, 스킬 쓰지 마." @ 1 @ named_actor_dead @ accepted_20260512_035433.jsonl_seed_master_0069
+          "A_03, 스킬 쓰지 말고 있어." @ 1 @ named_actor_dead @ accepted_20260512_234703.jsonl_seed_master_0192
 
-wait [4.8%(8%) / 8]
-  explicit_actor [75.0%(60%) / 6]
-    explicit_enemy_target [0.0%(10%) / 0]
-    none [100.0%(90%) / 6]
-      wait_only [66.7%(65%) / 4]
+wait [9.2%(8%) / 19]
+  explicit_actor [57.9%(60%) / 11]
+    explicit_enemy_target [27.3%(10%) / 3]
+      wait_only [33.3%(65%) / 1]
+        explicit_wait [100.0%(25%) / 1]
+          "A_04, E_02를 보면서 잠깐 대기해." @ 1 @ [] @ accepted_20260512_235127.jsonl_seed_master_0196
+      wait_then_attack [66.7%(20%) / 2]
+        wait_then_attack_valid [100.0%(15%) / 2]
+          "A_04, 3초 기다렸다가 E_02를 공격해." @ 1 @ explicit_wait_duration, wait_then_attack @ accepted_20260512_235127.jsonl_seed_master_0195
+          "A_04, 3초 뒤에 E_02를 공격해." @ 1 @ explicit_wait_duration, wait_then_attack @ accepted_20260512_235127.jsonl_seed_master_0194
+    none [72.7%(90%) / 8]
+      wait_only [50.0%(65%) / 4]
         explicit_wait [25.0%(25%) / 1]
           "A_04, 지금 자리에서 대기해." @ 1 @ [] @ accepted_20260512_035433.jsonl_seed_master_0070
         explicit_wait_duration [50.0%(20%) / 2]
           "A_04, 5초만 기다려." @ 2 @ explicit_wait_duration @ accepted_20260512_005252.jsonl_seed_master_0010, accepted_20260512_035437.jsonl_seed_master_0071
         hold_position_wait [25.0%(10%) / 1]
           "A_04, 위치 유지하면서 잠깐 버텨." @ 1 @ hold_front_requested @ accepted_20260512_035437.jsonl_seed_master_0072
-      wait_then_attack [16.7%(20%) / 1]
+      wait_then_attack [12.5%(20%) / 1]
         wait_then_attack_valid [100.0%(15%) / 1]
           "A_04, 3초 기다렸다가 E_02를 공격해." @ 1 @ wait_then_attack @ accepted_20260512_035437.jsonl_seed_master_0073
-      wait_then_skill [16.7%(10%) / 1]
-        wait_then_skill_valid [100.0%(10%) / 1]
+      wait_then_skill [25.0%(10%) / 2]
+        wait_then_skill_valid [100.0%(10%) / 2]
           "A_04, 3초 기다렸다가 스킬 써." @ 1 @ wait_then_skill @ accepted_20260512_035437.jsonl_seed_master_0074
-  explicit_multi_actor [0.0%(15%) / 0]
+          "A_04, 5초 기다렸다가 스킬 써." @ 1 @ explicit_wait_duration, wait_then_skill @ accepted_20260512_235127.jsonl_seed_master_0197
+      empty_action_expected [12.5%(5%) / 1]
+        selected_actor_dead [100.0%(6%) / 1]
+          "A_04, 지금 자리에서 대기해." @ 1 @ named_actor_dead @ accepted_20260512_235127.jsonl_seed_master_0198
+  explicit_multi_actor [21.1%(15%) / 4]
     explicit_enemy_target [0.0%(10%) / 0]
-    none [0.0%(90%) / 0]
-  global_condition [0.0%(15%) / 0]
+    none [100.0%(90%) / 4]
+      wait_only [25.0%(65%) / 1]
+        multi_actor_wait [100.0%(8%) / 1]
+          "A_03과 A_04는 잠깐 대기해." @ 1 @ [] @ accepted_20260512_235127.jsonl_seed_master_0199
+      wait_then_attack [25.0%(20%) / 1]
+        wait_then_attack_valid [100.0%(15%) / 1]
+          "A_03과 A_04는 잠깐 기다렸다가 공격해." @ 1 @ wait_then_attack @ accepted_20260512_235127.jsonl_seed_master_0200
+      wait_then_skill [25.0%(10%) / 1]
+        wait_then_skill_valid [100.0%(10%) / 1]
+          "A_03과 A_04는 3초 기다렸다가 스킬 써." @ 1 @ explicit_wait_duration, wait_then_skill @ accepted_20260512_235127.jsonl_seed_master_0201
+      empty_action_expected [25.0%(5%) / 1]
+        selected_actor_dead [100.0%(6%) / 1]
+          "A_03과 A_04는 잠깐 대기해." @ 1 @ named_actor_dead @ accepted_20260512_235127.jsonl_seed_master_0202
+  global_condition [10.5%(15%) / 2]
     explicit_enemy_target [0.0%(10%) / 0]
-    none [0.0%(90%) / 0]
-  no_valid_actor [25.0%(10%) / 2]
+    none [100.0%(90%) / 2]
+      wait_only [50.0%(65%) / 1]
+        hold_position_wait [100.0%(10%) / 1]
+          "위험한 아군은 잠깐 대기하면서 버텨." @ 1 @ [] @ accepted_20260512_235127.jsonl_seed_master_0203
+      wait_then_skill [50.0%(10%) / 1]
+        wait_then_skill_valid [100.0%(10%) / 1]
+          "스킬 쓸 수 있는 아군은 잠깐 기다렸다가 스킬 써." @ 1 @ wait_then_skill @ accepted_20260512_235640.jsonl_seed_master_0204
+  no_valid_actor [10.5%(10%) / 2]
     explicit_enemy_target [0.0%(10%) / 0]
     none [100.0%(90%) / 2]
       empty_action_expected [100.0%(5%) / 2]
@@ -524,23 +607,25 @@ wait [4.8%(8%) / 8]
         selected_actor_dead [50.0%(6%) / 1]
           "A_04, 지금 자리에서 대기해." @ 1 @ named_actor_dead @ accepted_20260512_035437.jsonl_seed_master_0078
 
-empty [7.3%(12%) / 12]
-  explicit_actor [58.3%(30%) / 7]
-    explicit_enemy_target [57.1%(20%) / 4]
-      empty_action_expected [100.0%(100%) / 4]
-        named_target_dead [25.0%(10%) / 1]
+empty [11.1%(12%) / 23]
+  explicit_actor [43.5%(30%) / 10]
+    explicit_enemy_target [50.0%(20%) / 5]
+      empty_action_expected [100.0%(100%) / 5]
+        named_actor_dead [20.0%(12%) / 1]
+          "A_01, E_02를 공격해." @ 1 @ named_actor_dead @ accepted_20260512_235640.jsonl_seed_master_0205
+        named_target_dead [20.0%(10%) / 1]
           "A_01, E_02를 공격해." @ 1 @ named_target_dead @ accepted_20260512_035440.jsonl_seed_master_0081
-        named_target_untargetable [25.0%(10%) / 1]
+        named_target_untargetable [20.0%(10%) / 1]
           "A_01, E_02를 공격해." @ 1 @ named_target_untargetable @ accepted_20260512_035440.jsonl_seed_master_0082
-        actor_outside_allowedActors [25.0%(8%) / 1]
+        actor_outside_allowedActors [20.0%(8%) / 1]
           "A_01, E_02를 공격해." @ 1 @ actor_outside_allowedActors @ accepted_20260512_035437.jsonl_seed_master_0080
-        attack_target_outside_allowedTargets [25.0%(8%) / 1]
+        attack_target_outside_allowedTargets [20.0%(8%) / 1]
           "A_01, E_02를 공격해." @ 1 @ attack_target_outside_allowedTargets @ accepted_20260512_035440.jsonl_seed_master_0083
-    explicit_ally_target [14.3%(15%) / 1]
+    explicit_ally_target [10.0%(15%) / 1]
       empty_action_expected [100.0%(100%) / 1]
         skill_target_dead_not_allowed [100.0%(8%) / 1]
           "A_04, 쓰러진 A_02에게 보호 스킬 써." @ 1 @ skill_target_dead_not_allowed @ accepted_20260512_035440.jsonl_seed_master_0084
-    invalid_explicit_target [28.6%(30%) / 2]
+    invalid_explicit_target [20.0%(30%) / 2]
       empty_action_expected [100.0%(100%) / 2]
         move_to_self_attempt [50.0%(6%) / 1]
           "A_02, 네 위치로 다시 붙어." @ 1 @ move_to_self_attempt @ accepted_20260512_035440.jsonl_seed_master_0085
@@ -549,59 +634,85 @@ empty [7.3%(12%) / 12]
     low_hp_ally [0.0%(5%) / 0]
     role_based_enemy [0.0%(5%) / 0]
     lowest_hp_enemy [0.0%(5%) / 0]
-    none [0.0%(20%) / 0]
-  explicit_multi_actor [8.3%(10%) / 1]
-    explicit_enemy_target [100.0%(20%) / 1]
-      empty_action_expected [100.0%(100%) / 1]
-        all_named_actors_dead [100.0%(6%) / 1]
+    none [20.0%(20%) / 2]
+      empty_action_expected [100.0%(100%) / 2]
+        named_actor_dead [50.0%(12%) / 1]
+          "A_01, 지금 공격할 수 있는 적을 찾아 공격해." @ 1 @ named_actor_dead @ accepted_20260512_235640.jsonl_seed_master_0206
+        no_valid_target [50.0%(8%) / 1]
+          "A_01, 지금 공격할 수 있는 적을 공격해." @ 1 @ no_valid_target @ accepted_20260512_235640.jsonl_seed_master_0207
+  explicit_multi_actor [21.7%(10%) / 5]
+    explicit_enemy_target [80.0%(20%) / 4]
+      empty_action_expected [100.0%(100%) / 4]
+        all_named_actors_dead [25.0%(6%) / 1]
           "A_01과 A_02는 E_02를 공격해." @ 1 @ all_named_actors_dead @ accepted_20260512_035440.jsonl_seed_master_0087
+        named_target_dead [25.0%(10%) / 1]
+          "A_01과 A_02는 E_02를 공격해." @ 1 @ named_target_dead @ accepted_20260512_235640.jsonl_seed_master_0209
+        named_target_untargetable [25.0%(10%) / 1]
+          "A_01과 A_02는 E_02를 공격해." @ 1 @ named_target_untargetable @ accepted_20260512_235640.jsonl_seed_master_0210
+        attack_target_outside_allowedTargets [25.0%(8%) / 1]
+          "A_01과 A_02는 E_02를 공격해." @ 1 @ attack_target_outside_allowedTargets @ accepted_20260512_235640.jsonl_seed_master_0208
     explicit_ally_target [0.0%(15%) / 0]
-    invalid_explicit_target [0.0%(30%) / 0]
+    invalid_explicit_target [20.0%(30%) / 1]
+      empty_action_expected [100.0%(100%) / 1]
+        skill_actor_has_no_skill [100.0%(8%) / 1]
+          "A_03과 A_04는 죽은 E_02한테 스킬 써." @ 1 @ actor_has_no_skill, named_target_dead @ accepted_20260512_235640.jsonl_seed_master_0211
     low_hp_ally [0.0%(5%) / 0]
     role_based_enemy [0.0%(5%) / 0]
     lowest_hp_enemy [0.0%(5%) / 0]
     none [0.0%(20%) / 0]
-  global_condition [8.3%(25%) / 1]
+  global_condition [8.7%(25%) / 2]
     explicit_enemy_target [0.0%(20%) / 0]
     explicit_ally_target [0.0%(15%) / 0]
     invalid_explicit_target [0.0%(30%) / 0]
-    low_hp_ally [0.0%(5%) / 0]
+    low_hp_ally [50.0%(5%) / 1]
+      empty_action_expected [100.0%(100%) / 1]
+        no_matching_actor [100.0%(10%) / 1]
+          "체력이 낮은 아군을 도울 수 있는 아군은 붙어." @ 1 @ no_matching_actor, low_hp_ally_target @ accepted_20260512_235640.jsonl_seed_master_0212
     role_based_enemy [0.0%(5%) / 0]
     lowest_hp_enemy [0.0%(5%) / 0]
-    none [100.0%(20%) / 1]
+    none [50.0%(20%) / 1]
       empty_action_expected [100.0%(100%) / 1]
         no_matching_actor [100.0%(10%) / 1]
           "체력이 낮은 아군은 뒤로 빠져." @ 1 @ no_matching_actor @ accepted_20260512_035440.jsonl_seed_master_0088
-  global_role_based [8.3%(15%) / 1]
+  global_role_based [8.7%(15%) / 2]
     explicit_enemy_target [0.0%(20%) / 0]
     explicit_ally_target [0.0%(15%) / 0]
     invalid_explicit_target [0.0%(30%) / 0]
     low_hp_ally [0.0%(5%) / 0]
-    role_based_enemy [100.0%(5%) / 1]
+    role_based_enemy [50.0%(5%) / 1]
       empty_action_expected [100.0%(100%) / 1]
         no_matching_role_actor [100.0%(6%) / 1]
           "원거리 아군은 적 후열을 공격해." @ 1 @ no_matching_role_actor @ accepted_20260512_035440.jsonl_seed_master_0089
     lowest_hp_enemy [0.0%(5%) / 0]
-    none [0.0%(20%) / 0]
-  global_state_based [8.3%(10%) / 1]
+    none [50.0%(20%) / 1]
+      empty_action_expected [100.0%(100%) / 1]
+        no_matching_role_actor [100.0%(6%) / 1]
+          "전열 아군은 앞으로 버텨." @ 1 @ no_matching_role_actor @ accepted_20260512_235640.jsonl_seed_master_0213
+  global_state_based [8.7%(10%) / 2]
     explicit_enemy_target [0.0%(20%) / 0]
     explicit_ally_target [0.0%(15%) / 0]
     invalid_explicit_target [0.0%(30%) / 0]
     low_hp_ally [0.0%(5%) / 0]
-    role_based_enemy [0.0%(5%) / 0]
-    lowest_hp_enemy [100.0%(5%) / 1]
+    role_based_enemy [50.0%(5%) / 1]
+      empty_action_expected [100.0%(100%) / 1]
+        no_valid_target [100.0%(8%) / 1]
+          "공격 가능한 아군은 적 후열을 공격해." @ 1 @ no_valid_target, target_role_backline_enemy @ accepted_20260512_235640.jsonl_seed_master_0214
+    lowest_hp_enemy [50.0%(5%) / 1]
       empty_action_expected [100.0%(100%) / 1]
         no_valid_target [100.0%(8%) / 1]
           "공격 가능한 아군은 체력이 제일 낮은 적을 공격해." @ 1 @ no_valid_target @ accepted_20260512_035440.jsonl_seed_master_0090
     none [0.0%(20%) / 0]
-  no_valid_actor [8.3%(10%) / 1]
-    explicit_enemy_target [0.0%(20%) / 0]
+  no_valid_actor [8.7%(10%) / 2]
+    explicit_enemy_target [50.0%(20%) / 1]
+      empty_action_expected [100.0%(100%) / 1]
+        named_actor_dead [100.0%(12%) / 1]
+          "A_01, E_02를 공격해." @ 1 @ named_actor_dead @ accepted_20260512_235640.jsonl_seed_master_0215
     explicit_ally_target [0.0%(15%) / 0]
     invalid_explicit_target [0.0%(30%) / 0]
     low_hp_ally [0.0%(5%) / 0]
     role_based_enemy [0.0%(5%) / 0]
     lowest_hp_enemy [0.0%(5%) / 0]
-    none [100.0%(20%) / 1]
+    none [50.0%(20%) / 1]
       empty_action_expected [100.0%(100%) / 1]
         no_matching_actor [100.0%(10%) / 1]
           "살아있는 아군은 전부 후퇴해." @ 1 @ no_valid_actor @ accepted_20260512_035444.jsonl_seed_master_0091

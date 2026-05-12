@@ -252,7 +252,8 @@ output 규칙:
 - output은 학생 SLM이 실제 runtime prompt를 보고 출력해야 하는 정답 JSON이다.
 - output은 sanitizer가 고친 결과가 아니라 처음부터 raw valid label이어야 한다.
 - output의 top-level key는 thinking, dialog, action 세 개만 사용한다.
-- thinking은 짧은 한국어 판단 요약이다. 자세한 사고 과정이 아니어야 한다.
+- thinking은 짧은 한국어 판단 요약과 핵심 이유 1개를 한 문장으로 담는다.
+- thinking은 자세한 사고 과정, 단계별 추론, 긴 분석을 쓰지 않는다.
 - dialog는 action actor당 정확히 하나만 만든다.
 - action에 없는 unitId를 dialog에 넣지 않는다.
 - 같은 unitId의 dialog를 여러 개 만들지 않는다.
