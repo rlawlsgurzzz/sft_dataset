@@ -38,7 +38,7 @@ except ImportError:
 
 DEFAULT_DATASET_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_TAXONOMY_PATH = DEFAULT_DATASET_ROOT / "config" / "taxonomy_sot.json"
-DEFAULT_TEACHER_MODEL = "google/gemma-4-31B-it"
+DEFAULT_TEACHER_MODEL = "gemma-4-31b-it"
 
 
 def run_report(dataset_root: Path, taxonomy_path: Path) -> None:
@@ -216,9 +216,9 @@ def run_generate(args: argparse.Namespace) -> None:
     try:
         from sft_teacher_client import run_teacher_generation
     except ModuleNotFoundError as error:
-        if error.name == "together":
+        if error.name in {"google", "google.genai"}:
             print(
-                "generate failed: missing package 'together'. Install it with: python -m pip install together"
+                "generate failed: missing package 'google-genai'. Install it with: python -m pip install google-genai"
             )
             return
         raise
@@ -300,7 +300,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--output", default="", help="Optional request payload path."
     )
     generate_parser.add_argument("--model", default=DEFAULT_TEACHER_MODEL)
-    generate_parser.add_argument("--max-tokens", type=int, default=12000)
+    generate_parser.add_argument("--max-tokens", type=int, default=60000)
     generate_parser.add_argument("--print-json", action="store_true")
     generate_parser.add_argument(
         "--split",

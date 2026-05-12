@@ -1,26 +1,30 @@
-# Together AI teacher를 호출하고 raw generation JSONL을 저장한다.
+# Gemini API teacher를 호출하고 raw generation JSONL을 저장한다.
 # teacher 시스템 프롬프트는 dataset 생성 계약과 학생 SLM 런타임 계약을 한 파일에 포함한다.
 # teacher output에는 commandAnalysis를 생성하지 않도록 강제한다.
 # accepted/rejected 판정과 commandAnalysis 삽입은 validator가 수행한다.
-# 기존 request/generate 흐름과 trace 저장 흐름은 유지한다.
+# request/generate 실행 흐름과 trace 저장 흐름을 처리한다.
 
 from __future__ import annotations
 
 import argparse
 import json
 import os
+import time
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from together import Together
+from google import genai
+from google.genai import types
 
-MODEL_NAME = "google/gemma-4-31B-it"
+MODEL_NAME = "gemma-4-31b-it"
 
 SYSTEM_PROMPT = """
 너는 Unity 전투 명령 파서용 Synthetic SFT dataset master sample을 생성하는 데이터 생성기다.
 
-출력은 반드시 JSON object 하나 또는 JSON array 하나만 한다.
+출력은 반드시 JSON array 하나만 한다.
+array의 각 item은 raw master sample object 하나다.
+array item 수는 count_to_generate와 정확히 같아야 한다.
 마크다운, 코드블록, 주석, 사과문, 설명문, JSON 밖 텍스트를 출력하지 않는다.
 사용자가 제공한 selected_bucket, target_split, existing_valid_paraphrase_samples, other_split_reserved_command_texts, command_text_policy, count_to_generate를 따른다.
 
@@ -113,6 +117,13 @@ command_text 생성 및 패러프레이징 스타일 규칙:
 - command_text는 사용자가 전장 정보를 자세히 설명하지 않는다는 전제로 작성한다.
 - command_text 자체는 불친절하고 짧아도 되며, 어떤 전술 상황인지 설명하는 책임은 area_situation, unit field, skill_case, gold, output이 맡는다.
 - 기존 기준 문장이 친절하게 쓰여 있더라도, 새로 만드는 표현은 실제 유저 입력처럼 생략, 압축, 구어체 지시를 우선한다.
+
+command_text 표현 다양성 강제 규칙:
+- command_text paraphrase는 unitId 치환이 아니다.
+- 같은 command slot의 표현 pool 안에서는 문장 구조, 동사, 어미, 조사, 말투 중 최소 2개 이상을 바꾼다.
+- "A_01, E_02를 공격해." → "A_03, E_04를 공격해." 같은 출력은 실패다.
+- "공격해", "쳐", "때려", "물어", "압박해", "끊어", "붙어서 패"처럼 실제 유저 표현을 바꾼다.
+- 표현을 다양화하더라도 selected_bucket의 actor/target/action 의미와 edge_flags는 유지한다.
 
 한국어 unitId 해석 규칙:
 - 콤마와 unitId 나열만 보고 actor/target을 기계적으로 판단하지 않는다.
@@ -239,6 +250,7 @@ sample별 전장 다양성 강제 규칙:
 
 skill 생성 규칙:
 - skillDescription은 actor가 사용할 수 있는 정확한 문자열이다.
+- skillDescription은 스킬명이 아니라 효과 설명문이다. "회전 베기", "강력한 일격" 같은 이름만 쓰지 말고, "창을 던져 적 하나에게 물리 피해를 입힌다.", "적에게 돌진해 피해를 주고 잠시 기절시킨다."처럼 행동 + 대상 + 효과를 한 문장으로 쓴다.
 - skill action의 description은 actor.skillDescription과 정확히 같아야 한다.
 - IsSkillOnSelf=true이면 skill.target은 actor 자신의 unitId다.
 - IsSkillOnOtherAlly=true이면 skill.target은 actor 자신이 아닌 아군 unitId다.
@@ -593,6 +605,55 @@ commandAnalysis는 validator가 accepted 저장 시점에 계산해서 추가한
 """.strip()
 
 
+def get_api_key() -> str:
+    api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
+    if not api_key:
+        raise RuntimeError(
+            "GEMINI_API_KEY 또는 GOOGLE_API_KEY 환경변수가 없습니다.\n"
+            "PowerShell 예시:\n"
+            '$env:GEMINI_API_KEY="네_API_키"'
+        )
+    return api_key
+
+
+def get_chunk_text(chunk: object) -> str:
+    text = getattr(chunk, "text", None)
+    return text if isinstance(text, str) else ""
+
+
+def sdk_object_to_dict(value: Any) -> dict[str, Any] | None:
+    if value is None:
+        return None
+
+    if hasattr(value, "model_dump"):
+        return value.model_dump(mode="json", exclude_none=True)
+
+    if hasattr(value, "to_json_dict"):
+        result = value.to_json_dict()
+        return result if isinstance(result, dict) else None
+
+    if hasattr(value, "__dict__"):
+        return {
+            key: item
+            for key, item in vars(value).items()
+            if not key.startswith("_") and item is not None
+        }
+
+    return None
+
+
+def extract_token_usage(usage_metadata: Any) -> dict[str, Any]:
+    data = sdk_object_to_dict(usage_metadata) or {}
+
+    return {
+        "prompt_token_count": data.get("prompt_token_count"),
+        "cached_content_token_count": data.get("cached_content_token_count"),
+        "candidates_token_count": data.get("candidates_token_count"),
+        "thoughts_token_count": data.get("thoughts_token_count"),
+        "total_token_count": data.get("total_token_count"),
+    }
+
+
 def load_json(path: Path) -> dict[str, Any]:
     with path.open("r", encoding="utf-8") as file:
         data = json.load(file)
@@ -603,24 +664,19 @@ def load_json(path: Path) -> dict[str, Any]:
     return data
 
 
-# Together streaming 응답에서 delta.content만 누적한다.
-def extract_stream_text(stream: Any, stream_output: bool = False) -> str:
+# Gemini streaming 응답에서 chunk.text만 누적한다.
+def collect_gemini_stream_text(stream: Any, stream_output: bool = False) -> str:
     chunks: list[str] = []
 
-    for event in stream:
-        choices = getattr(event, "choices", None)
-        if not choices:
+    for chunk in stream:
+        piece = get_chunk_text(chunk)
+        if not piece:
             continue
 
-        delta = getattr(choices[0], "delta", None)
-        if delta is None:
-            continue
+        chunks.append(piece)
 
-        content = getattr(delta, "content", None)
-        if content:
-            chunks.append(content)
-            if stream_output:
-                print(content, end="", flush=True)
+        if stream_output:
+            print(piece, end="", flush=True)
 
     if stream_output:
         print()
@@ -628,48 +684,97 @@ def extract_stream_text(stream: Any, stream_output: bool = False) -> str:
     return "".join(chunks)
 
 
-# Together chat completion을 호출하고 teacher raw text를 반환한다.
-def call_together(
+# Gemini generate_content_stream을 호출하고 teacher raw text와 timing을 반환한다.
+def call_gemini(
     user_payload: dict[str, Any],
     model_name: str,
     max_tokens: int,
     stream_output: bool = False,
-) -> str:
-    api_key = os.environ.get("TOGETHER_API_KEY")
-    if not api_key:
-        raise RuntimeError("TOGETHER_API_KEY environment variable is not set.")
-
-    client = Together(api_key=api_key)
+) -> tuple[str, dict[str, Any]]:
+    client = genai.Client(api_key=get_api_key())
+    user_text = json.dumps(user_payload, ensure_ascii=False, indent=2)
 
     if stream_output:
         print("generating with stream output...", flush=True)
     else:
         print("generating...", flush=True)
 
-    stream = client.chat.completions.create(
+    start_time = time.perf_counter()
+    first_chunk_time: float | None = None
+    chunks: list[str] = []
+    usage_metadata: Any = None
+
+    stream = client.models.generate_content_stream(
         model=model_name,
-        messages=[
-            {
-                "role": "system",
-                "content": SYSTEM_PROMPT,
-            },
-            {
-                "role": "user",
-                "content": json.dumps(user_payload, ensure_ascii=False),
-            },
-        ],
-        temperature=0.0,
-        top_p=0.8,
-        max_tokens=max_tokens,
-        stream=True,
+        contents=user_text,
+        config=types.GenerateContentConfig(
+            system_instruction=SYSTEM_PROMPT,
+            temperature=0.0,
+            top_p=1.0,
+            candidate_count=1,
+            max_output_tokens=max_tokens,
+            response_mime_type="application/json",
+            thinking_config=types.ThinkingConfig(thinking_level="minimal"),
+        ),
     )
 
-    text = extract_stream_text(stream, stream_output=stream_output).strip()
+    for chunk in stream:
+        metadata = getattr(chunk, "usage_metadata", None)
+        if metadata is not None:
+            usage_metadata = metadata
+
+        piece = get_chunk_text(chunk)
+        if not piece:
+            continue
+
+        if first_chunk_time is None:
+            first_chunk_time = time.perf_counter()
+
+        chunks.append(piece)
+
+        if stream_output:
+            print(piece, end="", flush=True)
+
+    end_time = time.perf_counter()
+
+    if stream_output:
+        print()
+
+    text = "".join(chunks).strip()
     if not text:
         raise RuntimeError("Teacher response is empty.")
 
+    token_usage = extract_token_usage(usage_metadata)
+
+    timing = {
+        "ttft_sec": (
+            None
+            if first_chunk_time is None
+            else round(first_chunk_time - start_time, 3)
+        ),
+        "total_response_time_sec": round(end_time - start_time, 3),
+        "response_chars": len(text),
+        "prompt_token_count": token_usage["prompt_token_count"],
+        "cached_content_token_count": token_usage["cached_content_token_count"],
+        "candidates_token_count": token_usage["candidates_token_count"],
+        "thoughts_token_count": token_usage["thoughts_token_count"],
+        "total_token_count": token_usage["total_token_count"],
+    }
+
     print("generation complete", flush=True)
-    return text
+    print(
+        "timing: "
+        f"ttft_sec={timing['ttft_sec']}, "
+        f"total_response_time_sec={timing['total_response_time_sec']}, "
+        f"response_chars={timing['response_chars']}, "
+        f"prompt_tokens={timing['prompt_token_count']}, "
+        f"output_tokens={timing['candidates_token_count']}, "
+        f"thoughts_tokens={timing['thoughts_token_count']}, "
+        f"total_tokens={timing['total_token_count']}",
+        flush=True,
+    )
+
+    return text, timing
 
 
 def strip_code_fence(text: str) -> str:
@@ -690,7 +795,9 @@ def extract_first_json_value(text: str) -> str:
     if not stripped:
         raise ValueError("Teacher response is empty.")
 
-    start_candidates = [index for index in (stripped.find("{"), stripped.find("[")) if index >= 0]
+    start_candidates = [
+        index for index in (stripped.find("{"), stripped.find("[")) if index >= 0
+    ]
     if not start_candidates:
         raise ValueError("Teacher response does not contain JSON.")
 
@@ -749,7 +856,9 @@ def normalize_samples(parsed: Any) -> list[dict[str, Any]]:
     elif isinstance(parsed, dict):
         samples = [parsed]
     else:
-        raise ValueError("Teacher JSON root must be object, array, or object with samples.")
+        raise ValueError(
+            "Teacher JSON root must be object, array, or object with samples."
+        )
 
     normalized: list[dict[str, Any]] = []
     for index, sample in enumerate(samples, start=1):
@@ -760,6 +869,15 @@ def normalize_samples(parsed: Any) -> list[dict[str, Any]]:
     return normalized
 
 
+def assign_sample_ids(samples: list[dict[str, Any]], output_path: Path) -> None:
+    batch_id = output_path.stem
+    if batch_id.endswith("_raw"):
+        batch_id = batch_id.removesuffix("_raw")
+
+    for index, sample in enumerate(samples, start=1):
+        sample["id"] = f"{batch_id}_{index:03d}"
+
+
 def append_jsonl(path: Path, records: list[dict[str, Any]]) -> None:
     if not records:
         return
@@ -767,7 +885,9 @@ def append_jsonl(path: Path, records: list[dict[str, Any]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8", newline="\n") as file:
         for record in records:
-            file.write(json.dumps(record, ensure_ascii=False, separators=(",", ":")) + "\n")
+            file.write(
+                json.dumps(record, ensure_ascii=False, separators=(",", ":")) + "\n"
+            )
 
 
 # request payload를 읽고 teacher raw samples와 trace를 각각 JSONL에 append한다.
@@ -776,12 +896,12 @@ def run_teacher_generation(
     output_path: Path,
     trace_path: Path,
     model_name: str = MODEL_NAME,
-    max_tokens: int = 12000,
+    max_tokens: int = 40000,
     print_json: bool = False,
     stream_output: bool = False,
 ) -> dict[str, Any]:
     payload = load_json(input_path)
-    raw_response = call_together(
+    raw_response, timing = call_gemini(
         user_payload=payload,
         model_name=model_name,
         max_tokens=max_tokens,
@@ -790,6 +910,7 @@ def run_teacher_generation(
 
     parsed = parse_teacher_json(raw_response)
     samples = normalize_samples(parsed)
+    assign_sample_ids(samples, output_path)
     append_jsonl(output_path, samples)
 
     trace_record = {
@@ -798,7 +919,15 @@ def run_teacher_generation(
         "input_path": str(input_path),
         "output_path": str(output_path),
         "sample_count": len(samples),
+        "ttft_sec": timing["ttft_sec"],
+        "total_response_time_sec": timing["total_response_time_sec"],
+        "response_chars": timing["response_chars"],
         "raw_response": raw_response,
+        "prompt_token_count": timing["prompt_token_count"],
+        "cached_content_token_count": timing["cached_content_token_count"],
+        "candidates_token_count": timing["candidates_token_count"],
+        "thoughts_token_count": timing["thoughts_token_count"],
+        "total_token_count": timing["total_token_count"],
     }
     append_jsonl(trace_path, [trace_record])
 
@@ -810,6 +939,14 @@ def run_teacher_generation(
         "output_path": str(output_path),
         "trace_path": str(trace_path),
         "sample_count": len(samples),
+        "ttft_sec": timing["ttft_sec"],
+        "total_response_time_sec": timing["total_response_time_sec"],
+        "response_chars": timing["response_chars"],
+        "prompt_token_count": timing["prompt_token_count"],
+        "cached_content_token_count": timing["cached_content_token_count"],
+        "candidates_token_count(actual tokens)": timing["candidates_token_count"],
+        "thoughts_token_count": timing["thoughts_token_count"],
+        "total_token_count": timing["total_token_count"],
     }
 
 
@@ -833,12 +970,12 @@ def main() -> None:
     parser.add_argument(
         "--model",
         default=MODEL_NAME,
-        help="Together model name.",
+        help="Gemini API model name.",
     )
     parser.add_argument(
         "--max-tokens",
         type=int,
-        default=12000,
+        default=40000,
         help="Maximum output tokens.",
     )
     parser.add_argument(

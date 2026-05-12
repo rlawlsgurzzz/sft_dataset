@@ -1,14 +1,14 @@
 {
   "request": {
-    "raw_request": "c1-1-1-1-1-1.1",
-    "count_to_generate": 1,
+    "raw_request": "c1-1-1-1-1-1.5",
+    "count_to_generate": 5,
     "display_path": "1-1-1-1-1-1",
     "stable_path": "attack.explicit_actor.explicit_enemy_target.attack_only.simple_clear_target",
     "skill_stable_path": null,
     "command_slot_index": 1,
     "base_command_text": "A_01, E_02를 공격해."
   },
-  "target_split": "validation",
+  "target_split": "train",
   "selected_bucket": {
     "intent_family": "attack",
     "intent_family_description": "기본 공격 또는 공격 중심 명령이다.",
@@ -24,20 +24,23 @@
     "edge_flag_descriptions": {},
     "skill_case": null
   },
-  "existing_valid_paraphrase_samples": [],
-  "other_split_reserved_command_texts": [
+  "existing_valid_paraphrase_samples": [
     {
-      "split": "train",
       "command_text": "A_01, E_02를 공격해.",
       "command_style": "direct_korean"
+    },
+    {
+      "command_text": "A_03, E_05 좀 때려줘.",
+      "command_style": "casual_korean"
     }
   ],
+  "other_split_reserved_command_texts": [],
   "command_text_policy": {
-    "target_split": "validation",
-    "same_split_expression_pool_size": 3,
-    "existing_same_split_expression_count": 0,
-    "other_split_reserved_expression_count": 1,
-    "new_unique_command_texts_to_create": 1,
+    "target_split": "train",
+    "same_split_expression_pool_size": 7,
+    "existing_same_split_expression_count": 2,
+    "other_split_reserved_expression_count": 0,
+    "new_unique_command_texts_to_create": 5,
     "samples_using_same_split_cycle": 0,
     "cycle_source": "existing_valid_paraphrase_samples plus newly created unique command_texts in this request",
     "rules": [
@@ -52,7 +55,7 @@
       "다른 split의 command_text 표현 pool을 cycle 대상으로 섞지 않는다."
     ]
   },
-  "count_to_generate": 1,
+  "count_to_generate": 5,
   "runtime_generation_contract": {
     "teacher_role": "전장 시나리오와 정답 output을 생성한다.",
     "validator_role": "area_situation을 검증하고 commandAnalysis를 계산해 accepted 저장 시점에 추가한다.",
@@ -206,7 +209,7 @@
   },
   "generation_constraints": [
     "selected_bucket만 따른다.",
-    "각 sample.split은 반드시 validation이다.",
+    "각 sample.split은 반드시 train이다.",
     "새 command는 selected_bucket의 command slot 의미와 edge_flags를 유지한다.",
     "command_text_policy를 따른다.",
     "existing_valid_paraphrase_samples는 요청 split의 cycle 가능 표현 pool이다.",
@@ -225,9 +228,7 @@
     "area_situation.allies에는 A_01부터 A_06까지 정확히 6명의 ally를 만든다.",
     "area_situation.enemies에는 E_01부터 E_06까지 정확히 6명의 enemy를 만든다.",
     "아군 유닛에는 IsSkillOnOtherAlly와 단일 closest/farthest 필드를 사용한다.",
-    "targetableOpponentsByDistance, aliveAlliesByDistance, IsSkillOnAlly는 사용하지 않는다.",
-    "closestTargetableOpponent, farthestTargetableOpponent, closestAliveAlly, farthestAliveAlly는 배열이 아니라 unitId string 또는 null이다.",
-    "새 네 필드에는 살아있고 유효한 후보만 넣는다.",
+    "closestTargetableOpponent, farthestTargetableOpponent, closestAliveAlly, farthestAliveAlly는 배열이 아니라 unitId string 또는 null이며, 살아있는 유효 후보만 넣는다.",
     "죽은 unit도 보통 canBeTargeted=true일 수 있지만, 새 네 필드에는 죽은 unit을 넣지 않는다.",
     "output은 sanitizer가 고친 결과가 아니라 처음부터 raw valid assistant output이어야 한다.",
     "output은 학생 SLM runtime system prompt를 실제로 적용했을 때의 thinking/dialog/action 정답이어야 한다."
