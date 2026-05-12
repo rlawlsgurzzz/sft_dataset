@@ -409,9 +409,6 @@ def validate_unit_common_fields(ctx: ValidationContext, unit: dict[str, Any], si
     if role not in TEAM_FORMATION_ROLES:
         ctx.add("UNIT_TEAM_FORMATION_ROLE_INVALID", f"{label}.{role}")
 
-    if unit.get("isAlive") is False and unit.get("canBeTargeted") is not True:
-        ctx.add("DEAD_UNIT_SHOULD_BE_TARGETABLE", label)
-
 
 def validate_unit_key_sets(ctx: ValidationContext) -> None:
     allies_raw = get_area(ctx.sample).get("allies")
