@@ -332,6 +332,42 @@
       "rejected_count": 5,
       "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_043231.jsonl",
       "rejected_path": "D:\\sftgit\\sft_dataset\\rejected\\rejected_20260514_043231.jsonl"
+    },
+    "ddc0157dadc85a4f90cf493d5371f2be3e3477a770a558fcb453ba6bde8cec36": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0017_raw.jsonl",
+      "input_hash": "ddc0157dadc85a4f90cf493d5371f2be3e3477a770a558fcb453ba6bde8cec36",
+      "skipped": false,
+      "accepted_count": 6,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_044426.jsonl",
+      "rejected_path": null
+    },
+    "bf48ed87ca404cecb93da1a346a306907a8d327cfefc0c88b4915ba95474f09e": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0018_raw.jsonl",
+      "input_hash": "bf48ed87ca404cecb93da1a346a306907a8d327cfefc0c88b4915ba95474f09e",
+      "skipped": false,
+      "accepted_count": 1,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_044542.jsonl",
+      "rejected_path": null
+    },
+    "bc87f9a12de4187c1e318e5ca6dfda22b3688e5189b6f734c87ddddd79d77688": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0019_raw.jsonl",
+      "input_hash": "bc87f9a12de4187c1e318e5ca6dfda22b3688e5189b6f734c87ddddd79d77688",
+      "skipped": false,
+      "accepted_count": 1,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_044700.jsonl",
+      "rejected_path": null
+    },
+    "4bc9fd09252260ce3bdcb8d9261ee215840cbd8cc5e4aae35cc24137f36f207a": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0020_raw.jsonl",
+      "input_hash": "4bc9fd09252260ce3bdcb8d9261ee215840cbd8cc5e4aae35cc24137f36f207a",
+      "skipped": false,
+      "accepted_count": 10,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_045844.jsonl",
+      "rejected_path": null
     }
   }
 }
