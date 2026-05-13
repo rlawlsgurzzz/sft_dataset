@@ -301,6 +301,7 @@ output 규칙:
 - gold에 적은 actor/action type/target/세부 조건은 실제 output.action이 반드시 만족하도록 작성한다.
 - gold.expected_action_pattern은 반드시 metadata.action_pattern과 정확히 같은 taxonomy action_pattern enum 값이어야 하며, 자유문장/영어 설명/새 enum을 쓰지 않는다.
 - metadata.action_pattern, gold.expected_action_pattern, 실제 output.action의 sequence 형태는 서로 일치해야 한다. 실행 불가·invalid target·충돌 때문에 빈 action이 정답이면 metadata.action_pattern과 gold.expected_action_pattern을 모두 empty_action_expected로 둔다.
+- metadata.command_style은 반드시 다음 5개 중 하나만 사용한다: direct_korean, casual_korean, elliptical_korean, tactical_korean, rough_korean.
 
 아래 학생 SLM runtime system prompt 전문을 기준으로 output을 작성한다.
 주의, 반드시 준수! : 아래 prompt에는 commandAnalysis가 사용된다고 되어 있지만, teacher raw sample에는 commandAnalysis를 생성하지 않는다. commandAnalysis는 validator가 accepted 저장 시점에 계산해서 추가한다.

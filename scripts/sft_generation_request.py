@@ -596,6 +596,8 @@ def build_generation_constraints(target_split: str = DEFAULT_TARGET_SPLIT) -> li
         f"각 sample.split은 반드시 {target_split}이다.",
         "새 command는 selected_bucket의 command slot 의미와 edge_flags를 유지한다.",
         "command_text_policy를 따른다.",
+        "metadata.command_style은 direct_korean, casual_korean, elliptical_korean, tactical_korean, rough_korean 중 하나만 사용한다.",
+        "metadata.command_style에 informal을 절대 사용하지 않는다.",
         "existing_valid_paraphrase_samples는 요청 split의 cycle 가능 표현 pool이다.",
         "other_split_reserved_command_texts는 다른 split의 중복 금지 표현 목록이다.",
         "새 command_text는 existing_valid_paraphrase_samples와 exact duplicate이면 안 된다.",
