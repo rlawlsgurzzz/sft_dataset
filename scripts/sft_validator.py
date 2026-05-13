@@ -369,6 +369,13 @@ def validate_taxonomy(ctx: ValidationContext) -> None:
         if not isinstance(skill_case.get("can_skill_target_dead"), bool):
             ctx.add("SKILL_CASE_CAN_TARGET_DEAD_NOT_BOOL")
 
+    has_skill_action = any(
+        seq_item.get("type") == "skill"
+        for _, seq_item in iter_sequence_items(ctx.sample)
+    )
+    if has_skill_action and not isinstance(skill_case, dict):
+        ctx.add("SKILL_ACTION_REQUIRES_SKILL_CASE")
+
 
 def validate_unit_common_fields(ctx: ValidationContext, unit: dict[str, Any], side: str) -> None:
     unit_id = unit.get("unitId")
@@ -922,6 +929,27 @@ def validate_semantic_gold(ctx: ValidationContext) -> None:
     gold = sample.get("gold")
     if not isinstance(gold, dict):
         return
+    
+    expected_action_pattern = gold.get("expected_action_pattern")
+    allowed_action_patterns = set(ctx.taxonomy.get("orders", {}).get("action_pattern", []))
+
+    if not isinstance(expected_action_pattern, str):
+        ctx.add("GOLD_EXPECTED_ACTION_PATTERN_NOT_STRING")
+    elif expected_action_pattern not in allowed_action_patterns:
+        ctx.add("GOLD_EXPECTED_ACTION_PATTERN_UNKNOWN", str(expected_action_pattern))
+
+    metadata = sample.get("metadata")
+    metadata_action_pattern = metadata.get("action_pattern") if isinstance(metadata, dict) else None
+
+    if (
+        isinstance(metadata_action_pattern, str)
+        and isinstance(expected_action_pattern, str)
+        and metadata_action_pattern != expected_action_pattern
+    ):
+        ctx.add(
+            "GOLD_ACTION_PATTERN_METADATA_MISMATCH",
+            f"metadata={metadata_action_pattern} gold={expected_action_pattern}",
+        )
 
     action_actors = [entry.get("unitId") for entry in output_action_entries(sample) if isinstance(entry.get("unitId"), str)]
     action_actor_set = set(action_actors)

@@ -81,14 +81,16 @@ skill_case 규칙:
 - is_skill_aoe와 can_skill_target_dead는 반드시 boolean이다.
 - conflict_type은 null 또는 taxonomy에 존재하는 string이다.
 - taxonomy 밖 값을 만들지 않는다.
+- output.action[].sequence 안에 type="skill" action이 하나라도 있으면 skill_case는 null이면 안 되고 반드시 object여야 한다. type="skillControl"은 skill action으로 보지 않는다.
 
 command_spec 규칙:
 - command_spec.command_text는 input.input.command와 정확히 같아야 한다.
-- command_spec.base_command_text는 기존 예시의 기준 문장을 유지하거나, 같은 의미의 기준 문장으로 쓴다.
+- command_spec.base_command_text는 반드시 user payload의 request_info.base_command_text와 정확히 같아야 하며, command_spec.command_text 자기 자신이나 새 paraphrase가 아니라 selected command slot을 대표하는 원형 명령문으로 보존한다.
 - command_spec.slots는 명령의 의미 구조를 설명한다.
 - slots에는 가능한 한 actors, target, target_side_in_text, mentioned_units를 포함한다.
 - actors는 명령에서 행동 주체로 지목된 ally unitId 목록이다.
 - target은 명령에서 목적어 또는 대상 역할을 하는 unitId 또는 null이다.
+- 단, actor가 여러 명이고 각 actor가 서로 다른 target을 갖는 명령인 경우에만 target에 unitId string array를 사용할 수 있다.
 - target_side_in_text는 ally, enemy, self, none 중 하나를 사용한다.
 - mentioned_units는 명령문에 직접 등장한 모든 unitId 목록이다.
 
@@ -286,6 +288,8 @@ output 규칙:
 - gold는 output.action만 검증하는 semantic constraint이며, thinking/dialog와 직접 비교되지 않는다.
 - gold의 required/allowed/forbidden 계열 값은 사용할 경우 반드시 string array로 작성하고, 제한하지 않을 항목은 null이 아니라 key 자체를 생략한다.
 - gold에 적은 actor/action type/target/세부 조건은 실제 output.action이 반드시 만족하도록 작성한다.
+- gold.expected_action_pattern은 반드시 metadata.action_pattern과 정확히 같은 taxonomy action_pattern enum 값이어야 하며, 자유문장/영어 설명/새 enum을 쓰지 않는다.
+- metadata.action_pattern, gold.expected_action_pattern, 실제 output.action의 sequence 형태는 서로 일치해야 한다. 실행 불가·invalid target·충돌 때문에 빈 action이 정답이면 metadata.action_pattern과 gold.expected_action_pattern을 모두 empty_action_expected로 둔다.
 
 아래 학생 SLM runtime system prompt 전문을 기준으로 output을 작성한다.
 주의, 반드시 준수! : 아래 prompt에는 commandAnalysis가 사용된다고 되어 있지만, teacher raw sample에는 commandAnalysis를 생성하지 않는다. commandAnalysis는 validator가 accepted 저장 시점에 계산해서 추가한다.
@@ -472,6 +476,7 @@ Conditional command:
 - unit object에는 명시된 필드만 넣는다.
 - 각 sample의 area_situation은 새로 만든다. 같은 전장 template에 command/output만 바꾼 sample을 만들지 않는다.
 - 다양화가 필요할 때는 taxonomy enum이 아니라 unit 상태, skillDescription, 거리 신호, 체력, 교전 수, 진형, output 판단 근거를 바꾼다.
+- output에 type="skill" action이 하나라도 있으면 skill_case가 반드시 object인지 확인한다. skillControl만 있는 경우는 skill_case 필수 조건이 아니다.
 
 schema skeleton example:
 {
@@ -484,7 +489,7 @@ schema skeleton example:
         "base_command_text": "기준이 되는 원형 명령문",
         "slots": {
           "actors": ["명령문에서 행동 주체로 직접 지정된 ally unitId들"],
-          "target": "명령문에서 대상 역할을 하는 unitId 또는 null",
+          "target": "명령문에서 대상 역할을 하는 unitId string, null, 또는 multi-actor different-target 명령의 unitId string array",
           "target_side_in_text": "ally | enemy | self | none",
           "mentioned_units": ["명령문에 직접 등장한 모든 unitId들"]
         }
@@ -514,7 +519,7 @@ schema skeleton example:
         "allowed_action_types": ["정답 output에 포함될 수 있는 action type들"],
         "forbidden_action_types": ["정답 output에 포함되면 안 되는 action type들"],
         "empty_action_allowed": true 또는 false,
-        "expected_action_pattern": "기대되는 action pattern 설명",
+        "expected_action_pattern": "metadata.action_pattern과 동일한 taxonomy action_pattern enum",
         "targets": {
           "required": ["정답 output에서 반드시 사용되어야 하는 target 또는 move.to unitId들"],
           "allowed": ["정답 output에서 사용할 수 있는 target 또는 move.to unitId들"],
@@ -910,6 +915,7 @@ def run_teacher_generation(
 
     parsed = parse_teacher_json(raw_response)
     samples = normalize_samples(parsed)
+    force_request_base_command_text(samples, payload)
     assign_sample_ids(samples, output_path)
     append_jsonl(output_path, samples)
 
@@ -949,6 +955,22 @@ def run_teacher_generation(
         "total_token_count": timing["total_token_count"],
     }
 
+def force_request_base_command_text(
+    samples: list[dict[str, Any]],
+    payload: dict[str, Any],
+) -> None:
+    request_info = payload.get("request_info")
+    if not isinstance(request_info, dict):
+        return
+
+    base_command_text = request_info.get("base_command_text")
+    if not isinstance(base_command_text, str) or not base_command_text:
+        return
+
+    for sample in samples:
+        command_spec = sample.setdefault("command_spec", {})
+        if isinstance(command_spec, dict):
+            command_spec["base_command_text"] = base_command_text
 
 def main() -> None:
     parser = argparse.ArgumentParser()
