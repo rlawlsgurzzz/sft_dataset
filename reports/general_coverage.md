@@ -1,30 +1,30 @@
 # General Coverage
 
-attack [25.0%(24%) / 49]
-  explicit_actor [63.3%(35%) / 31]
-    explicit_enemy_target [41.9%(30%) / 13]
-      attack_only [76.9%(45%) / 10]
-        simple_clear_target [90.0%(18%) / 9]
-          1-1-1-1-1-1 @ "A_01, E_02를 공격해." @ 9 @ [] @ accepted_20260514_002649.jsonl_seed_master_0001, accepted_20260514_005848.jsonl_batch_0001_001, accepted_20260514_015203.jsonl_batch_0002_001, accepted_20260514_015203.jsonl_batch_0002_002, accepted_20260514_015203.jsonl_batch_0002_003, accepted_20260514_015203.jsonl_batch_0002_004, accepted_20260514_015203.jsonl_batch_0002_005, accepted_20260514_015203.jsonl_batch_0002_006, accepted_20260514_015203.jsonl_batch_0002_007
-        multiple_valid_targets [10.0%(10%) / 1]
-          1-1-1-1-2-1 @ "A_01, 지금 가장 처리하기 좋은 적을 골라 공격해." @ 1 @ [] @ accepted_20260514_002742.jsonl_seed_master_0114
-      move_then_attack [23.1%(25%) / 3]
-        simple_clear_target [33.3%(18%) / 1]
-          1-1-1-3-1-1 @ "A_01, E_02에게 접근해서 공격해." @ 1 @ [] @ accepted_20260514_002742.jsonl_seed_master_0115
-        pressure_source_target_clear [33.3%(8%) / 1]
-          1-1-1-3-7-1 @ "A_01, E_02에게 붙어서 공격해." @ 1 @ pressure_source_target_clear @ accepted_20260514_002742.jsonl_seed_master_0116
-        flank_attack_requested [33.3%(6%) / 1]
-          1-1-1-3-9-1 @ "A_01, E_02의 뒤쪽으로 돌아가서 공격해." @ 1 @ flank_requested @ accepted_20260514_002740.jsonl_seed_master_0014
-    nearest_enemy [9.7%(15%) / 3]
-      attack_only [66.7%(45%) / 2]
-        multiple_valid_targets [50.0%(10%) / 1]
-          1-1-3-1-2-1 @ "A_01, 가장 가까운 적을 공격해." @ 1 @ [] @ accepted_20260514_002742.jsonl_seed_master_0117
-        nearest_target_clear [50.0%(8%) / 1]
+attack [47.9%(24%) / 135]
+  explicit_actor [86.7%(35%) / 117]
+    explicit_enemy_target [70.9%(30%) / 83]
+      attack_only [49.4%(45%) / 41]
+        simple_clear_target [95.1%(18%) / 39]
+          1-1-1-1-1-1 @ "A_01, E_02를 공격해." @ 39 @ [] @ accepted_20260514_002649.jsonl_seed_master_0001, accepted_20260514_005848.jsonl_batch_0001_001, accepted_20260514_015203.jsonl_batch_0002_001, accepted_20260514_015203.jsonl_batch_0002_002, accepted_20260514_015203.jsonl_batch_0002_003, accepted_20260514_015203.jsonl_batch_0002_004, accepted_20260514_015203.jsonl_batch_0002_005, accepted_20260514_015203.jsonl_batch_0002_006, accepted_20260514_015203.jsonl_batch_0002_007, accepted_20260514_021615.jsonl_batch_0003_001, accepted_20260514_021615.jsonl_batch_0003_002, accepted_20260514_021615.jsonl_batch_0003_003, accepted_20260514_021615.jsonl_batch_0003_004, accepted_20260514_021615.jsonl_batch_0003_005, accepted_20260514_021615.jsonl_batch_0003_006, accepted_20260514_021615.jsonl_batch_0003_007, accepted_20260514_021615.jsonl_batch_0003_008, accepted_20260514_021615.jsonl_batch_0003_009, accepted_20260514_021615.jsonl_batch_0003_010, accepted_20260514_022817.jsonl_batch_0004_001, accepted_20260514_022817.jsonl_batch_0004_002, accepted_20260514_022817.jsonl_batch_0004_003, accepted_20260514_022817.jsonl_batch_0004_004, accepted_20260514_022817.jsonl_batch_0004_005, accepted_20260514_022817.jsonl_batch_0004_006, accepted_20260514_022817.jsonl_batch_0004_007, accepted_20260514_022817.jsonl_batch_0004_008, accepted_20260514_022817.jsonl_batch_0004_009, accepted_20260514_022817.jsonl_batch_0004_010, accepted_20260514_024019.jsonl_batch_0005_001, accepted_20260514_024019.jsonl_batch_0005_002, accepted_20260514_024019.jsonl_batch_0005_003, accepted_20260514_024019.jsonl_batch_0005_004, accepted_20260514_024019.jsonl_batch_0005_005, accepted_20260514_024019.jsonl_batch_0005_006, accepted_20260514_024019.jsonl_batch_0005_007, accepted_20260514_024019.jsonl_batch_0005_008, accepted_20260514_024019.jsonl_batch_0005_009, accepted_20260514_024019.jsonl_batch_0005_010
+        multiple_valid_targets [4.9%(10%) / 2]
+          1-1-1-1-2-1 @ "A_01, 지금 가장 처리하기 좋은 적을 골라 공격해." @ 2 @ [] @ accepted_20260514_002742.jsonl_seed_master_0114, accepted_20260514_024137.jsonl_batch_0006_001
+      move_then_attack [50.6%(25%) / 42]
+        simple_clear_target [7.1%(18%) / 3]
+          1-1-1-3-1-1 @ "A_01, E_02에게 접근해서 공격해." @ 3 @ [] @ accepted_20260514_002742.jsonl_seed_master_0115, accepted_20260514_024903.jsonl_batch_0007_002, accepted_20260514_024903.jsonl_batch_0007_004
+        pressure_source_target_clear [19.0%(8%) / 8]
+          1-1-1-3-7-1 @ "A_01, E_02에게 붙어서 공격해." @ 8 @ pressure_source_target_clear @ accepted_20260514_002742.jsonl_seed_master_0116, accepted_20260514_025740.jsonl_batch_0008_001, accepted_20260514_025740.jsonl_batch_0008_002, accepted_20260514_025740.jsonl_batch_0008_003, accepted_20260514_025740.jsonl_batch_0008_004, accepted_20260514_025740.jsonl_batch_0008_005, accepted_20260514_025740.jsonl_batch_0008_006, accepted_20260514_025740.jsonl_batch_0008_007
+        flank_attack_requested [73.8%(6%) / 31]
+          1-1-1-3-9-1 @ "A_01, E_02의 뒤쪽으로 돌아가서 공격해." @ 31 @ flank_requested @ accepted_20260514_002740.jsonl_seed_master_0014, accepted_20260514_031435.jsonl_batch_0009_001, accepted_20260514_031435.jsonl_batch_0009_002, accepted_20260514_031435.jsonl_batch_0009_003, accepted_20260514_031435.jsonl_batch_0009_004, accepted_20260514_031435.jsonl_batch_0009_005, accepted_20260514_031435.jsonl_batch_0009_006, accepted_20260514_031435.jsonl_batch_0009_007, accepted_20260514_031435.jsonl_batch_0009_008, accepted_20260514_031435.jsonl_batch_0009_009, accepted_20260514_031435.jsonl_batch_0009_010, accepted_20260514_032651.jsonl_batch_0010_001, accepted_20260514_032651.jsonl_batch_0010_002, accepted_20260514_032651.jsonl_batch_0010_003, accepted_20260514_032651.jsonl_batch_0010_004, accepted_20260514_032651.jsonl_batch_0010_005, accepted_20260514_032651.jsonl_batch_0010_006, accepted_20260514_032651.jsonl_batch_0010_007, accepted_20260514_032651.jsonl_batch_0010_008, accepted_20260514_032651.jsonl_batch_0010_009, accepted_20260514_032651.jsonl_batch_0010_010, accepted_20260514_033859.jsonl_batch_0011_001, accepted_20260514_033859.jsonl_batch_0011_002, accepted_20260514_033859.jsonl_batch_0011_003, accepted_20260514_033859.jsonl_batch_0011_004, accepted_20260514_033859.jsonl_batch_0011_005, accepted_20260514_033859.jsonl_batch_0011_006, accepted_20260514_033859.jsonl_batch_0011_007, accepted_20260514_033859.jsonl_batch_0011_008, accepted_20260514_033859.jsonl_batch_0011_009, accepted_20260514_033859.jsonl_batch_0011_010
+    nearest_enemy [16.2%(15%) / 19]
+      attack_only [94.7%(45%) / 18]
+        multiple_valid_targets [94.4%(10%) / 17]
+          1-1-3-1-2-1 @ "A_01, 가장 가까운 적을 공격해." @ 17 @ [] @ accepted_20260514_002742.jsonl_seed_master_0117, accepted_20260514_035057.jsonl_batch_0012_001, accepted_20260514_035057.jsonl_batch_0012_002, accepted_20260514_035057.jsonl_batch_0012_003, accepted_20260514_035057.jsonl_batch_0012_004, accepted_20260514_035057.jsonl_batch_0012_005, accepted_20260514_035057.jsonl_batch_0012_006, accepted_20260514_035057.jsonl_batch_0012_007, accepted_20260514_035057.jsonl_batch_0012_008, accepted_20260514_035057.jsonl_batch_0012_009, accepted_20260514_035057.jsonl_batch_0012_010, accepted_20260514_035808.jsonl_batch_0013_001, accepted_20260514_035808.jsonl_batch_0013_002, accepted_20260514_035808.jsonl_batch_0013_003, accepted_20260514_035808.jsonl_batch_0013_004, accepted_20260514_035808.jsonl_batch_0013_005, accepted_20260514_035808.jsonl_batch_0013_006
+        nearest_target_clear [5.6%(8%) / 1]
           1-1-3-1-3-1 @ "A_02, 가장 가까운 적을 공격해." @ 1 @ [] @ accepted_20260514_002649.jsonl_seed_master_0002
-      move_then_attack [33.3%(25%) / 1]
+      move_then_attack [5.3%(25%) / 1]
         nearest_target_clear [100.0%(8%) / 1]
           1-1-3-3-3-1 @ "A_02, 제일 가까운 적한테 붙어서 공격해." @ 1 @ [] @ accepted_20260514_002740.jsonl_seed_master_0015
-    lowest_hp_enemy [9.7%(15%) / 3]
+    lowest_hp_enemy [2.6%(15%) / 3]
       attack_only [66.7%(45%) / 2]
         multiple_valid_targets [50.0%(10%) / 1]
           1-1-4-1-2-1 @ "A_01, 체력이 제일 낮은 적을 공격해." @ 1 @ [] @ accepted_20260514_002742.jsonl_seed_master_0118
@@ -33,7 +33,7 @@ attack [25.0%(24%) / 49]
       move_then_attack [33.3%(25%) / 1]
         lowest_hp_target_clear [100.0%(8%) / 1]
           1-1-4-3-4-1 @ "A_01, 체력이 제일 낮은 적에게 붙어서 공격해." @ 1 @ [] @ accepted_20260514_002742.jsonl_seed_master_0119
-    highest_threat_enemy [9.7%(12%) / 3]
+    highest_threat_enemy [2.6%(12%) / 3]
       attack_only [66.7%(45%) / 2]
         multiple_valid_targets [50.0%(10%) / 1]
           1-1-5-1-2-1 @ "A_01, 가장 위협적인 적을 공격해." @ 1 @ [] @ accepted_20260514_002742.jsonl_seed_master_0120
@@ -42,7 +42,7 @@ attack [25.0%(24%) / 49]
       move_then_attack [33.3%(25%) / 1]
         highest_threat_target_clear [100.0%(7%) / 1]
           1-1-5-3-5-1 @ "A_01, 제일 위험한 적에게 접근해서 공격해." @ 1 @ [] @ accepted_20260514_002742.jsonl_seed_master_0121
-    role_based_enemy [12.9%(12%) / 4]
+    role_based_enemy [3.4%(12%) / 4]
       attack_only [75.0%(45%) / 3]
         multiple_valid_targets [33.3%(10%) / 1]
           1-1-6-1-2-1 @ "A_01, 후열 적을 먼저 공격해." @ 1 @ target_role_backline_enemy @ accepted_20260514_002742.jsonl_seed_master_0122
@@ -52,7 +52,7 @@ attack [25.0%(24%) / 49]
       move_then_attack [25.0%(25%) / 1]
         role_based_target_clear [100.0%(8%) / 1]
           1-1-6-3-6-1 @ "A_01, 적 후열 쪽으로 붙어서 공격해." @ 1 @ target_role_backline_enemy @ accepted_20260514_002742.jsonl_seed_master_0123
-    pressure_source_enemy [9.7%(10%) / 3]
+    pressure_source_enemy [2.6%(10%) / 3]
       attack_only [66.7%(45%) / 2]
         pressure_source_target_clear [100.0%(8%) / 2]
           1-1-7-1-7-1 @ "A_01, A_02를 때리는 적을 공격해." @ 1 @ pressure_source_target_clear @ accepted_20260514_002742.jsonl_seed_master_0124
@@ -60,13 +60,13 @@ attack [25.0%(24%) / 49]
       move_then_attack [33.3%(25%) / 1]
         pressure_source_target_clear [100.0%(8%) / 1]
           1-1-7-3-7-1 @ "A_01, A_02를 압박하는 적에게 붙어서 공격해." @ 1 @ pressure_source_target_clear @ accepted_20260514_002742.jsonl_seed_master_0125
-    invalid_explicit_target [6.5%(6%) / 2]
+    invalid_explicit_target [1.7%(6%) / 2]
       empty_action_expected [100.0%(5%) / 2]
         dead_named_target [50.0%(6%) / 1]
           1-1-11-13-10-1 @ "A_01, 죽은 E_02를 공격해." @ 1 @ named_target_dead @ accepted_20260514_002742.jsonl_seed_master_0126
         untargetable_named_target [50.0%(5%) / 1]
           1-1-11-13-11-1 @ "A_01, 숨어 있는 E_02를 공격해." @ 1 @ named_target_untargetable @ accepted_20260514_002742.jsonl_seed_master_0127
-  explicit_multi_actor [18.4%(15%) / 9]
+  explicit_multi_actor [6.7%(15%) / 9]
     explicit_enemy_target [22.2%(30%) / 2]
       multi_actor_same_target [50.0%(18%) / 1]
         focus_fire_clear [100.0%(8%) / 1]
@@ -101,7 +101,7 @@ attack [25.0%(24%) / 49]
         pressure_source_target_clear [100.0%(8%) / 1]
           1-2-7-11-7-1 @ "A_01과 A_02는 아군을 압박하는 적을 같이 공격해." @ 1 @ pressure_source_target_clear @ accepted_20260514_002742.jsonl_seed_master_0134
     invalid_explicit_target [0.0%(6%) / 0]
-  global_condition [6.1%(20%) / 3]
+  global_condition [2.2%(20%) / 3]
     explicit_enemy_target [33.3%(30%) / 1]
       multi_actor_same_target [100.0%(18%) / 1]
         focus_fire_clear [100.0%(8%) / 1]
@@ -118,7 +118,7 @@ attack [25.0%(24%) / 49]
         pressure_source_target_clear [100.0%(8%) / 1]
           1-3-7-11-7-1 @ "손이 비는 아군은 압박받는 아군을 때리는 적을 같이 공격해." @ 1 @ free_actor_selection, pressure_source_target_clear @ accepted_20260514_002742.jsonl_seed_master_0136
     invalid_explicit_target [0.0%(6%) / 0]
-  global_role_based [6.1%(15%) / 3]
+  global_role_based [2.2%(15%) / 3]
     explicit_enemy_target [33.3%(30%) / 1]
       multi_actor_same_target [100.0%(18%) / 1]
         focus_fire_clear [100.0%(8%) / 1]
@@ -135,7 +135,7 @@ attack [25.0%(24%) / 49]
           1-4-6-12-6-1 @ "원거리 아군은 적 후열을 먼저 공격해." @ 1 @ actor_role_ranged, target_role_backline_enemy @ accepted_20260514_002740.jsonl_seed_master_0025
     pressure_source_enemy [0.0%(10%) / 0]
     invalid_explicit_target [0.0%(6%) / 0]
-  global_state_based [6.1%(15%) / 3]
+  global_state_based [2.2%(15%) / 3]
     explicit_enemy_target [0.0%(30%) / 0]
     nearest_enemy [0.0%(15%) / 0]
     lowest_hp_enemy [33.3%(15%) / 1]
@@ -153,7 +153,7 @@ attack [25.0%(24%) / 49]
           1-5-7-11-7-1 @ "지원 가능한 아군은 아군을 압박하는 적을 같이 공격해." @ 1 @ pressure_source_target_clear @ accepted_20260514_002742.jsonl_seed_master_0139
     invalid_explicit_target [0.0%(6%) / 0]
 
-move [19.4%(22%) / 38]
+move [13.5%(22%) / 38]
   explicit_actor [57.9%(45%) / 22]
     explicit_ally_target [27.3%(22%) / 6]
       move_only [66.7%(55%) / 4]
@@ -314,7 +314,7 @@ move [19.4%(22%) / 38]
         no_matching_actor [100.0%(5%) / 1]
           2-6-12-13-12-1 @ "움직일 수 있는 아군은 전부 후퇴해." @ 1 @ no_matching_actor @ accepted_20260514_002742.jsonl_seed_master_0162
 
-skill [29.6%(26%) / 58]
+skill [20.6%(26%) / 58]
   explicit_actor [72.4%(55%) / 42]
     explicit_enemy_target [31.0%(26%) / 13]
       skill_only [92.3%(70%) / 12]
@@ -495,7 +495,7 @@ skill [29.6%(26%) / 58]
         no_valid_skill_actor [100.0%(4%) / 1]
           3-6-12-13-13-1 @ "스킬 가능한 아군은 지금 스킬 써." @ 1 @ no_valid_skill_actor @ accepted_20260514_002743.jsonl_seed_master_0188
 
-skillControl [6.6%(8%) / 13]
+skillControl [4.6%(8%) / 13]
   explicit_actor [46.2%(70%) / 6]
     none [100.0%(100%) / 6]
       skillControl_defer [33.3%(55%) / 2]
@@ -535,7 +535,7 @@ skillControl [6.6%(8%) / 13]
           4-6-12-13-8-1 @ "A_03, 스킬 쓰지 마." @ 1 @ named_actor_dead @ accepted_20260514_002741.jsonl_seed_master_0069
           4-6-12-13-8-2 @ "A_03, 스킬 쓰지 말고 있어." @ 1 @ named_actor_dead @ accepted_20260514_002743.jsonl_seed_master_0192
 
-wait [7.7%(8%) / 15]
+wait [5.3%(8%) / 15]
   explicit_actor [60.0%(60%) / 9]
     explicit_enemy_target [33.3%(10%) / 3]
       wait_only [33.3%(65%) / 1]
@@ -588,7 +588,7 @@ wait [7.7%(8%) / 15]
         selected_actor_dead [50.0%(6%) / 1]
           5-6-12-13-8-1 @ "A_04, 지금 자리에서 대기해." @ 1 @ named_actor_dead @ accepted_20260514_002741.jsonl_seed_master_0078
 
-empty [11.7%(12%) / 23]
+empty [8.2%(12%) / 23]
   explicit_actor [43.5%(30%) / 10]
     explicit_enemy_target [50.0%(20%) / 5]
       empty_action_expected [100.0%(100%) / 5]

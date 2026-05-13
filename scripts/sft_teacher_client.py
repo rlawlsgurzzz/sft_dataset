@@ -917,7 +917,7 @@ def run_teacher_generation(
     output_path: Path,
     trace_path: Path,
     model_name: str = MODEL_NAME,
-    max_tokens: int = 40000,
+    max_tokens: int = 50000,
     print_json: bool = False,
     stream_output: bool = False,
 ) -> dict[str, Any]:
@@ -1013,7 +1013,7 @@ def main() -> None:
     parser.add_argument(
         "--max-tokens",
         type=int,
-        default=40000,
+        default=50000,
         help="Maximum output tokens.",
     )
     parser.add_argument(
