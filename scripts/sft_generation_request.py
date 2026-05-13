@@ -329,6 +329,75 @@ def build_other_split_reserved_command_texts(
     return result
 
 
+def build_command_text_sequence_contract(
+    *,
+    existing_count: int,
+    new_unique_count: int,
+    cycle_count: int,
+) -> dict[str, Any]:
+    new_unique_start = 1 if new_unique_count > 0 else None
+    new_unique_end = new_unique_count if new_unique_count > 0 else None
+
+    cycle_start = new_unique_count + 1 if cycle_count > 0 else None
+    cycle_end = new_unique_count + cycle_count if cycle_count > 0 else None
+
+    cycle_source_pool_size = existing_count + new_unique_count
+    cycle_reuse_plan: list[dict[str, Any]] = []
+
+    if cycle_count > 0 and cycle_source_pool_size > 0:
+        for offset in range(cycle_count):
+            source_pool_index = (offset % cycle_source_pool_size) + 1
+            output_index = new_unique_count + offset + 1
+
+            if source_pool_index <= existing_count:
+                source_kind = "existing_valid_paraphrase_samples"
+                source_index_1_based = source_pool_index
+            else:
+                source_kind = "newly_created_unique_command_texts_in_this_response"
+                source_index_1_based = source_pool_index - existing_count
+
+            cycle_reuse_plan.append(
+                {
+                    "output_index_1_based": output_index,
+                    "source_pool_index_1_based": source_pool_index,
+                    "source_kind": source_kind,
+                    "source_index_1_based": source_index_1_based,
+                }
+            )
+
+    return {
+        "output_order": "new_unique_first_then_cycle",
+        "new_unique_output_range_1_based": (
+            [new_unique_start, new_unique_end]
+            if new_unique_start is not None and new_unique_end is not None
+            else []
+        ),
+        "cycle_output_range_1_based": (
+            [cycle_start, cycle_end]
+            if cycle_start is not None and cycle_end is not None
+            else []
+        ),
+        "cycle_source_pool_order": (
+            "existing_valid_paraphrase_samples in payload order followed by "
+            "newly_created_unique_command_texts in output order"
+        ),
+        "cycle_reuse_strategy": "round_robin_from_first_source_pool_item",
+        "cycle_source_pool_size_after_new_unique": cycle_source_pool_size,
+        "cycle_reuse_plan_1_based": cycle_reuse_plan,
+        "hard_fail_conditions": [
+            "cycle samples appear before all new_unique samples are created",
+            "a new_unique output reuses an existing command_text",
+            "a cycle output ignores cycle_reuse_plan_1_based",
+            "a cycle output repeatedly uses only source_pool_index_1_based=1",
+        ],
+        "example": (
+            "if existing=2,new=5,cycle=5 then outputs 1-5 are new unique; "
+            "outputs 6-10 reuse source pool indexes [1,2,3,4,5], where "
+            "1-2 are existing samples and 3-5 are newly created unique outputs 1-3"
+        ),
+    }
+
+
 # split별 표현 pool 생성/순환 정책을 payload에 명시한다.
 def build_command_text_policy(
     existing_paraphrase_samples: list[dict[str, str]],
@@ -347,14 +416,26 @@ def build_command_text_policy(
         "target_split": target_split,
         "same_split_expression_pool_size": pool_limit,
         "existing_same_split_expression_count": existing_count,
-        "other_split_reserved_expression_count": len(other_split_reserved_command_texts),
+        "other_split_reserved_expression_count": len(
+            other_split_reserved_command_texts
+        ),
         "new_unique_command_texts_to_create": new_unique_count,
         "samples_using_same_split_cycle": cycle_count,
         "cycle_source": "existing_valid_paraphrase_samples plus newly created unique command_texts in this request",
+        "sequence_contract": build_command_text_sequence_contract(
+            existing_count=existing_count,
+            new_unique_count=new_unique_count,
+            cycle_count=cycle_count,
+        ),
         "rules": [
             "같은 split 안에서 command_text 표현 pool을 관리한다.",
             "표현 pool이 가득 차기 전에는 새 command_text를 만든다.",
             "새 command_text는 existing_valid_paraphrase_samples와 exact duplicate이면 안 된다.",
+            "출력 array의 앞쪽 new_unique_command_texts_to_create개 sample은 반드시 새 unique command_text로 만든다.",
+            "새 unique command_text 생성이 모두 끝난 뒤에만 samples_using_same_split_cycle개 sample을 만든다.",
+            "cycle source pool은 existing_valid_paraphrase_samples의 payload 순서 뒤에 이번 응답에서 만든 새 unique command_text를 output 순서대로 이어 붙인 목록이다.",
+            "cycle sample은 sequence_contract.cycle_reuse_plan_1_based를 따라 source command_text를 재사용한다.",
+            "cycle 구간에서 첫 번째 source command_text만 반복하거나 같은 command_text를 연속 반복하지 않는다.",
             "새 command_text는 other_split_reserved_command_texts와 exact duplicate이면 안 된다.",
             "표현 pool이 가득 찬 뒤에는 같은 split 표현 pool 안에서만 command_text를 순환 재사용할 수 있다.",
             "같은 요청에서 새로 만든 unique command_text도 이후 cycle source로 사용할 수 있다.",

@@ -85,7 +85,7 @@ skill_case 규칙:
 
 command_spec 규칙:
 - command_spec.command_text는 input.input.command와 정확히 같아야 한다.
-- command_spec.base_command_text는 반드시 user payload의 request_info.base_command_text와 정확히 같아야 하며, command_spec.command_text 자기 자신이나 새 paraphrase가 아니라 selected command slot을 대표하는 원형 명령문으로 보존한다.
+- command_spec.base_command_text는 반드시 user payload의 request.base_command_text와 정확히 같아야 하며, command_spec.command_text 자기 자신이나 새 paraphrase가 아니라 selected command slot을 대표하는 원형 명령문으로 보존한다.
 - command_spec.slots는 명령의 의미 구조를 설명한다.
 - slots에는 가능한 한 actors, target, target_side_in_text, mentioned_units를 포함한다.
 - actors는 명령에서 행동 주체로 지목된 ally unitId 목록이다.
@@ -99,6 +99,13 @@ split과 command_text 표현 pool 규칙:
 - existing_valid_paraphrase_samples는 target_split과 같은 split의 기존 표현 pool이다.
 - other_split_reserved_command_texts는 다른 split에 이미 존재하는 command_text 목록이다.
 - command_text_policy.new_unique_command_texts_to_create 수만큼은 같은 split 표현 pool에 추가할 새 command_text를 만든다.
+- command_text_policy.sequence_contract가 있으면 command_text 생성 순서는 반드시 그 계약을 따른다.
+- 출력 array의 앞쪽 command_text_policy.new_unique_command_texts_to_create개 sample은 반드시 새 unique command_text여야 한다.
+- 새 unique 구간에서는 existing_valid_paraphrase_samples, other_split_reserved_command_texts, request.base_command_text, 같은 응답 안의 이전 command_text와 exact duplicate인 command_text를 쓰지 않는다.
+- cycle 구간은 새 unique 구간이 모두 끝난 뒤에만 시작한다.
+- cycle source pool은 existing_valid_paraphrase_samples의 command_text 순서 뒤에 이번 응답 앞쪽에서 새로 만든 unique command_text를 생성 순서대로 이어 붙인 목록이다.
+- cycle 구간의 각 sample은 command_text_policy.sequence_contract.cycle_reuse_plan_1_based의 output_index_1_based와 source_pool_index_1_based를 따른다.
+- cycle 구간에서 같은 command_text를 연속 반복하거나 첫 번째 source command_text만 반복하면 실패다.
 - 새 command_text는 existing_valid_paraphrase_samples의 command_text와 exact duplicate이면 안 된다.
 - 새 command_text는 other_split_reserved_command_texts의 command_text와 exact duplicate이면 안 된다.
 - command_text_policy.samples_using_same_split_cycle에 해당하는 sample은 같은 split 표현 pool 안에서 command_text를 순환 재사용할 수 있다.
@@ -126,6 +133,10 @@ command_text 표현 다양성 강제 규칙:
 - "A_01, E_02를 공격해." → "A_03, E_04를 공격해." 같은 출력은 실패다.
 - "공격해", "쳐", "때려", "물어", "압박해", "끊어", "붙어서 패"처럼 실제 유저 표현을 바꾼다.
 - 표현을 다양화하더라도 selected_bucket의 actor/target/action 의미와 edge_flags는 유지한다.
+- new_unique 구간의 command_text는 paraphrase 생성 대상이다. unitId만 바꾸는 것은 실패이며, 문장 구조, 동사, 어미, 조사, 말투 중 최소 2개 이상을 바꾼다.
+- cycle 구간의 command_text는 paraphrase 생성 대상이 아니라 cycle source pool의 command_text를 exact reuse하는 대상이다.
+- cycle 구간의 다양성은 새 문장을 만드는 방식이 아니라, sequence_contract.cycle_reuse_plan_1_based에 따라 서로 다른 source command_text를 round-robin으로 재사용하는 방식으로 보장한다.
+- cycle 구간에서 source command_text를 재사용하더라도 area_situation, gold, output은 복사하지 않고 새로 만든다.
 
 한국어 unitId 해석 규칙:
 - 콤마와 unitId 나열만 보고 actor/target을 기계적으로 판단하지 않는다.
@@ -478,6 +489,10 @@ Conditional command:
 - 다양화가 필요할 때는 taxonomy enum이 아니라 unit 상태, skillDescription, 거리 신호, 체력, 교전 수, 진형, output 판단 근거를 바꾼다.
 - output에 type="skill" action이 하나라도 있으면 skill_case가 반드시 object인지 확인한다. skillControl만 있는 경우는 skill_case 필수 조건이 아니다.
 - command_text paraphrase는 unitId 치환이 아니다. 같은 command slot의 표현 pool 안에서는 문장 구조, 동사, 어미, 조사, 말투 중 최소 2개 이상을 바꾼다.
+- 출력 직전 command_text_policy.sequence_contract를 확인한다. 출력 array의 앞쪽 new_unique_command_texts_to_create개 sample이 모두 새 unique command_text인지 검사한다.
+- cycle_output_range_1_based에 해당하는 sample들은 cycle_reuse_plan_1_based의 output_index_1_based 순서와 일치해야 한다.
+- cycle sample의 command_text는 cycle_reuse_plan_1_based가 가리키는 source pool 항목의 command_text와 정확히 같아야 한다.
+
 
 schema skeleton example:
 {

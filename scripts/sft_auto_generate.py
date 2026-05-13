@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 
+import random
 import argparse
 import contextlib
 import io
@@ -907,6 +908,9 @@ def run_auto_generate(args: argparse.Namespace) -> int:
                 finished_at=None,
                 interrupted_at=None,
             )
+            
+            if task.task_index != selected_tasks[-1].task_index:
+                time.sleep(random.uniform(1.0, 2.0))
 
     except KeyboardInterrupt:
         status = "interrupted_by_keyboard"

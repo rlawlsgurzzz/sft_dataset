@@ -1,7 +1,7 @@
 {
   "request": {
-    "raw_request": "c1-1-1-1-1-1.10",
-    "count_to_generate": 10,
+    "raw_request": "c1-1-1-1-1-1.7",
+    "count_to_generate": 7,
     "display_path": "1-1-1-1-1-1",
     "stable_path": "attack.explicit_actor.explicit_enemy_target.attack_only.simple_clear_target",
     "skill_stable_path": null,
@@ -41,12 +41,52 @@
     "existing_same_split_expression_count": 2,
     "other_split_reserved_expression_count": 0,
     "new_unique_command_texts_to_create": 5,
-    "samples_using_same_split_cycle": 5,
+    "samples_using_same_split_cycle": 2,
     "cycle_source": "existing_valid_paraphrase_samples plus newly created unique command_texts in this request",
+    "sequence_contract": {
+      "output_order": "new_unique_first_then_cycle",
+      "new_unique_output_range_1_based": [
+        1,
+        5
+      ],
+      "cycle_output_range_1_based": [
+        6,
+        7
+      ],
+      "cycle_source_pool_order": "existing_valid_paraphrase_samples in payload order followed by newly_created_unique_command_texts in output order",
+      "cycle_reuse_strategy": "round_robin_from_first_source_pool_item",
+      "cycle_source_pool_size_after_new_unique": 7,
+      "cycle_reuse_plan_1_based": [
+        {
+          "output_index_1_based": 6,
+          "source_pool_index_1_based": 1,
+          "source_kind": "existing_valid_paraphrase_samples",
+          "source_index_1_based": 1
+        },
+        {
+          "output_index_1_based": 7,
+          "source_pool_index_1_based": 2,
+          "source_kind": "existing_valid_paraphrase_samples",
+          "source_index_1_based": 2
+        }
+      ],
+      "hard_fail_conditions": [
+        "cycle samples appear before all new_unique samples are created",
+        "a new_unique output reuses an existing command_text",
+        "a cycle output ignores cycle_reuse_plan_1_based",
+        "a cycle output repeatedly uses only source_pool_index_1_based=1"
+      ],
+      "example": "if existing=2,new=5,cycle=5 then outputs 1-5 are new unique; outputs 6-10 reuse source pool indexes [1,2,3,4,5], where 1-2 are existing samples and 3-5 are newly created unique outputs 1-3"
+    },
     "rules": [
       "같은 split 안에서 command_text 표현 pool을 관리한다.",
       "표현 pool이 가득 차기 전에는 새 command_text를 만든다.",
       "새 command_text는 existing_valid_paraphrase_samples와 exact duplicate이면 안 된다.",
+      "출력 array의 앞쪽 new_unique_command_texts_to_create개 sample은 반드시 새 unique command_text로 만든다.",
+      "새 unique command_text 생성이 모두 끝난 뒤에만 samples_using_same_split_cycle개 sample을 만든다.",
+      "cycle source pool은 existing_valid_paraphrase_samples의 payload 순서 뒤에 이번 응답에서 만든 새 unique command_text를 output 순서대로 이어 붙인 목록이다.",
+      "cycle sample은 sequence_contract.cycle_reuse_plan_1_based를 따라 source command_text를 재사용한다.",
+      "cycle 구간에서 첫 번째 source command_text만 반복하거나 같은 command_text를 연속 반복하지 않는다.",
       "새 command_text는 other_split_reserved_command_texts와 exact duplicate이면 안 된다.",
       "표현 pool이 가득 찬 뒤에는 같은 split 표현 pool 안에서만 command_text를 순환 재사용할 수 있다.",
       "같은 요청에서 새로 만든 unique command_text도 이후 cycle source로 사용할 수 있다.",
@@ -55,7 +95,7 @@
       "다른 split의 command_text 표현 pool을 cycle 대상으로 섞지 않는다."
     ]
   },
-  "count_to_generate": 10,
+  "count_to_generate": 7,
   "runtime_generation_contract": {
     "teacher_role": "전장 시나리오와 정답 output을 생성한다.",
     "validator_role": "area_situation을 검증하고 commandAnalysis를 계산해 accepted 저장 시점에 추가한다.",
