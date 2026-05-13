@@ -477,6 +477,7 @@ Conditional command:
 - 각 sample의 area_situation은 새로 만든다. 같은 전장 template에 command/output만 바꾼 sample을 만들지 않는다.
 - 다양화가 필요할 때는 taxonomy enum이 아니라 unit 상태, skillDescription, 거리 신호, 체력, 교전 수, 진형, output 판단 근거를 바꾼다.
 - output에 type="skill" action이 하나라도 있으면 skill_case가 반드시 object인지 확인한다. skillControl만 있는 경우는 skill_case 필수 조건이 아니다.
+- command_text paraphrase는 unitId 치환이 아니다. 같은 command slot의 표현 pool 안에서는 문장 구조, 동사, 어미, 조사, 말투 중 최소 2개 이상을 바꾼다.
 
 schema skeleton example:
 {

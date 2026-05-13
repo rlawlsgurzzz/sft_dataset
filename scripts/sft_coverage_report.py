@@ -154,6 +154,70 @@ def get_skill_path(sample: dict[str, Any]) -> Optional[tuple[str, str, str]]:
         "null" if conflict_type is None else str(conflict_type),
     )
 
+def get_1_based_order_index(taxonomy: dict[str, Any], order_key: str, value: str) -> int:
+    values = taxonomy.get("orders", {}).get(order_key, [])
+    if not isinstance(values, list):
+        return 0
+
+    for index, item in enumerate(values, start=1):
+        if item == value:
+            return index
+
+    return 0
+
+
+def get_1_based_mapping_key_index(mapping: dict[str, Any], value: str) -> int:
+    for index, item in enumerate(mapping.keys(), start=1):
+        if item == value:
+            return index
+
+    return 0
+
+
+def get_scenario_family_index(taxonomy: dict[str, Any], intent_family: str, scenario_family: str) -> int:
+    intent_matrix = taxonomy.get("general_valid_matrix", {}).get(intent_family, {})
+    if not isinstance(intent_matrix, dict):
+        return 0
+
+    scenario_map = intent_matrix.get("allowed_scenario_family", {})
+    if not isinstance(scenario_map, dict):
+        return 0
+
+    return get_1_based_mapping_key_index(scenario_map, scenario_family)
+
+
+def format_general_numeric_path(
+    taxonomy: dict[str, Any],
+    general_path: tuple[str, str, str, str, str],
+    command_slot_index: int,
+) -> str:
+    intent_family, actor_selection, target_selection, action_pattern, scenario_family = general_path
+
+    return "-".join(
+        [
+            str(get_1_based_order_index(taxonomy, "intent_family", intent_family)),
+            str(get_1_based_order_index(taxonomy, "actor_selection", actor_selection)),
+            str(get_1_based_order_index(taxonomy, "target_selection", target_selection)),
+            str(get_1_based_order_index(taxonomy, "action_pattern", action_pattern)),
+            str(get_scenario_family_index(taxonomy, intent_family, scenario_family)),
+            str(command_slot_index),
+        ]
+    )
+
+
+def format_skill_numeric_path(
+    taxonomy: dict[str, Any],
+    skill_path: tuple[str, str, str],
+) -> str:
+    skill_family, skill_target_kind, conflict_type = skill_path
+
+    return "-".join(
+        [
+            str(get_1_based_order_index(taxonomy, "skill_family", skill_family)),
+            str(get_1_based_order_index(taxonomy, "skill_target_kind", skill_target_kind)),
+            str(get_1_based_order_index(taxonomy, "conflict_type", conflict_type)),
+        ]
+    )
 
 def percent(part: int, total: int) -> float:
     if total <= 0:
@@ -217,11 +281,40 @@ def group_rows(samples: list[dict[str, Any]], skill_only: bool = False) -> dict[
             skill_path = get_skill_path(sample)
             if skill_path is None:
                 continue
-            key = (*skill_path, get_base_command_text(sample), get_edge_flags(sample))
+            key = (*get_general_path(sample), *skill_path, get_base_command_text(sample), get_edge_flags(sample))
         else:
             key = (*get_general_path(sample), get_base_command_text(sample), get_edge_flags(sample))
         groups[key].append(sample)
     return groups
+
+def build_general_slot_index_map(
+    samples: list[dict[str, Any]],
+) -> dict[tuple[tuple[str, str, str, str, str], str, tuple[str, ...]], int]:
+    grouped_by_path: dict[
+        tuple[str, str, str, str, str],
+        dict[tuple[str, tuple[str, ...]], list[dict[str, Any]]],
+    ] = defaultdict(lambda: defaultdict(list))
+
+    for sample in samples:
+        general_path = get_general_path(sample)
+        command_key = (get_base_command_text(sample), get_edge_flags(sample))
+        grouped_by_path[general_path][command_key].append(sample)
+
+    slot_indexes: dict[tuple[tuple[str, str, str, str, str], str, tuple[str, ...]], int] = {}
+
+    for general_path, command_groups in grouped_by_path.items():
+        rows = [
+            (base_command_text, edge_flags, grouped_samples)
+            for (base_command_text, edge_flags), grouped_samples in command_groups.items()
+        ]
+
+        for slot_index, (base_command_text, edge_flags, _) in enumerate(
+            sorted(rows, key=lambda item: item[0]),
+            start=1,
+        ):
+            slot_indexes[(general_path, base_command_text, edge_flags)] = slot_index
+
+    return slot_indexes
 
 
 def render_row(
@@ -229,6 +322,7 @@ def render_row(
     edge_flags: tuple[str, ...],
     grouped_samples: list[dict[str, Any]],
     indent: str = "",
+    numeric_path: Optional[str] = None,
 ) -> str:
     report_refs = [
         get_report_sample_ref(sample, index)
@@ -237,6 +331,9 @@ def render_row(
 
     edge_text = ", ".join(edge_flags) if edge_flags else "[]"
     report_ref_text = ", ".join(report_refs) if report_refs else "{}"
+
+    if numeric_path:
+        return f'{indent}{numeric_path} @ "{command_text}" @ {len(grouped_samples)} @ {edge_text} @ {report_ref_text}'
 
     return f'{indent}"{command_text}" @ {len(grouped_samples)} @ {edge_text} @ {report_ref_text}'
 
@@ -253,6 +350,7 @@ def render_general_coverage(samples: list[dict[str, Any]], taxonomy: dict[str, A
     lines: list[str] = ["# General Coverage", ""]
     total = len(samples)
     groups = group_rows(samples, skill_only=False)
+    slot_indexes = build_general_slot_index_map(samples)
 
     intent_family_counts = count_by(samples, lambda sample: get_general_path(sample)[0])
 
@@ -338,6 +436,8 @@ def render_general_coverage(samples: list[dict[str, Any]], taxonomy: dict[str, A
                         )
 
                         matching_rows = []
+                        general_path = (intent_family, actor, target, action, scenario)
+
                         for key, grouped_samples in groups.items():
                             (
                                 key_intent_family,
@@ -356,15 +456,22 @@ def render_general_coverage(samples: list[dict[str, Any]], taxonomy: dict[str, A
                                 and key_action == action
                                 and key_scenario == scenario
                             ):
-                                matching_rows.append((command_text, edge_flags, grouped_samples))
+                                command_slot_index = slot_indexes.get((general_path, command_text, edge_flags), 0)
+                                numeric_path = format_general_numeric_path(
+                                    taxonomy=taxonomy,
+                                    general_path=general_path,
+                                    command_slot_index=command_slot_index,
+                                )
+                                matching_rows.append((numeric_path, command_text, edge_flags, grouped_samples))
 
-                        for command_text, edge_flags, grouped_samples in sorted(matching_rows, key=lambda item: item[0]):
+                        for numeric_path, command_text, edge_flags, grouped_samples in sorted(matching_rows, key=lambda item: item[1]):
                             lines.append(
                                 render_row(
                                     command_text=command_text,
                                     edge_flags=edge_flags,
                                     grouped_samples=grouped_samples,
                                     indent="          ",
+                                    numeric_path=numeric_path,
                                 )
                             )
 
@@ -377,6 +484,7 @@ def render_skill_coverage(samples: list[dict[str, Any]], taxonomy: dict[str, Any
     skill_samples = [sample for sample in samples if get_skill_path(sample) is not None]
     total = len(skill_samples)
     groups = group_rows(skill_samples, skill_only=True)
+    slot_indexes = build_general_slot_index_map(samples)
 
     lines: list[str] = ["# Skill Coverage", ""]
     family_counts = count_by(
@@ -436,23 +544,54 @@ def render_skill_coverage(samples: list[dict[str, Any]], taxonomy: dict[str, Any
                 )
 
                 matching_rows = []
+                skill_numeric_path = format_skill_numeric_path(
+                    taxonomy=taxonomy,
+                    skill_path=(family, target_kind, conflict),
+                )
+
                 for key, grouped_samples in groups.items():
-                    key_family, key_target_kind, key_conflict, command_text, edge_flags = key
+                    (
+                        key_intent_family,
+                        key_actor,
+                        key_target,
+                        key_action,
+                        key_scenario,
+                        key_family,
+                        key_target_kind,
+                        key_conflict,
+                        command_text,
+                        edge_flags,
+                    ) = key
 
                     if (
                         key_family == family
                         and key_target_kind == target_kind
                         and key_conflict == conflict
                     ):
-                        matching_rows.append((command_text, edge_flags, grouped_samples))
+                        general_path = (
+                            key_intent_family,
+                            key_actor,
+                            key_target,
+                            key_action,
+                            key_scenario,
+                        )
+                        command_slot_index = slot_indexes.get((general_path, command_text, edge_flags), 0)
+                        general_numeric_path = format_general_numeric_path(
+                            taxonomy=taxonomy,
+                            general_path=general_path,
+                            command_slot_index=command_slot_index,
+                        )
+                        numeric_path = f"{general_numeric_path}/{skill_numeric_path}"
+                        matching_rows.append((numeric_path, command_text, edge_flags, grouped_samples))
 
-                for command_text, edge_flags, grouped_samples in sorted(matching_rows, key=lambda item: item[0]):
+                for numeric_path, command_text, edge_flags, grouped_samples in sorted(matching_rows, key=lambda item: item[1]):
                     lines.append(
                         render_row(
                             command_text=command_text,
                             edge_flags=edge_flags,
                             grouped_samples=grouped_samples,
                             indent="      ",
+                            numeric_path=numeric_path,
                         )
                     )
 
