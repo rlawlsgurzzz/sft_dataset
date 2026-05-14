@@ -368,6 +368,492 @@
       "rejected_count": 0,
       "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_045844.jsonl",
       "rejected_path": null
+    },
+    "06260a734819ad0272094742cf1752798d8d78e02434a93ba1797394b12aeb0f": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0021_raw.jsonl",
+      "input_hash": "06260a734819ad0272094742cf1752798d8d78e02434a93ba1797394b12aeb0f",
+      "skipped": false,
+      "accepted_count": 8,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_051047.jsonl",
+      "rejected_path": null
+    },
+    "d30a5c2cb3450104dab16880069acea6e920a0c2669f55d0a7f6c3c9b40d1b22": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0022_raw.jsonl",
+      "input_hash": "d30a5c2cb3450104dab16880069acea6e920a0c2669f55d0a7f6c3c9b40d1b22",
+      "skipped": false,
+      "accepted_count": 10,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_052252.jsonl",
+      "rejected_path": null
+    },
+    "4a3eb4d25a019462bbba6591b687318612acee42660a240e539841ecb3661fe3": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0023_raw.jsonl",
+      "input_hash": "4a3eb4d25a019462bbba6591b687318612acee42660a240e539841ecb3661fe3",
+      "skipped": false,
+      "accepted_count": 2,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_052521.jsonl",
+      "rejected_path": null
+    },
+    "39fe5e7982d74e224ff2ad33250504d9630b71954691a55498a54c15c090146e": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0024_raw.jsonl",
+      "input_hash": "39fe5e7982d74e224ff2ad33250504d9630b71954691a55498a54c15c090146e",
+      "skipped": false,
+      "accepted_count": 2,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_052754.jsonl",
+      "rejected_path": null
+    },
+    "1921b63a6a21a65af2ef6c44c6ccada8f03f7b7f2d19c1d1a53f6fd1b737e17f": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0025_raw.jsonl",
+      "input_hash": "1921b63a6a21a65af2ef6c44c6ccada8f03f7b7f2d19c1d1a53f6fd1b737e17f",
+      "skipped": false,
+      "accepted_count": 3,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_053136.jsonl",
+      "rejected_path": null
+    },
+    "66cc6279386179d7009598039a0f49976dfb937252e3bf4b4b9e860e3508c823": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0026_raw.jsonl",
+      "input_hash": "66cc6279386179d7009598039a0f49976dfb937252e3bf4b4b9e860e3508c823",
+      "skipped": false,
+      "accepted_count": 3,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_053519.jsonl",
+      "rejected_path": null
+    },
+    "e708e7cf6196124a87adcea2fddf9f9d740d4f8b609d7969c6219088e7bcb1f4": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0027_raw.jsonl",
+      "input_hash": "e708e7cf6196124a87adcea2fddf9f9d740d4f8b609d7969c6219088e7bcb1f4",
+      "skipped": false,
+      "accepted_count": 1,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_053637.jsonl",
+      "rejected_path": null
+    },
+    "c394916a54f55e47b29233a0b0650a6f36dd15c24df31e1d3385439d1df47f3c": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0028_raw.jsonl",
+      "input_hash": "c394916a54f55e47b29233a0b0650a6f36dd15c24df31e1d3385439d1df47f3c",
+      "skipped": false,
+      "accepted_count": 1,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_053754.jsonl",
+      "rejected_path": null
+    },
+    "ae143a23d7b83869b6995166806e4d627049fd86b1851c94bd1e76e71281f7e7": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0029_raw.jsonl",
+      "input_hash": "ae143a23d7b83869b6995166806e4d627049fd86b1851c94bd1e76e71281f7e7",
+      "skipped": false,
+      "accepted_count": 1,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_053911.jsonl",
+      "rejected_path": null
+    },
+    "08179c38af21320bccf23790772fee096c4420de1d155d2f611a5d0331445f26": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0030_raw.jsonl",
+      "input_hash": "08179c38af21320bccf23790772fee096c4420de1d155d2f611a5d0331445f26",
+      "skipped": false,
+      "accepted_count": 1,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_054031.jsonl",
+      "rejected_path": null
+    },
+    "ff97c3ca8e3ae04b5244d87dd70ba612463e1a72853f58f7ba6b68c0dde73ead": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0031_raw.jsonl",
+      "input_hash": "ff97c3ca8e3ae04b5244d87dd70ba612463e1a72853f58f7ba6b68c0dde73ead",
+      "skipped": false,
+      "accepted_count": 1,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_064341.jsonl",
+      "rejected_path": null
+    },
+    "616ae25efa5013480193772a215595c2b23f0affddb7d0320e944d17d33dfa86": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0032_raw.jsonl",
+      "input_hash": "616ae25efa5013480193772a215595c2b23f0affddb7d0320e944d17d33dfa86",
+      "skipped": false,
+      "accepted_count": 10,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_065653.jsonl",
+      "rejected_path": null
+    },
+    "cb9b38e402aed8016e17ae227210212c2fe195b81990b97a91239567bd3a28cb": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0033_raw.jsonl",
+      "input_hash": "cb9b38e402aed8016e17ae227210212c2fe195b81990b97a91239567bd3a28cb",
+      "skipped": false,
+      "accepted_count": 1,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_065805.jsonl",
+      "rejected_path": null
+    },
+    "c328c78cb259e0c6f8862871fa8a282df08dce626bf161ba7ddc5d98b113f67e": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0034_raw.jsonl",
+      "input_hash": "c328c78cb259e0c6f8862871fa8a282df08dce626bf161ba7ddc5d98b113f67e",
+      "skipped": false,
+      "accepted_count": 10,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_070918.jsonl",
+      "rejected_path": null
+    },
+    "f4abc658a82fff03cf32ca3acc45bb872d0c8fe681f3a53999811557db36afcf": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0035_raw.jsonl",
+      "input_hash": "f4abc658a82fff03cf32ca3acc45bb872d0c8fe681f3a53999811557db36afcf",
+      "skipped": false,
+      "accepted_count": 10,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_072025.jsonl",
+      "rejected_path": null
+    },
+    "5b495b5c793804d1a3bbd7308280ecc85564dfd73ac569a80e7a4555e205a8e3": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0036_raw.jsonl",
+      "input_hash": "5b495b5c793804d1a3bbd7308280ecc85564dfd73ac569a80e7a4555e205a8e3",
+      "skipped": false,
+      "accepted_count": 5,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_072600.jsonl",
+      "rejected_path": null
+    },
+    "8abab86dd3496737c0537ed839f4a457f0e28333e2d55167ea7a8d115f602fab": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0037_raw.jsonl",
+      "input_hash": "8abab86dd3496737c0537ed839f4a457f0e28333e2d55167ea7a8d115f602fab",
+      "skipped": false,
+      "accepted_count": 2,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_072835.jsonl",
+      "rejected_path": null
+    },
+    "b9aa6ea9ce67381f812edc5d3add0a664e7553477b3628592f144571f6ebead2": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0038_raw.jsonl",
+      "input_hash": "b9aa6ea9ce67381f812edc5d3add0a664e7553477b3628592f144571f6ebead2",
+      "skipped": false,
+      "accepted_count": 6,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_073617.jsonl",
+      "rejected_path": null
+    },
+    "ce8afe1f37ecbdf9b09a9aacea9304c2d551984bd5c9c50e8f6dca9477bed0d1": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0039_raw.jsonl",
+      "input_hash": "ce8afe1f37ecbdf9b09a9aacea9304c2d551984bd5c9c50e8f6dca9477bed0d1",
+      "skipped": false,
+      "accepted_count": 1,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_073737.jsonl",
+      "rejected_path": null
+    },
+    "e6f7bb4a0b98c3b535a9123142663eec9f497205dad85d582e00321726ddd215": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0040_raw.jsonl",
+      "input_hash": "e6f7bb4a0b98c3b535a9123142663eec9f497205dad85d582e00321726ddd215",
+      "skipped": false,
+      "accepted_count": 1,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_073857.jsonl",
+      "rejected_path": null
+    },
+    "ba9f7c2647f63a0e9e23bd70be1eaf6eda34b11466a118ccc3713794231ff459": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0041_raw.jsonl",
+      "input_hash": "ba9f7c2647f63a0e9e23bd70be1eaf6eda34b11466a118ccc3713794231ff459",
+      "skipped": false,
+      "accepted_count": 1,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_074017.jsonl",
+      "rejected_path": null
+    },
+    "c087ad596e699f8893fbf28fdc2758e69ab9c82eb0cff86d2a8ff9b5bf124bff": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0042_raw.jsonl",
+      "input_hash": "c087ad596e699f8893fbf28fdc2758e69ab9c82eb0cff86d2a8ff9b5bf124bff",
+      "skipped": false,
+      "accepted_count": 10,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_075254.jsonl",
+      "rejected_path": null
+    },
+    "413354c388362721e20e1cc1ae76cff0657e844be3d034208a4efdae2264de3b": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0043_raw.jsonl",
+      "input_hash": "413354c388362721e20e1cc1ae76cff0657e844be3d034208a4efdae2264de3b",
+      "skipped": false,
+      "accepted_count": 6,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_080039.jsonl",
+      "rejected_path": null
+    },
+    "c3daf99999e4701510f575a0635d0061d5308f0a8c58691df5edea374ebec09b": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0044_raw.jsonl",
+      "input_hash": "c3daf99999e4701510f575a0635d0061d5308f0a8c58691df5edea374ebec09b",
+      "skipped": false,
+      "accepted_count": 5,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_080709.jsonl",
+      "rejected_path": null
+    },
+    "d71b4a61a7697d0fa48291bbfd34a6ce497f792fa1a8cdc924989626617eb433": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0045_raw.jsonl",
+      "input_hash": "d71b4a61a7697d0fa48291bbfd34a6ce497f792fa1a8cdc924989626617eb433",
+      "skipped": false,
+      "accepted_count": 10,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_082011.jsonl",
+      "rejected_path": null
+    },
+    "36a4ea56c11d825cfa23d56497f989ab4233cef0af64c0788f215b9c9a77c069": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0046_raw.jsonl",
+      "input_hash": "36a4ea56c11d825cfa23d56497f989ab4233cef0af64c0788f215b9c9a77c069",
+      "skipped": false,
+      "accepted_count": 10,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_083309.jsonl",
+      "rejected_path": null
+    },
+    "5fcdba0784379fad73f1d395daf5c9070eba5a6fa46225ca261c8a00a7e125cf": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0047_raw.jsonl",
+      "input_hash": "5fcdba0784379fad73f1d395daf5c9070eba5a6fa46225ca261c8a00a7e125cf",
+      "skipped": false,
+      "accepted_count": 3,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_083704.jsonl",
+      "rejected_path": null
+    },
+    "1e624a625170c43c399ddd726503ebc9d6d7cdeb43db6dc4724a4340c6a44df2": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0048_raw.jsonl",
+      "input_hash": "1e624a625170c43c399ddd726503ebc9d6d7cdeb43db6dc4724a4340c6a44df2",
+      "skipped": false,
+      "accepted_count": 2,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_083945.jsonl",
+      "rejected_path": null
+    },
+    "643418be3bed1f8475bb99c65d9744f3e0e5b2a12ffc5a032ee0961a786031c4": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0049_raw.jsonl",
+      "input_hash": "643418be3bed1f8475bb99c65d9744f3e0e5b2a12ffc5a032ee0961a786031c4",
+      "skipped": false,
+      "accepted_count": 10,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_085936.jsonl",
+      "rejected_path": null
+    },
+    "9509b8021202241aebc5fd3b46155a87ee2fd4ee252067ea7e58cac05690b82c": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0050_raw.jsonl",
+      "input_hash": "9509b8021202241aebc5fd3b46155a87ee2fd4ee252067ea7e58cac05690b82c",
+      "skipped": false,
+      "accepted_count": 10,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_091202.jsonl",
+      "rejected_path": null
+    },
+    "461866a79874c53e211c831d402287fd9bff6171d0b347ee887e9bb8da0282d8": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0051_raw.jsonl",
+      "input_hash": "461866a79874c53e211c831d402287fd9bff6171d0b347ee887e9bb8da0282d8",
+      "skipped": false,
+      "accepted_count": 4,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_091703.jsonl",
+      "rejected_path": null
+    },
+    "a5d76e2dfdfb0d274a00e00142bb93eb2a67b40ea32a93dfabb3ab873675345a": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0052_raw.jsonl",
+      "input_hash": "a5d76e2dfdfb0d274a00e00142bb93eb2a67b40ea32a93dfabb3ab873675345a",
+      "skipped": false,
+      "accepted_count": 1,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_091820.jsonl",
+      "rejected_path": null
+    },
+    "75db5b8a52a68316286883e2a3594c66a2344cc053b868f5f1fa00c7735fa710": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0053_raw.jsonl",
+      "input_hash": "75db5b8a52a68316286883e2a3594c66a2344cc053b868f5f1fa00c7735fa710",
+      "skipped": false,
+      "accepted_count": 10,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_093100.jsonl",
+      "rejected_path": null
+    },
+    "f4c99e4ba5f1125165e3fc8896480250235018b47f6a8136324dd9226204549b": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0054_raw.jsonl",
+      "input_hash": "f4c99e4ba5f1125165e3fc8896480250235018b47f6a8136324dd9226204549b",
+      "skipped": false,
+      "accepted_count": 10,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_094322.jsonl",
+      "rejected_path": null
+    },
+    "00a2508248a4b7b5554e9cc4140b8e8b4617525c525046fff7e3279da13a7972": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0055_raw.jsonl",
+      "input_hash": "00a2508248a4b7b5554e9cc4140b8e8b4617525c525046fff7e3279da13a7972",
+      "skipped": false,
+      "accepted_count": 1,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_095343.jsonl",
+      "rejected_path": null
+    },
+    "a74342fb89659762085536cad9e24e81f26d0617886176f9c1b3bb8f54d93f40": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0056_raw.jsonl",
+      "input_hash": "a74342fb89659762085536cad9e24e81f26d0617886176f9c1b3bb8f54d93f40",
+      "skipped": false,
+      "accepted_count": 1,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_095500.jsonl",
+      "rejected_path": null
+    },
+    "6751030cb541814a46fda5edac60c9315abbc3fa3e9fd1a33dbc66e62a5d3358": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0057_raw.jsonl",
+      "input_hash": "6751030cb541814a46fda5edac60c9315abbc3fa3e9fd1a33dbc66e62a5d3358",
+      "skipped": false,
+      "accepted_count": 10,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_100613.jsonl",
+      "rejected_path": null
+    },
+    "bab5edbdafbd6f9e6b24bac91be1bba0335e3a765b5869da522cb24632f7337f": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0058_raw.jsonl",
+      "input_hash": "bab5edbdafbd6f9e6b24bac91be1bba0335e3a765b5869da522cb24632f7337f",
+      "skipped": false,
+      "accepted_count": 10,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_101819.jsonl",
+      "rejected_path": null
+    },
+    "8b40b819b42bb3581c86a6097170e4faae8060e8b972ed0b2b0c78d7e1cca1bd": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0059_raw.jsonl",
+      "input_hash": "8b40b819b42bb3581c86a6097170e4faae8060e8b972ed0b2b0c78d7e1cca1bd",
+      "skipped": false,
+      "accepted_count": 9,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_103435.jsonl",
+      "rejected_path": null
+    },
+    "aa0ab2d1d5f2ee67f5f1d5adcadfe534a64ae3571235d621b102006e16c4b692": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0060_raw.jsonl",
+      "input_hash": "aa0ab2d1d5f2ee67f5f1d5adcadfe534a64ae3571235d621b102006e16c4b692",
+      "skipped": false,
+      "accepted_count": 9,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_104536.jsonl",
+      "rejected_path": null
+    },
+    "14b90b58a7ccaa9b273243394ba188cffd5527a12bf9b09c7eb2a54e40b18dd6": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0061_raw.jsonl",
+      "input_hash": "14b90b58a7ccaa9b273243394ba188cffd5527a12bf9b09c7eb2a54e40b18dd6",
+      "skipped": false,
+      "accepted_count": 10,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_110453.jsonl",
+      "rejected_path": null
+    },
+    "763b159ba0ef8167367d53e1ffc8dbaa9512cabe04c9398891f743b8c53cd03f": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0062_raw.jsonl",
+      "input_hash": "763b159ba0ef8167367d53e1ffc8dbaa9512cabe04c9398891f743b8c53cd03f",
+      "skipped": false,
+      "accepted_count": 10,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_111725.jsonl",
+      "rejected_path": null
+    },
+    "cb162f23e4a63e1dc47f96ccc4ff2b3295ed7a60e649827db96efde6e12c9884": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0063_raw.jsonl",
+      "input_hash": "cb162f23e4a63e1dc47f96ccc4ff2b3295ed7a60e649827db96efde6e12c9884",
+      "skipped": false,
+      "accepted_count": 9,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_112850.jsonl",
+      "rejected_path": null
+    },
+    "d0c620d5d4bcbf1741638ebf6adedd795c26e0c0b678fdb8e969fa8e316a5601": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0064_raw.jsonl",
+      "input_hash": "d0c620d5d4bcbf1741638ebf6adedd795c26e0c0b678fdb8e969fa8e316a5601",
+      "skipped": false,
+      "accepted_count": 9,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_114003.jsonl",
+      "rejected_path": null
+    },
+    "4b768832fae8a4947acfe634c88e3e93443fb29a5cf749007322588480c93697": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0065_raw.jsonl",
+      "input_hash": "4b768832fae8a4947acfe634c88e3e93443fb29a5cf749007322588480c93697",
+      "skipped": false,
+      "accepted_count": 0,
+      "rejected_count": 1,
+      "accepted_path": null,
+      "rejected_path": "D:\\sftgit\\sft_dataset\\rejected\\rejected_20260514_114121.jsonl"
+    },
+    "00f97fc125f25974288c0b97a4ddd7d8047b430f7c3fdc66790e3b2a9c425b4c": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0066_raw.jsonl",
+      "input_hash": "00f97fc125f25974288c0b97a4ddd7d8047b430f7c3fdc66790e3b2a9c425b4c",
+      "skipped": false,
+      "accepted_count": 10,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_115253.jsonl",
+      "rejected_path": null
+    },
+    "7153e1283b2419aae9aeab40d89bea00750b7e2a0740c0239a7a58b2eef13bc6": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0067_raw.jsonl",
+      "input_hash": "7153e1283b2419aae9aeab40d89bea00750b7e2a0740c0239a7a58b2eef13bc6",
+      "skipped": false,
+      "accepted_count": 10,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_120446.jsonl",
+      "rejected_path": null
+    },
+    "9505222ac2022b35a8bad68f6d678ae4f59972829b37c4843bca3354b1a86c15": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0068_raw.jsonl",
+      "input_hash": "9505222ac2022b35a8bad68f6d678ae4f59972829b37c4843bca3354b1a86c15",
+      "skipped": false,
+      "accepted_count": 10,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_121642.jsonl",
+      "rejected_path": null
+    },
+    "03ea517f32f176f28fdf14431c63400975de218e258f52b991af54da0b0e0514": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0069_raw.jsonl",
+      "input_hash": "03ea517f32f176f28fdf14431c63400975de218e258f52b991af54da0b0e0514",
+      "skipped": false,
+      "accepted_count": 10,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_122845.jsonl",
+      "rejected_path": null
+    },
+    "59b0eec675166dd5e2820c94979f587a19c5ae5ce9f71cbe3aefb5ae777e9d4d": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0070_raw.jsonl",
+      "input_hash": "59b0eec675166dd5e2820c94979f587a19c5ae5ce9f71cbe3aefb5ae777e9d4d",
+      "skipped": false,
+      "accepted_count": 1,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_123001.jsonl",
+      "rejected_path": null
+    },
+    "167b425033a896598b22d7bb9167a9da8ec6bc8c2093e9d28be35e4e0d4d0173": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0071_raw.jsonl",
+      "input_hash": "167b425033a896598b22d7bb9167a9da8ec6bc8c2093e9d28be35e4e0d4d0173",
+      "skipped": false,
+      "accepted_count": 0,
+      "rejected_count": 6,
+      "accepted_path": null,
+      "rejected_path": "D:\\sftgit\\sft_dataset\\rejected\\rejected_20260514_123707.jsonl"
+    },
+    "41ba89af0b7b34c4ae03c81efbb7355ac58c1f5a724bffa0a5065d3152116b54": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0072_raw.jsonl",
+      "input_hash": "41ba89af0b7b34c4ae03c81efbb7355ac58c1f5a724bffa0a5065d3152116b54",
+      "skipped": false,
+      "accepted_count": 2,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_123934.jsonl",
+      "rejected_path": null
+    },
+    "8f8cb878d8a437cc62506e82f393bcb13a8d83c9a548e28474b3aec480f9eced": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0073_raw.jsonl",
+      "input_hash": "8f8cb878d8a437cc62506e82f393bcb13a8d83c9a548e28474b3aec480f9eced",
+      "skipped": false,
+      "accepted_count": 3,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_124259.jsonl",
+      "rejected_path": null
+    },
+    "9e2ca3d0ed7a7ac46abeed672612276bfc03e351ab6da62aaf5eeaeb85c3fb73": {
+      "input_path": "D:\\sftgit\\sft_dataset\\raw_generations\\batch_0074_raw.jsonl",
+      "input_hash": "9e2ca3d0ed7a7ac46abeed672612276bfc03e351ab6da62aaf5eeaeb85c3fb73",
+      "skipped": false,
+      "accepted_count": 10,
+      "rejected_count": 0,
+      "accepted_path": "D:\\sftgit\\sft_dataset\\accepted\\accepted_20260514_125535.jsonl",
+      "rejected_path": null
     }
   }
 }

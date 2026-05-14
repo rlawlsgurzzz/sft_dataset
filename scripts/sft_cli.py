@@ -300,7 +300,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--output", default="", help="Optional request payload path."
     )
     generate_parser.add_argument("--model", default=DEFAULT_TEACHER_MODEL)
-    generate_parser.add_argument("--max-tokens", type=int, default=50000)
+    generate_parser.add_argument("--max-tokens", type=int, default=60000)
     generate_parser.add_argument("--print-json", action="store_true")
     generate_parser.add_argument(
         "--split",
