@@ -1,115 +1,115 @@
 # Skill Coverage
 
-enemy_single_target_attack [25.8%(18%) / 16]
-  enemy_alive [81.2%(80%) / 13]
-    null [84.6%(55%) / 11]
-      3-1-1-4-1-2/1-1-1 @ "A_03, E_02한테 공격 스킬 써." @ 1 @ [] @ accepted_20260514_002741.jsonl_seed_master_0103
-      3-1-1-4-1-3/1-1-1 @ "A_03, E_02한테 스킬 써." @ 1 @ [] @ accepted_20260514_002740.jsonl_seed_master_0043
-      3-1-3-5-12-1/1-1-1 @ "A_03, 가장 가까운 적에게 접근해서 스킬 써." @ 1 @ [] @ accepted_20260514_002743.jsonl_seed_master_0167
-      3-1-6-5-12-1/1-1-1 @ "A_03, 적 후열에게 접근해서 스킬 써." @ 1 @ target_role_backline_enemy @ accepted_20260514_002743.jsonl_seed_master_0172
-      3-1-4-4-1-1/1-1-1 @ "A_03, 체력이 제일 낮은 적에게 스킬 써." @ 1 @ [] @ accepted_20260514_002743.jsonl_seed_master_0165
-      3-2-1-11-1-1/1-1-1 @ "A_03과 A_06은 E_02에게 스킬을 써." @ 1 @ [] @ accepted_20260514_002743.jsonl_seed_master_0177
-      3-2-1-12-1-1/1-1-1 @ "A_03은 E_01에게, A_06은 E_03에게 스킬을 써." @ 1 @ [] @ accepted_20260514_002743.jsonl_seed_master_0179
+enemy_single_target_attack [30.0%(18%) / 158]
+  enemy_alive [70.3%(80%) / 111]
+    null [76.6%(55%) / 85]
+      3-1-1-4-1-2/1-1-1 @ "A_03, E_02한테 공격 스킬 써." @ 2 @ [] @ accepted_20260514_002741.jsonl_seed_master_0103, accepted_20260514_211207.jsonl_batch_0131_001
+      3-1-1-4-1-3/1-1-1 @ "A_03, E_02한테 스킬 써." @ 2 @ [] @ accepted_20260514_002740.jsonl_seed_master_0043, accepted_20260514_211327.jsonl_batch_0132_001
+      3-1-3-5-12-1/1-1-1 @ "A_03, 가장 가까운 적에게 접근해서 스킬 써." @ 21 @ [] @ accepted_20260514_002743.jsonl_seed_master_0167, accepted_20260515_023627.jsonl_batch_0175_001, accepted_20260515_023627.jsonl_batch_0175_002, accepted_20260515_023627.jsonl_batch_0175_003, accepted_20260515_023627.jsonl_batch_0175_004, accepted_20260515_023627.jsonl_batch_0175_005, accepted_20260515_023627.jsonl_batch_0175_006, accepted_20260515_023627.jsonl_batch_0175_007, accepted_20260515_023627.jsonl_batch_0175_008, accepted_20260515_023627.jsonl_batch_0175_009, accepted_20260515_023627.jsonl_batch_0175_010, accepted_20260515_024853.jsonl_batch_0176_001, accepted_20260515_024853.jsonl_batch_0176_002, accepted_20260515_024853.jsonl_batch_0176_003, accepted_20260515_024853.jsonl_batch_0176_004, accepted_20260515_024853.jsonl_batch_0176_005, accepted_20260515_024853.jsonl_batch_0176_006, accepted_20260515_024853.jsonl_batch_0176_007, accepted_20260515_024853.jsonl_batch_0176_008, accepted_20260515_024853.jsonl_batch_0176_009, accepted_20260515_024853.jsonl_batch_0176_010
+      3-1-6-5-12-1/1-1-1 @ "A_03, 적 후열에게 접근해서 스킬 써." @ 2 @ target_role_backline_enemy @ accepted_20260514_002743.jsonl_seed_master_0172, accepted_20260515_025413.jsonl_batch_0180_001
+      3-1-4-4-1-1/1-1-1 @ "A_03, 체력이 제일 낮은 적에게 스킬 써." @ 2 @ [] @ accepted_20260514_002743.jsonl_seed_master_0165, accepted_20260515_020846.jsonl_batch_0171_001
+      3-2-1-11-1-1/1-1-1 @ "A_03과 A_06은 E_02에게 스킬을 써." @ 2 @ [] @ accepted_20260514_002743.jsonl_seed_master_0177, accepted_20260515_045416.jsonl_batch_0193_001
+      3-2-1-12-1-1/1-1-1 @ "A_03은 E_01에게, A_06은 E_03에게 스킬을 써." @ 2 @ [] @ accepted_20260514_002743.jsonl_seed_master_0179, accepted_20260515_053917.jsonl_batch_0198_001
       3-2-6-12-1-1/1-1-1 @ "A_03은 적 전열에, A_06은 적 후열에 스킬을 써." @ 1 @ target_role_backline_enemy @ accepted_20260514_002743.jsonl_seed_master_0182
-      3-3-4-4-1-1/1-1-1 @ "스킬 쓸 수 있는 아군은 체력 낮은 적에게 스킬 써." @ 1 @ [] @ accepted_20260514_002743.jsonl_seed_master_0185
-      3-5-1-4-1-1/1-1-1 @ "스킬을 쓰기 안전한 아군은 E_02에게 스킬 써." @ 1 @ healthy_actor_selection @ accepted_20260514_002743.jsonl_seed_master_0187
-      3-4-6-4-1-1/1-1-1 @ "원거리 아군은 적 후열에 스킬을 써." @ 1 @ actor_role_ranged, target_role_backline_enemy @ accepted_20260514_002741.jsonl_seed_master_0058
-    text_ally_target_but_enemy_skill [15.4%(25%) / 2]
-      3-1-2-4-6-1/1-1-5 @ "A_01, A_02한테 스킬 써." @ 1 @ explicit_ally_target_conflicts_with_enemy_skill @ accepted_20260514_002740.jsonl_seed_master_0050
-      3-1-2-4-6-2/1-1-5 @ "A_03, A_02한테 공격 스킬 써." @ 1 @ explicit_ally_target_conflicts_with_enemy_skill @ accepted_20260514_002741.jsonl_seed_master_0104
-  enemy_dead [18.8%(20%) / 3]
-    text_dead_target_but_skill_cannot_target_dead [100.0%(20%) / 3]
+      3-3-4-4-1-1/1-1-1 @ "스킬 쓸 수 있는 아군은 체력 낮은 적에게 스킬 써." @ 25 @ [] @ accepted_20260514_002743.jsonl_seed_master_0185, accepted_20260515_061426.jsonl_batch_0205_001, accepted_20260515_061426.jsonl_batch_0205_002, accepted_20260515_061426.jsonl_batch_0205_003, accepted_20260515_061426.jsonl_batch_0205_004, accepted_20260515_061426.jsonl_batch_0205_005, accepted_20260515_061426.jsonl_batch_0205_006, accepted_20260515_061426.jsonl_batch_0205_007, accepted_20260515_061426.jsonl_batch_0205_008, accepted_20260515_061426.jsonl_batch_0205_009, accepted_20260515_061426.jsonl_batch_0205_010, accepted_20260515_062639.jsonl_batch_0206_001, accepted_20260515_062639.jsonl_batch_0206_002, accepted_20260515_062639.jsonl_batch_0206_003, accepted_20260515_062639.jsonl_batch_0206_004, accepted_20260515_062639.jsonl_batch_0206_005, accepted_20260515_062639.jsonl_batch_0206_006, accepted_20260515_062639.jsonl_batch_0206_007, accepted_20260515_062639.jsonl_batch_0206_008, accepted_20260515_062639.jsonl_batch_0206_009, accepted_20260515_062639.jsonl_batch_0206_010, accepted_20260515_063135.jsonl_batch_0207_001, accepted_20260515_063135.jsonl_batch_0207_002, accepted_20260515_063135.jsonl_batch_0207_003, accepted_20260515_063135.jsonl_batch_0207_004
+      3-5-1-4-1-1/1-1-1 @ "스킬을 쓰기 안전한 아군은 E_02에게 스킬 써." @ 2 @ healthy_actor_selection @ 2accepted_20260514_190145.jsonl_2batch_0001_001, accepted_20260514_002743.jsonl_seed_master_0187
+      3-4-6-4-1-1/1-1-1 @ "원거리 아군은 적 후열에 스킬을 써." @ 24 @ actor_role_ranged, target_role_backline_enemy @ accepted_20260514_002741.jsonl_seed_master_0058, accepted_20260515_065226.jsonl_batch_0209_001, accepted_20260515_065226.jsonl_batch_0209_002, accepted_20260515_065226.jsonl_batch_0209_003, accepted_20260515_065226.jsonl_batch_0209_004, accepted_20260515_065226.jsonl_batch_0209_005, accepted_20260515_065226.jsonl_batch_0209_007, accepted_20260515_065226.jsonl_batch_0209_008, accepted_20260515_065226.jsonl_batch_0209_009, accepted_20260515_065226.jsonl_batch_0209_010, accepted_20260515_070444.jsonl_batch_0210_001, accepted_20260515_070444.jsonl_batch_0210_002, accepted_20260515_070444.jsonl_batch_0210_003, accepted_20260515_070444.jsonl_batch_0210_004, accepted_20260515_070444.jsonl_batch_0210_005, accepted_20260515_070444.jsonl_batch_0210_006, accepted_20260515_070444.jsonl_batch_0210_007, accepted_20260515_070444.jsonl_batch_0210_008, accepted_20260515_070444.jsonl_batch_0210_009, accepted_20260515_070444.jsonl_batch_0210_010, accepted_20260515_070947.jsonl_batch_0211_001, accepted_20260515_070947.jsonl_batch_0211_002, accepted_20260515_070947.jsonl_batch_0211_003, accepted_20260515_070947.jsonl_batch_0211_004
+    text_ally_target_but_enemy_skill [23.4%(25%) / 26]
+      3-1-2-4-6-1/1-1-5 @ "A_01, A_02한테 스킬 써." @ 13 @ explicit_ally_target_conflicts_with_enemy_skill @ accepted_20260514_002740.jsonl_seed_master_0050, accepted_20260515_000021.jsonl_batch_0155_001, accepted_20260515_000021.jsonl_batch_0155_002, accepted_20260515_000021.jsonl_batch_0155_003, accepted_20260515_000021.jsonl_batch_0155_004, accepted_20260515_000021.jsonl_batch_0155_005, accepted_20260515_000021.jsonl_batch_0155_006, accepted_20260515_000021.jsonl_batch_0155_007, accepted_20260515_000021.jsonl_batch_0155_008, accepted_20260515_000021.jsonl_batch_0155_009, accepted_20260515_000021.jsonl_batch_0155_010, accepted_20260515_000300.jsonl_batch_0156_001, accepted_20260515_000300.jsonl_batch_0156_002
+      3-1-2-4-6-2/1-1-5 @ "A_03, A_02한테 공격 스킬 써." @ 13 @ explicit_ally_target_conflicts_with_enemy_skill @ accepted_20260514_002741.jsonl_seed_master_0104, accepted_20260515_001505.jsonl_batch_0157_001, accepted_20260515_001505.jsonl_batch_0157_002, accepted_20260515_001505.jsonl_batch_0157_003, accepted_20260515_001505.jsonl_batch_0157_004, accepted_20260515_001505.jsonl_batch_0157_005, accepted_20260515_001505.jsonl_batch_0157_006, accepted_20260515_001505.jsonl_batch_0157_007, accepted_20260515_001505.jsonl_batch_0157_008, accepted_20260515_001505.jsonl_batch_0157_009, accepted_20260515_001505.jsonl_batch_0157_010, accepted_20260515_001746.jsonl_batch_0158_001, accepted_20260515_001746.jsonl_batch_0158_002
+  enemy_dead [29.7%(20%) / 47]
+    text_dead_target_but_skill_cannot_target_dead [100.0%(20%) / 47]
       3-1-1-4-9-1/1-5-6 @ "A_03, 죽은 E_02한테 공격 스킬 써." @ 1 @ skill_target_dead_not_allowed @ accepted_20260514_002740.jsonl_seed_master_0047
-      3-1-11-13-9-1/1-5-6 @ "A_03, 죽은 E_02한테 스킬 써." @ 1 @ skill_target_dead_not_allowed @ accepted_20260514_002743.jsonl_seed_master_0174
-      3-1-11-13-14-1/1-5-6 @ "A_03, 죽은 E_02한테 스킬 써." @ 1 @ named_target_dead, no_valid_skill_target @ accepted_20260514_002743.jsonl_seed_master_0175
+      3-1-11-13-9-1/1-5-6 @ "A_03, 죽은 E_02한테 스킬 써." @ 26 @ skill_target_dead_not_allowed @ accepted_20260514_002743.jsonl_seed_master_0174, accepted_20260515_030716.jsonl_batch_0182_001, accepted_20260515_030716.jsonl_batch_0182_002, accepted_20260515_030716.jsonl_batch_0182_003, accepted_20260515_030716.jsonl_batch_0182_004, accepted_20260515_030716.jsonl_batch_0182_005, accepted_20260515_030716.jsonl_batch_0182_006, accepted_20260515_030716.jsonl_batch_0182_008, accepted_20260515_030716.jsonl_batch_0182_009, accepted_20260515_030716.jsonl_batch_0182_010, accepted_20260515_032513.jsonl_batch_0183_001, accepted_20260515_032513.jsonl_batch_0183_002, accepted_20260515_032513.jsonl_batch_0183_003, accepted_20260515_032513.jsonl_batch_0183_004, accepted_20260515_032513.jsonl_batch_0183_005, accepted_20260515_032513.jsonl_batch_0183_006, accepted_20260515_032513.jsonl_batch_0183_007, accepted_20260515_032513.jsonl_batch_0183_008, accepted_20260515_032513.jsonl_batch_0183_009, accepted_20260515_032513.jsonl_batch_0183_010, accepted_20260515_033213.jsonl_batch_0184_001, accepted_20260515_033213.jsonl_batch_0184_002, accepted_20260515_033213.jsonl_batch_0184_003, accepted_20260515_033213.jsonl_batch_0184_004, accepted_20260515_033213.jsonl_batch_0184_005, accepted_20260515_033213.jsonl_batch_0184_006
+      3-1-11-13-14-1/1-5-6 @ "A_03, 죽은 E_02한테 스킬 써." @ 20 @ named_target_dead, no_valid_skill_target @ accepted_20260514_002743.jsonl_seed_master_0175, accepted_20260515_034401.jsonl_batch_0185_001, accepted_20260515_034401.jsonl_batch_0185_002, accepted_20260515_034401.jsonl_batch_0185_003, accepted_20260515_034401.jsonl_batch_0185_004, accepted_20260515_034401.jsonl_batch_0185_005, accepted_20260515_034401.jsonl_batch_0185_006, accepted_20260515_034401.jsonl_batch_0185_007, accepted_20260515_034401.jsonl_batch_0185_008, accepted_20260515_034401.jsonl_batch_0185_009, accepted_20260515_034401.jsonl_batch_0185_010, accepted_20260515_035552.jsonl_batch_0186_001, accepted_20260515_035552.jsonl_batch_0186_002, accepted_20260515_035552.jsonl_batch_0186_003, accepted_20260515_035552.jsonl_batch_0186_004, accepted_20260515_035552.jsonl_batch_0186_005, accepted_20260515_035552.jsonl_batch_0186_006, accepted_20260515_035552.jsonl_batch_0186_007, accepted_20260515_035552.jsonl_batch_0186_009, accepted_20260515_035552.jsonl_batch_0186_010
 
-self_buff [4.8%(14%) / 3]
-  self [100.0%(100%) / 3]
-    null [33.3%(45%) / 1]
+self_buff [8.0%(14%) / 42]
+  self [100.0%(100%) / 42]
+    null [2.4%(45%) / 1]
       5-1-12-8-4-1/2-3-1 @ "A_04, 3초 기다렸다가 스킬 써." @ 1 @ wait_then_skill @ accepted_20260514_002741.jsonl_seed_master_0074
-    text_enemy_target_but_self_skill [33.3%(35%) / 1]
-      3-1-1-4-4-1/2-3-2 @ "A_03, E_02한테 스킬 써." @ 1 @ explicit_enemy_target_conflicts_with_self_skill @ accepted_20260514_002740.jsonl_seed_master_0044
-    text_ally_target_but_self_skill [33.3%(20%) / 1]
-      3-1-2-4-4-1/2-3-3 @ "A_03, A_02한테 스킬 써." @ 1 @ explicit_ally_target_conflicts_with_self_skill @ accepted_20260514_002741.jsonl_seed_master_0094
+    text_enemy_target_but_self_skill [54.8%(35%) / 23]
+      3-1-1-4-4-1/2-3-2 @ "A_03, E_02한테 스킬 써." @ 23 @ explicit_enemy_target_conflicts_with_self_skill @ accepted_20260514_002740.jsonl_seed_master_0044, accepted_20260514_212719.jsonl_batch_0134_001, accepted_20260514_212719.jsonl_batch_0134_002, accepted_20260514_212719.jsonl_batch_0134_003, accepted_20260514_212719.jsonl_batch_0134_004, accepted_20260514_212719.jsonl_batch_0134_005, accepted_20260514_212719.jsonl_batch_0134_006, accepted_20260514_212719.jsonl_batch_0134_007, accepted_20260514_212719.jsonl_batch_0134_008, accepted_20260514_212719.jsonl_batch_0134_009, accepted_20260514_212719.jsonl_batch_0134_010, accepted_20260514_213948.jsonl_batch_0135_001, accepted_20260514_213948.jsonl_batch_0135_002, accepted_20260514_213948.jsonl_batch_0135_003, accepted_20260514_213948.jsonl_batch_0135_004, accepted_20260514_213948.jsonl_batch_0135_005, accepted_20260514_213948.jsonl_batch_0135_006, accepted_20260514_213948.jsonl_batch_0135_007, accepted_20260514_213948.jsonl_batch_0135_008, accepted_20260514_213948.jsonl_batch_0135_009, accepted_20260514_213948.jsonl_batch_0135_010, accepted_20260514_214223.jsonl_batch_0136_001, accepted_20260514_214223.jsonl_batch_0136_002
+    text_ally_target_but_self_skill [42.9%(20%) / 18]
+      3-1-2-4-4-1/2-3-3 @ "A_03, A_02한테 스킬 써." @ 18 @ explicit_ally_target_conflicts_with_self_skill @ accepted_20260514_002741.jsonl_seed_master_0094, accepted_20260514_233855.jsonl_batch_0153_001, accepted_20260514_233855.jsonl_batch_0153_002, accepted_20260514_233855.jsonl_batch_0153_003, accepted_20260514_233855.jsonl_batch_0153_004, accepted_20260514_233855.jsonl_batch_0153_005, accepted_20260514_233855.jsonl_batch_0153_006, accepted_20260514_233855.jsonl_batch_0153_007, accepted_20260514_233855.jsonl_batch_0153_008, accepted_20260514_233855.jsonl_batch_0153_009, accepted_20260514_233855.jsonl_batch_0153_010, accepted_20260514_234733.jsonl_batch_0154_001, accepted_20260514_234733.jsonl_batch_0154_002, accepted_20260514_234733.jsonl_batch_0154_003, accepted_20260514_234733.jsonl_batch_0154_004, accepted_20260514_234733.jsonl_batch_0154_005, accepted_20260514_234733.jsonl_batch_0154_006, accepted_20260514_234733.jsonl_batch_0154_007
 
-ally_shield [9.7%(13%) / 6]
-  ally_alive [66.7%(85%) / 4]
-    null [75.0%(50%) / 3]
-      3-1-2-4-2-1/3-2-1 @ "A_04, A_02한테 스킬 써." @ 2 @ [] @ accepted_20260514_002740.jsonl_seed_master_0049, accepted_20260514_002741.jsonl_seed_master_0095
-      3-2-2-12-2-1/3-2-1 @ "A_04는 A_01에게, A_05는 A_02에게 스킬을 써." @ 1 @ [] @ accepted_20260514_002743.jsonl_seed_master_0181
-    text_enemy_target_but_ally_skill [25.0%(30%) / 1]
-      3-1-1-4-5-1/3-2-4 @ "A_04, E_02한테 보호 스킬 써." @ 1 @ explicit_enemy_target_conflicts_with_ally_skill @ accepted_20260514_002741.jsonl_seed_master_0096
-  ally_dead [33.3%(15%) / 2]
+ally_shield [6.8%(13%) / 36]
+  ally_alive [94.4%(85%) / 34]
+    null [47.1%(50%) / 16]
+      3-1-2-4-2-1/3-2-1 @ "A_04, A_02한테 스킬 써." @ 3 @ [] @ accepted_20260514_002740.jsonl_seed_master_0049, accepted_20260514_002741.jsonl_seed_master_0095, accepted_20260514_232535.jsonl_batch_0151_001
+      3-2-2-12-2-1/3-2-1 @ "A_04는 A_01에게, A_05는 A_02에게 스킬을 써." @ 13 @ [] @ accepted_20260514_002743.jsonl_seed_master_0181, accepted_20260515_055320.jsonl_batch_0200_001, accepted_20260515_055320.jsonl_batch_0200_002, accepted_20260515_055320.jsonl_batch_0200_003, accepted_20260515_055320.jsonl_batch_0200_004, accepted_20260515_055320.jsonl_batch_0200_005, accepted_20260515_055320.jsonl_batch_0200_006, accepted_20260515_055320.jsonl_batch_0200_007, accepted_20260515_055320.jsonl_batch_0200_008, accepted_20260515_055320.jsonl_batch_0200_009, accepted_20260515_055320.jsonl_batch_0200_010, accepted_20260515_055556.jsonl_batch_0201_001, accepted_20260515_055556.jsonl_batch_0201_002
+    text_enemy_target_but_ally_skill [52.9%(30%) / 18]
+      3-1-1-4-5-1/3-2-4 @ "A_04, E_02한테 보호 스킬 써." @ 18 @ explicit_enemy_target_conflicts_with_ally_skill @ accepted_20260514_002741.jsonl_seed_master_0096, accepted_20260514_215511.jsonl_batch_0137_001, accepted_20260514_215511.jsonl_batch_0137_002, accepted_20260514_215511.jsonl_batch_0137_003, accepted_20260514_215511.jsonl_batch_0137_004, accepted_20260514_215511.jsonl_batch_0137_005, accepted_20260514_215511.jsonl_batch_0137_006, accepted_20260514_215511.jsonl_batch_0137_007, accepted_20260514_215511.jsonl_batch_0137_008, accepted_20260514_215511.jsonl_batch_0137_009, accepted_20260514_215511.jsonl_batch_0137_010, accepted_20260514_220411.jsonl_batch_0138_001, accepted_20260514_220411.jsonl_batch_0138_002, accepted_20260514_220411.jsonl_batch_0138_003, accepted_20260514_220411.jsonl_batch_0138_004, accepted_20260514_220411.jsonl_batch_0138_005, accepted_20260514_220411.jsonl_batch_0138_006, accepted_20260514_220411.jsonl_batch_0138_007
+  ally_dead [5.6%(15%) / 2]
     text_dead_target_but_skill_cannot_target_dead [100.0%(20%) / 2]
       6-1-2-13-8-1/3-4-6 @ "A_04, 쓰러진 A_02에게 보호 스킬 써." @ 1 @ skill_target_dead_not_allowed @ accepted_20260514_002741.jsonl_seed_master_0084
       3-1-2-4-9-1/3-4-6 @ "A_04, 쓰러진 A_02한테 보호 스킬 써." @ 1 @ skill_target_dead_not_allowed @ accepted_20260514_002741.jsonl_seed_master_0053
 
-ally_heal [16.1%(11%) / 10]
-  ally_alive [90.0%(85%) / 9]
-    null [77.8%(55%) / 7]
-      3-1-2-4-2-2/4-2-1 @ "A_04, 체력이 낮은 A_02한테 회복 스킬 써." @ 1 @ low_hp_ally_target @ accepted_20260514_002741.jsonl_seed_master_0098
-      3-1-9-4-2-1/4-2-1 @ "A_04, 체력이 낮은 아군에게 스킬 써." @ 1 @ low_hp_ally_target @ accepted_20260514_002743.jsonl_seed_master_0173
-      3-2-2-11-2-1/4-2-1 @ "A_04와 A_05는 A_02에게 스킬을 써." @ 1 @ [] @ accepted_20260514_002743.jsonl_seed_master_0180
-      3-2-9-11-2-1/4-2-1 @ "A_04와 A_05는 체력이 제일 낮은 아군에게 스킬을 써." @ 1 @ low_hp_ally_target @ accepted_20260514_002743.jsonl_seed_master_0183
-      3-3-9-4-2-1/4-2-1 @ "회복 가능한 아군은 체력이 낮은 아군에게 스킬 써." @ 1 @ low_hp_ally_target @ accepted_20260514_002743.jsonl_seed_master_0186
-      3-5-9-4-2-1/4-2-1 @ "회복 스킬이 있는 아군은 체력이 낮은 아군에게 스킬 써." @ 1 @ low_hp_ally_target @ accepted_20260514_002741.jsonl_seed_master_0059
-      3-6-2-13-14-1/4-2-1 @ "회복 스킬이 있는 아군은 체력이 낮은 아군에게 스킬 써." @ 1 @ no_valid_skill_target @ accepted_20260514_002741.jsonl_seed_master_0061
-    text_enemy_target_but_ally_skill [22.2%(25%) / 2]
-      3-1-1-4-5-2/4-2-4 @ "A_04, E_02한테 스킬 써." @ 1 @ explicit_enemy_target_conflicts_with_ally_skill @ accepted_20260514_002740.jsonl_seed_master_0045
-      3-1-1-4-5-3/4-2-4 @ "A_04, E_02한테 회복 스킬 써." @ 1 @ explicit_enemy_target_conflicts_with_ally_skill @ accepted_20260514_002741.jsonl_seed_master_0099
-  ally_dead [10.0%(15%) / 1]
+ally_heal [14.4%(11%) / 76]
+  ally_alive [98.7%(85%) / 75]
+    null [66.7%(55%) / 50]
+      3-1-2-4-2-2/4-2-1 @ "A_04, 체력이 낮은 A_02한테 회복 스킬 써." @ 2 @ low_hp_ally_target @ accepted_20260514_002741.jsonl_seed_master_0098, accepted_20260514_232657.jsonl_batch_0152_001
+      3-1-9-4-2-1/4-2-1 @ "A_04, 체력이 낮은 아군에게 스킬 써." @ 2 @ low_hp_ally_target @ accepted_20260514_002743.jsonl_seed_master_0173, accepted_20260515_025533.jsonl_batch_0181_001
+      3-2-2-11-2-1/4-2-1 @ "A_04와 A_05는 A_02에게 스킬을 써." @ 2 @ [] @ accepted_20260514_002743.jsonl_seed_master_0180, accepted_20260515_054039.jsonl_batch_0199_001
+      3-2-9-11-2-1/4-2-1 @ "A_04와 A_05는 체력이 제일 낮은 아군에게 스킬을 써." @ 2 @ low_hp_ally_target @ accepted_20260514_002743.jsonl_seed_master_0183, accepted_20260515_055845.jsonl_batch_0203_001
+      3-3-9-4-2-1/4-2-1 @ "회복 가능한 아군은 체력이 낮은 아군에게 스킬 써." @ 8 @ low_hp_ally_target @ accepted_20260514_002743.jsonl_seed_master_0186, accepted_20260515_063955.jsonl_batch_0208_001, accepted_20260515_063955.jsonl_batch_0208_002, accepted_20260515_063955.jsonl_batch_0208_003, accepted_20260515_063955.jsonl_batch_0208_004, accepted_20260515_063955.jsonl_batch_0208_005, accepted_20260515_063955.jsonl_batch_0208_006, accepted_20260515_063955.jsonl_batch_0208_007
+      3-5-9-4-2-1/4-2-1 @ "회복 스킬이 있는 아군은 체력이 낮은 아군에게 스킬 써." @ 32 @ low_hp_ally_target @ 2accepted_20260514_191342.jsonl_2batch_0002_001, 2accepted_20260514_191342.jsonl_2batch_0002_002, 2accepted_20260514_191342.jsonl_2batch_0002_003, 2accepted_20260514_191342.jsonl_2batch_0002_004, 2accepted_20260514_191342.jsonl_2batch_0002_005, 2accepted_20260514_191342.jsonl_2batch_0002_006, 2accepted_20260514_191342.jsonl_2batch_0002_007, 2accepted_20260514_191342.jsonl_2batch_0002_008, 2accepted_20260514_191342.jsonl_2batch_0002_009, 2accepted_20260514_191342.jsonl_2batch_0002_010, 2accepted_20260514_192535.jsonl_2batch_0003_001, 2accepted_20260514_192535.jsonl_2batch_0003_002, 2accepted_20260514_192535.jsonl_2batch_0003_003, 2accepted_20260514_192535.jsonl_2batch_0003_004, 2accepted_20260514_192535.jsonl_2batch_0003_005, 2accepted_20260514_192535.jsonl_2batch_0003_006, 2accepted_20260514_192535.jsonl_2batch_0003_007, 2accepted_20260514_192535.jsonl_2batch_0003_008, 2accepted_20260514_192535.jsonl_2batch_0003_009, 2accepted_20260514_192535.jsonl_2batch_0003_010, 2accepted_20260514_193722.jsonl_2batch_0004_001, 2accepted_20260514_193722.jsonl_2batch_0004_002, 2accepted_20260514_193722.jsonl_2batch_0004_003, 2accepted_20260514_193722.jsonl_2batch_0004_004, 2accepted_20260514_193722.jsonl_2batch_0004_005, 2accepted_20260514_193722.jsonl_2batch_0004_006, 2accepted_20260514_193722.jsonl_2batch_0004_007, 2accepted_20260514_193722.jsonl_2batch_0004_008, 2accepted_20260514_193722.jsonl_2batch_0004_009, 2accepted_20260514_193722.jsonl_2batch_0004_010, 2accepted_20260514_193840.jsonl_2batch_0005_001, accepted_20260514_002741.jsonl_seed_master_0059
+      3-6-2-13-14-1/4-2-1 @ "회복 스킬이 있는 아군은 체력이 낮은 아군에게 스킬 써." @ 2 @ no_valid_skill_target @ 2accepted_20260514_195315.jsonl_2batch_0008_001, accepted_20260514_002741.jsonl_seed_master_0061
+    text_enemy_target_but_ally_skill [33.3%(25%) / 25]
+      3-1-1-4-5-2/4-2-4 @ "A_04, E_02한테 스킬 써." @ 13 @ explicit_enemy_target_conflicts_with_ally_skill @ accepted_20260514_002740.jsonl_seed_master_0045, accepted_20260514_221649.jsonl_batch_0139_001, accepted_20260514_221649.jsonl_batch_0139_002, accepted_20260514_221649.jsonl_batch_0139_003, accepted_20260514_221649.jsonl_batch_0139_004, accepted_20260514_221649.jsonl_batch_0139_005, accepted_20260514_221649.jsonl_batch_0139_006, accepted_20260514_221649.jsonl_batch_0139_007, accepted_20260514_221649.jsonl_batch_0139_008, accepted_20260514_221649.jsonl_batch_0139_009, accepted_20260514_221649.jsonl_batch_0139_010, accepted_20260514_221927.jsonl_batch_0140_001, accepted_20260514_221927.jsonl_batch_0140_002
+      3-1-1-4-5-3/4-2-4 @ "A_04, E_02한테 회복 스킬 써." @ 12 @ explicit_enemy_target_conflicts_with_ally_skill @ accepted_20260514_002741.jsonl_seed_master_0099, accepted_20260514_223225.jsonl_batch_0141_001, accepted_20260514_223225.jsonl_batch_0141_002, accepted_20260514_223225.jsonl_batch_0141_003, accepted_20260514_223225.jsonl_batch_0141_004, accepted_20260514_223225.jsonl_batch_0141_005, accepted_20260514_223225.jsonl_batch_0141_006, accepted_20260514_223225.jsonl_batch_0141_007, accepted_20260514_223225.jsonl_batch_0141_008, accepted_20260514_223225.jsonl_batch_0141_009, accepted_20260514_223505.jsonl_batch_0142_001, accepted_20260514_223505.jsonl_batch_0142_002
+  ally_dead [1.3%(15%) / 1]
     text_dead_target_but_skill_cannot_target_dead [100.0%(20%) / 1]
       3-1-2-4-9-2/4-4-6 @ "A_04, 죽은 A_02한테 회복 스킬 써." @ 1 @ skill_target_dead_not_allowed @ accepted_20260514_002741.jsonl_seed_master_0100
 
-ally_resurrection [4.8%(13%) / 3]
-  ally_dead [66.7%(70%) / 2]
-    null [100.0%(65%) / 2]
-      3-1-2-4-7-1/5-4-1 @ "A_04, 쓰러진 A_02한테 스킬 써." @ 2 @ dead_ally_skill_target_allowed @ accepted_20260514_002741.jsonl_seed_master_0051, accepted_20260514_002741.jsonl_seed_master_0101
-  ally_alive [33.3%(30%) / 1]
-    text_living_target_but_resurrection_skill [100.0%(35%) / 1]
-      3-1-2-4-8-1/5-2-7 @ "A_04, 살아있는 A_02한테 부활 스킬 써." @ 1 @ text_living_target_but_resurrection_skill @ accepted_20260514_002741.jsonl_seed_master_0052
+ally_resurrection [12.1%(13%) / 64]
+  ally_dead [54.7%(70%) / 35]
+    null [100.0%(65%) / 35]
+      3-1-2-4-7-1/5-4-1 @ "A_04, 쓰러진 A_02한테 스킬 써." @ 35 @ dead_ally_skill_target_allowed @ accepted_20260514_002741.jsonl_seed_master_0051, accepted_20260514_002741.jsonl_seed_master_0101, accepted_20260515_005126.jsonl_batch_0162_001, accepted_20260515_005126.jsonl_batch_0162_002, accepted_20260515_005126.jsonl_batch_0162_004, accepted_20260515_005126.jsonl_batch_0162_005, accepted_20260515_005126.jsonl_batch_0162_006, accepted_20260515_005126.jsonl_batch_0162_007, accepted_20260515_005126.jsonl_batch_0162_008, accepted_20260515_005126.jsonl_batch_0162_009, accepted_20260515_010347.jsonl_batch_0163_001, accepted_20260515_010347.jsonl_batch_0163_003, accepted_20260515_010347.jsonl_batch_0163_004, accepted_20260515_010347.jsonl_batch_0163_005, accepted_20260515_010347.jsonl_batch_0163_006, accepted_20260515_010347.jsonl_batch_0163_007, accepted_20260515_010347.jsonl_batch_0163_008, accepted_20260515_010347.jsonl_batch_0163_009, accepted_20260515_010347.jsonl_batch_0163_010, accepted_20260515_011613.jsonl_batch_0164_001, accepted_20260515_011613.jsonl_batch_0164_002, accepted_20260515_011613.jsonl_batch_0164_004, accepted_20260515_011613.jsonl_batch_0164_005, accepted_20260515_011613.jsonl_batch_0164_006, accepted_20260515_011613.jsonl_batch_0164_007, accepted_20260515_011613.jsonl_batch_0164_008, accepted_20260515_011613.jsonl_batch_0164_009, accepted_20260515_011613.jsonl_batch_0164_010, accepted_20260515_012605.jsonl_batch_0165_001, accepted_20260515_012605.jsonl_batch_0165_002, accepted_20260515_012605.jsonl_batch_0165_004, accepted_20260515_012605.jsonl_batch_0165_005, accepted_20260515_012605.jsonl_batch_0165_006, accepted_20260515_012605.jsonl_batch_0165_007, accepted_20260515_012605.jsonl_batch_0165_008
+  ally_alive [45.3%(30%) / 29]
+    text_living_target_but_resurrection_skill [100.0%(35%) / 29]
+      3-1-2-4-8-1/5-2-7 @ "A_04, 살아있는 A_02한테 부활 스킬 써." @ 29 @ text_living_target_but_resurrection_skill @ accepted_20260514_002741.jsonl_seed_master_0052, accepted_20260515_013837.jsonl_batch_0166_001, accepted_20260515_013837.jsonl_batch_0166_002, accepted_20260515_013837.jsonl_batch_0166_003, accepted_20260515_013837.jsonl_batch_0166_004, accepted_20260515_013837.jsonl_batch_0166_005, accepted_20260515_013837.jsonl_batch_0166_006, accepted_20260515_013837.jsonl_batch_0166_007, accepted_20260515_013837.jsonl_batch_0166_008, accepted_20260515_013837.jsonl_batch_0166_009, accepted_20260515_013837.jsonl_batch_0166_010, accepted_20260515_015116.jsonl_batch_0167_001, accepted_20260515_015116.jsonl_batch_0167_002, accepted_20260515_015116.jsonl_batch_0167_003, accepted_20260515_015116.jsonl_batch_0167_004, accepted_20260515_015116.jsonl_batch_0167_005, accepted_20260515_015116.jsonl_batch_0167_006, accepted_20260515_015116.jsonl_batch_0167_007, accepted_20260515_015116.jsonl_batch_0167_008, accepted_20260515_015116.jsonl_batch_0167_009, accepted_20260515_015116.jsonl_batch_0167_010, accepted_20260515_020238.jsonl_batch_0168_001, accepted_20260515_020238.jsonl_batch_0168_003, accepted_20260515_020238.jsonl_batch_0168_004, accepted_20260515_020238.jsonl_batch_0168_005, accepted_20260515_020238.jsonl_batch_0168_006, accepted_20260515_020238.jsonl_batch_0168_007, accepted_20260515_020238.jsonl_batch_0168_008, accepted_20260515_020238.jsonl_batch_0168_009
 
-enemy_aoe_attack [14.5%(12%) / 9]
-  enemy_alive [100.0%(100%) / 9]
-    null [88.9%(75%) / 8]
-      3-2-1-11-10-1/6-1-1 @ "A_03과 A_06은 E_02 주변에 스킬을 써." @ 1 @ aoe_skill_requires_single_center_target @ accepted_20260514_002743.jsonl_seed_master_0178
-      3-1-1-4-10-1/6-1-1 @ "A_05, E_03 주변에 스킬 써." @ 1 @ aoe_skill_requires_single_center_target @ accepted_20260514_002743.jsonl_seed_master_0164
-      3-1-3-4-10-1/6-1-1 @ "A_06, 가장 가까운 적을 중심으로 스킬 써." @ 1 @ aoe_skill_requires_single_center_target @ accepted_20260514_002743.jsonl_seed_master_0169
-      3-1-6-4-10-1/6-1-1 @ "A_06, 적 후열이 뭉친 곳에 스킬 써." @ 1 @ target_role_backline_enemy, aoe_skill_requires_single_center_target @ accepted_20260514_002743.jsonl_seed_master_0170
-      3-1-6-4-10-2/6-1-1 @ "A_06, 적들이 뭉친 쪽에 스킬 써." @ 1 @ aoe_skill_requires_single_center_target @ accepted_20260514_002649.jsonl_seed_master_0008
-      3-1-12-4-10-1/6-1-1 @ "A_06, 적들이 뭉친 쪽에 스킬 써." @ 2 @ aoe_skill_requires_single_center_target @ accepted_20260514_002741.jsonl_seed_master_0055, accepted_20260514_002741.jsonl_seed_master_0109
-      3-1-4-4-10-1/6-1-1 @ "A_06, 체력이 제일 낮은 적을 중심으로 스킬 써." @ 1 @ aoe_skill_requires_single_center_target @ accepted_20260514_002743.jsonl_seed_master_0166
-    text_ally_target_but_enemy_skill [11.1%(25%) / 1]
-      3-1-2-4-6-4/6-1-5 @ "A_06, A_02 주변에 광역 스킬 써." @ 1 @ explicit_ally_target_conflicts_with_enemy_skill @ accepted_20260514_002741.jsonl_seed_master_0110
+enemy_aoe_attack [12.1%(12%) / 64]
+  enemy_alive [100.0%(100%) / 64]
+    null [81.2%(75%) / 52]
+      3-2-1-11-10-1/6-1-1 @ "A_03과 A_06은 E_02 주변에 스킬을 써." @ 34 @ aoe_skill_requires_single_center_target @ accepted_20260514_002743.jsonl_seed_master_0178, accepted_20260515_050728.jsonl_batch_0194_001, accepted_20260515_050728.jsonl_batch_0194_002, accepted_20260515_050728.jsonl_batch_0194_003, accepted_20260515_050728.jsonl_batch_0194_004, accepted_20260515_050728.jsonl_batch_0194_005, accepted_20260515_050728.jsonl_batch_0194_006, accepted_20260515_050728.jsonl_batch_0194_007, accepted_20260515_050728.jsonl_batch_0194_008, accepted_20260515_050728.jsonl_batch_0194_009, accepted_20260515_050728.jsonl_batch_0194_010, accepted_20260515_052040.jsonl_batch_0195_001, accepted_20260515_052040.jsonl_batch_0195_002, accepted_20260515_052040.jsonl_batch_0195_003, accepted_20260515_052040.jsonl_batch_0195_004, accepted_20260515_052040.jsonl_batch_0195_005, accepted_20260515_052040.jsonl_batch_0195_006, accepted_20260515_052040.jsonl_batch_0195_007, accepted_20260515_052040.jsonl_batch_0195_008, accepted_20260515_052040.jsonl_batch_0195_009, accepted_20260515_052040.jsonl_batch_0195_010, accepted_20260515_053348.jsonl_batch_0196_001, accepted_20260515_053348.jsonl_batch_0196_002, accepted_20260515_053348.jsonl_batch_0196_003, accepted_20260515_053348.jsonl_batch_0196_004, accepted_20260515_053348.jsonl_batch_0196_005, accepted_20260515_053348.jsonl_batch_0196_006, accepted_20260515_053348.jsonl_batch_0196_007, accepted_20260515_053348.jsonl_batch_0196_008, accepted_20260515_053348.jsonl_batch_0196_009, accepted_20260515_053348.jsonl_batch_0196_010, accepted_20260515_053752.jsonl_batch_0197_001, accepted_20260515_053752.jsonl_batch_0197_002, accepted_20260515_053752.jsonl_batch_0197_003
+      3-1-1-4-10-1/6-1-1 @ "A_05, E_03 주변에 스킬 써." @ 2 @ aoe_skill_requires_single_center_target @ accepted_20260514_002743.jsonl_seed_master_0164, accepted_20260514_224007.jsonl_batch_0145_001
+      3-1-3-4-10-1/6-1-1 @ "A_06, 가장 가까운 적을 중심으로 스킬 써." @ 7 @ aoe_skill_requires_single_center_target @ accepted_20260514_002743.jsonl_seed_master_0169, accepted_20260515_022358.jsonl_batch_0174_001, accepted_20260515_022358.jsonl_batch_0174_002, accepted_20260515_022358.jsonl_batch_0174_003, accepted_20260515_022358.jsonl_batch_0174_004, accepted_20260515_022358.jsonl_batch_0174_005, accepted_20260515_022358.jsonl_batch_0174_006
+      3-1-6-4-10-1/6-1-1 @ "A_06, 적 후열이 뭉친 곳에 스킬 써." @ 2 @ target_role_backline_enemy, aoe_skill_requires_single_center_target @ accepted_20260514_002743.jsonl_seed_master_0170, accepted_20260515_025132.jsonl_batch_0178_001
+      3-1-6-4-10-2/6-1-1 @ "A_06, 적들이 뭉친 쪽에 스킬 써." @ 2 @ aoe_skill_requires_single_center_target @ accepted_20260514_002649.jsonl_seed_master_0008, accepted_20260515_025252.jsonl_batch_0179_001
+      3-1-12-4-10-1/6-1-1 @ "A_06, 적들이 뭉친 쪽에 스킬 써." @ 3 @ aoe_skill_requires_single_center_target @ accepted_20260514_002741.jsonl_seed_master_0055, accepted_20260514_002741.jsonl_seed_master_0109, accepted_20260515_045139.jsonl_batch_0191_001
+      3-1-4-4-10-1/6-1-1 @ "A_06, 체력이 제일 낮은 적을 중심으로 스킬 써." @ 2 @ aoe_skill_requires_single_center_target @ accepted_20260514_002743.jsonl_seed_master_0166, accepted_20260515_021531.jsonl_batch_0172_001
+    text_ally_target_but_enemy_skill [18.8%(25%) / 12]
+      3-1-2-4-6-4/6-1-5 @ "A_06, A_02 주변에 광역 스킬 써." @ 12 @ explicit_ally_target_conflicts_with_enemy_skill @ accepted_20260514_002741.jsonl_seed_master_0110, accepted_20260515_003750.jsonl_batch_0160_001, accepted_20260515_003750.jsonl_batch_0160_002, accepted_20260515_003750.jsonl_batch_0160_003, accepted_20260515_003750.jsonl_batch_0160_004, accepted_20260515_003750.jsonl_batch_0160_005, accepted_20260515_003750.jsonl_batch_0160_006, accepted_20260515_003750.jsonl_batch_0160_007, accepted_20260515_003750.jsonl_batch_0160_008, accepted_20260515_003750.jsonl_batch_0160_009, accepted_20260515_003750.jsonl_batch_0160_010, accepted_20260515_003912.jsonl_batch_0161_001
 
-enemy_debuff [9.7%(8%) / 6]
-  enemy_alive [83.3%(85%) / 5]
-    null [80.0%(60%) / 4]
-      3-1-1-5-12-1/7-1-1 @ "A_03, E_02에게 접근해서 스킬 써." @ 1 @ [] @ accepted_20260514_002740.jsonl_seed_master_0048
-      3-1-1-4-1-4/7-1-1 @ "A_03, E_02한테 약화 스킬 써." @ 1 @ [] @ accepted_20260514_002741.jsonl_seed_master_0106
-      3-1-3-4-1-1/7-1-1 @ "A_03, 가장 가까운 적에게 스킬 써." @ 1 @ [] @ accepted_20260514_002743.jsonl_seed_master_0168
-      3-1-6-4-1-1/7-1-1 @ "A_03, 적 후열에게 스킬 써." @ 1 @ target_role_backline_enemy @ accepted_20260514_002743.jsonl_seed_master_0171
-    text_ally_target_but_enemy_skill [20.0%(25%) / 1]
-      3-1-2-4-6-3/7-1-5 @ "A_03, A_02한테 약화 스킬 써." @ 1 @ explicit_ally_target_conflicts_with_enemy_skill @ accepted_20260514_002741.jsonl_seed_master_0107
-  enemy_dead [16.7%(15%) / 1]
-    text_dead_target_but_skill_cannot_target_dead [100.0%(15%) / 1]
-      3-1-1-4-9-2/7-5-6 @ "A_03, 죽은 E_02한테 약화 스킬 써." @ 1 @ skill_target_dead_not_allowed @ accepted_20260514_002741.jsonl_seed_master_0108
+enemy_debuff [3.2%(8%) / 17]
+  enemy_alive [88.2%(85%) / 15]
+    null [53.3%(60%) / 8]
+      3-1-1-5-12-1/7-1-1 @ "A_03, E_02에게 접근해서 스킬 써." @ 2 @ [] @ accepted_20260514_002740.jsonl_seed_master_0048, accepted_20260514_232327.jsonl_batch_0150_001
+      3-1-1-4-1-4/7-1-1 @ "A_03, E_02한테 약화 스킬 써." @ 2 @ [] @ accepted_20260514_002741.jsonl_seed_master_0106, accepted_20260514_211448.jsonl_batch_0133_001
+      3-1-3-4-1-1/7-1-1 @ "A_03, 가장 가까운 적에게 스킬 써." @ 2 @ [] @ accepted_20260514_002743.jsonl_seed_master_0168, accepted_20260515_021650.jsonl_batch_0173_001
+      3-1-6-4-1-1/7-1-1 @ "A_03, 적 후열에게 스킬 써." @ 2 @ target_role_backline_enemy @ accepted_20260514_002743.jsonl_seed_master_0171, accepted_20260515_025011.jsonl_batch_0177_001
+    text_ally_target_but_enemy_skill [46.7%(25%) / 7]
+      3-1-2-4-6-3/7-1-5 @ "A_03, A_02한테 약화 스킬 써." @ 7 @ explicit_ally_target_conflicts_with_enemy_skill @ accepted_20260514_002741.jsonl_seed_master_0107, accepted_20260515_002507.jsonl_batch_0159_001, accepted_20260515_002507.jsonl_batch_0159_002, accepted_20260515_002507.jsonl_batch_0159_003, accepted_20260515_002507.jsonl_batch_0159_004, accepted_20260515_002507.jsonl_batch_0159_005, accepted_20260515_002507.jsonl_batch_0159_006
+  enemy_dead [11.8%(15%) / 2]
+    text_dead_target_but_skill_cannot_target_dead [100.0%(15%) / 2]
+      3-1-1-4-9-2/7-5-6 @ "A_03, 죽은 E_02한테 약화 스킬 써." @ 2 @ skill_target_dead_not_allowed @ accepted_20260514_002741.jsonl_seed_master_0108, accepted_20260514_223846.jsonl_batch_0144_001
 
-mobility_skill [3.2%(5%) / 2]
-  self [50.0%(50%) / 1]
-    null [100.0%(100%) / 1]
-      3-1-12-4-3-1/8-3-1 @ "A_01, 도약기로 빠져." @ 1 @ mobility_skill_self_escape @ accepted_20260514_002741.jsonl_seed_master_0111
-  enemy_alive [50.0%(50%) / 1]
-    null [100.0%(100%) / 1]
-      3-1-1-4-1-1/8-1-1 @ "A_01, E_02에게 도약기로 붙어." @ 1 @ mobility_skill_enemy_approach @ accepted_20260514_002741.jsonl_seed_master_0112
+mobility_skill [7.8%(5%) / 41]
+  self [95.1%(50%) / 39]
+    null [100.0%(100%) / 39]
+      3-1-12-4-3-1/8-3-1 @ "A_01, 도약기로 빠져." @ 39 @ mobility_skill_self_escape @ accepted_20260514_002741.jsonl_seed_master_0111, accepted_20260515_041552.jsonl_batch_0187_001, accepted_20260515_041552.jsonl_batch_0187_002, accepted_20260515_041552.jsonl_batch_0187_003, accepted_20260515_041552.jsonl_batch_0187_004, accepted_20260515_041552.jsonl_batch_0187_005, accepted_20260515_041552.jsonl_batch_0187_006, accepted_20260515_041552.jsonl_batch_0187_007, accepted_20260515_041552.jsonl_batch_0187_008, accepted_20260515_041552.jsonl_batch_0187_009, accepted_20260515_041552.jsonl_batch_0187_010, accepted_20260515_042811.jsonl_batch_0188_001, accepted_20260515_042811.jsonl_batch_0188_002, accepted_20260515_042811.jsonl_batch_0188_003, accepted_20260515_042811.jsonl_batch_0188_004, accepted_20260515_042811.jsonl_batch_0188_005, accepted_20260515_042811.jsonl_batch_0188_006, accepted_20260515_042811.jsonl_batch_0188_007, accepted_20260515_042811.jsonl_batch_0188_008, accepted_20260515_042811.jsonl_batch_0188_009, accepted_20260515_042811.jsonl_batch_0188_010, accepted_20260515_044024.jsonl_batch_0189_001, accepted_20260515_044024.jsonl_batch_0189_002, accepted_20260515_044024.jsonl_batch_0189_003, accepted_20260515_044024.jsonl_batch_0189_004, accepted_20260515_044024.jsonl_batch_0189_005, accepted_20260515_044024.jsonl_batch_0189_006, accepted_20260515_044024.jsonl_batch_0189_007, accepted_20260515_044024.jsonl_batch_0189_008, accepted_20260515_044024.jsonl_batch_0189_009, accepted_20260515_044024.jsonl_batch_0189_010, accepted_20260515_045019.jsonl_batch_0190_001, accepted_20260515_045019.jsonl_batch_0190_002, accepted_20260515_045019.jsonl_batch_0190_003, accepted_20260515_045019.jsonl_batch_0190_004, accepted_20260515_045019.jsonl_batch_0190_005, accepted_20260515_045019.jsonl_batch_0190_006, accepted_20260515_045019.jsonl_batch_0190_007, accepted_20260515_045019.jsonl_batch_0190_008
+  enemy_alive [4.9%(50%) / 2]
+    null [100.0%(100%) / 2]
+      3-1-1-4-1-1/8-1-1 @ "A_01, E_02에게 도약기로 붙어." @ 2 @ mobility_skill_enemy_approach @ accepted_20260514_002741.jsonl_seed_master_0112, accepted_20260514_211047.jsonl_batch_0130_001
 
-no_skill [11.3%(6%) / 7]
-  none [100.0%(100%) / 7]
-    skill_actor_has_no_skill [100.0%(100%) / 7]
+no_skill [5.5%(6%) / 29]
+  none [100.0%(100%) / 29]
+    skill_actor_has_no_skill [100.0%(100%) / 29]
       3-1-1-4-11-1/9-6-8 @ "A_03, E_02한테 스킬 써." @ 1 @ actor_has_no_skill @ accepted_20260514_002740.jsonl_seed_master_0046
       6-1-11-13-9-1/9-6-8 @ "A_03, E_02한테 스킬 써." @ 1 @ actor_has_no_skill @ accepted_20260514_002741.jsonl_seed_master_0086
-      3-1-12-13-11-1/9-6-8 @ "A_03, 지금 스킬 써." @ 1 @ actor_has_no_skill @ accepted_20260514_002743.jsonl_seed_master_0176
+      3-1-12-13-11-1/9-6-8 @ "A_03, 지금 스킬 써." @ 2 @ actor_has_no_skill @ accepted_20260514_002743.jsonl_seed_master_0176, accepted_20260515_045253.jsonl_batch_0192_001
       6-2-11-13-9-1/9-6-8 @ "A_03과 A_04는 죽은 E_02한테 스킬 써." @ 1 @ actor_has_no_skill, named_target_dead @ accepted_20260514_002745.jsonl_seed_master_0211
-      3-2-12-13-13-1/9-6-8 @ "A_03과 A_04는 지금 스킬 써." @ 1 @ no_valid_skill_actor @ accepted_20260514_002743.jsonl_seed_master_0184
-      3-6-1-13-13-1/9-6-8 @ "스킬 가능한 아군은 E_02에게 스킬 써." @ 1 @ no_valid_skill_actor @ accepted_20260514_002741.jsonl_seed_master_0060
-      3-6-12-13-13-1/9-6-8 @ "스킬 가능한 아군은 지금 스킬 써." @ 1 @ no_valid_skill_actor @ accepted_20260514_002743.jsonl_seed_master_0188
+      3-2-12-13-13-1/9-6-8 @ "A_03과 A_04는 지금 스킬 써." @ 2 @ no_valid_skill_actor @ accepted_20260514_002743.jsonl_seed_master_0184, accepted_20260515_055958.jsonl_batch_0204_001
+      3-6-1-13-13-1/9-6-8 @ "스킬 가능한 아군은 E_02에게 스킬 써." @ 13 @ no_valid_skill_actor @ 2accepted_20260514_194946.jsonl_2batch_0006_001, 2accepted_20260514_194946.jsonl_2batch_0006_002, 2accepted_20260514_194946.jsonl_2batch_0006_003, 2accepted_20260514_194946.jsonl_2batch_0006_004, 2accepted_20260514_194946.jsonl_2batch_0006_005, 2accepted_20260514_194946.jsonl_2batch_0006_006, 2accepted_20260514_194946.jsonl_2batch_0006_007, 2accepted_20260514_194946.jsonl_2batch_0006_008, 2accepted_20260514_194946.jsonl_2batch_0006_009, 2accepted_20260514_194946.jsonl_2batch_0006_010, 2accepted_20260514_195203.jsonl_2batch_0007_001, 2accepted_20260514_195203.jsonl_2batch_0007_002, accepted_20260514_002741.jsonl_seed_master_0060
+      3-6-12-13-13-1/9-6-8 @ "스킬 가능한 아군은 지금 스킬 써." @ 9 @ no_valid_skill_actor @ 2accepted_20260514_200139.jsonl_2batch_0009_001, 2accepted_20260514_200139.jsonl_2batch_0009_002, 2accepted_20260514_200139.jsonl_2batch_0009_003, 2accepted_20260514_200139.jsonl_2batch_0009_004, 2accepted_20260514_200139.jsonl_2batch_0009_005, 2accepted_20260514_200139.jsonl_2batch_0009_006, 2accepted_20260514_200139.jsonl_2batch_0009_007, 2accepted_20260514_200139.jsonl_2batch_0009_008, accepted_20260514_002743.jsonl_seed_master_0188

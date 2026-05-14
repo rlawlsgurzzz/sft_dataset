@@ -192,6 +192,7 @@ sample별 전장 다양성 강제 규칙:
 - A_01~A_06/E_01~E_06은 고정 캐릭터가 아니다. 같은 unitId라도 sample마다 역할, 원거리 여부, 체력, 공격력, 교전 수, 진형, 스킬 의미, 거리 관계가 바뀔 수 있다.
 - selected_bucket, skill_case, command, gold, output을 만족하는 범위 안에서 매 sample마다 최소 3개 이상의 주요 전장 요소를 바꾼다.
 - 주요 전장 요소는 다음을 뜻한다: actor의 전술 역할, actor의 skillDescription, 생존/사망 상태, hpRatio 분포, engagedByOpponentCount 분포, teamFormationRole 배치, closest/farthest 관계, target 후보의 상태.
+- 강력 권고: closest/farthest 아군·적, isAlive, canBeTargeted 값은 정답이 성립하는 범위 안에서 sample마다 작게 흔들어 고정 패턴을 만들지 않는다.
 - command_text를 재사용하는 sample이라도 area_situation과 output 판단 근거는 새로 만든다.
 - 다양화는 taxonomy 값을 새로 invent하는 방식으로 하지 않는다. taxonomy field는 selected_bucket과 valid taxonomy 값만 사용하고, 다양화는 전장 상태와 skillDescription 문장 안에서만 수행한다.
 
@@ -289,6 +290,7 @@ output 규칙:
 - 실행 가능한 action이 없으면 dialog와 action을 빈 배열로 둔다.
 - attack.target은 살아있고 canBeTargeted=true인 enemy만 가능하다.
 - move.to는 살아있는 ally 또는 살아있고 canBeTargeted=true인 enemy만 가능하다.
+- 강력 권고: 현재 위치를 유지하면 되는 actor는 action에 넣지 않는다.
 - move.to에는 actor 자신의 unitId를 쓰지 않는다.
 - skill target은 skill 규칙에 따른다.
 - wait은 명령이 대기, 지연, 타이밍 조절, 위치 유지처럼 즉시 다음 행동을 하지 말라는 의미를 직접 포함할 때만 사용한다.
@@ -387,6 +389,7 @@ output 규칙:
 - thinking은 짧은 한국어 요약이어야 하며, 자세한 사고 과정이 아니어야 한다.
 - 각 actor의 sequence는 최대 3개 action만 포함할 수 있다.
 - 실행 가능한 action이 없으면 {"thinking":"...","dialog":[],"action":[]} 형태로 출력한다.
+- 강력 권고: 현재 위치를 유지하면 되는 actor는 action에 넣지 않는다.
 
 Actor selection:
 - 명령에 살아있는 ally unitId가 직접 적혀 있다면, 그 ally들만 actor로 사용한다.
@@ -493,7 +496,7 @@ Conditional command:
 - 출력 직전 command_text_policy.sequence_contract를 확인한다. 출력 array의 앞쪽 new_unique_command_texts_to_create개 sample이 모두 새 unique command_text인지 검사한다.
 - cycle_output_range_1_based에 해당하는 sample들은 cycle_reuse_plan_1_based의 output_index_1_based 순서와 일치해야 한다.
 - cycle sample의 command_text는 cycle_reuse_plan_1_based가 가리키는 source pool 항목의 command_text와 정확히 같아야 한다.
-
+- 강제 점검: 모든 ally의 closest/farthest 필드는 실제 allies/enemies 목록을 역조회해, opponent는 isAlive=true && canBeTargeted=true인 enemy만, ally는 자기 자신이 아닌 isAlive=true ally만 가리키는지 확인한다.
 
 schema skeleton example:
 {
