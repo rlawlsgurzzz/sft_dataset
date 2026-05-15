@@ -975,15 +975,17 @@ def run_teacher_generation(
         "total_token_count": timing["total_token_count"],
     }
 
+# request payload의 base command를 teacher 출력에 강제로 반영한다.
+# teacher가 paraphrase를 base_command_text에 잘못 넣어도 기준 command slot 원문으로 되돌린다.
 def force_request_base_command_text(
     samples: list[dict[str, Any]],
     payload: dict[str, Any],
 ) -> None:
-    request_info = payload.get("request_info")
-    if not isinstance(request_info, dict):
+    request = payload.get("request")
+    if not isinstance(request, dict):
         return
 
-    base_command_text = request_info.get("base_command_text")
+    base_command_text = request.get("base_command_text")
     if not isinstance(base_command_text, str) or not base_command_text:
         return
 
@@ -991,7 +993,7 @@ def force_request_base_command_text(
         command_spec = sample.setdefault("command_spec", {})
         if isinstance(command_spec, dict):
             command_spec["base_command_text"] = base_command_text
-
+            
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
