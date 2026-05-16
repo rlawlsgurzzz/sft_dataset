@@ -334,6 +334,7 @@ def build_command_text_sequence_contract(
     existing_count: int,
     new_unique_count: int,
     cycle_count: int,
+    cycle_start_offset: int = 0,
 ) -> dict[str, Any]:
     new_unique_start = 1 if new_unique_count > 0 else None
     new_unique_end = new_unique_count if new_unique_count > 0 else None
@@ -342,11 +343,18 @@ def build_command_text_sequence_contract(
     cycle_end = new_unique_count + cycle_count if cycle_count > 0 else None
 
     cycle_source_pool_size = existing_count + new_unique_count
+    normalized_cycle_start_offset = (
+        cycle_start_offset % cycle_source_pool_size
+        if cycle_count > 0 and cycle_source_pool_size > 0
+        else 0
+    )
     cycle_reuse_plan: list[dict[str, Any]] = []
 
     if cycle_count > 0 and cycle_source_pool_size > 0:
         for offset in range(cycle_count):
-            source_pool_index = (offset % cycle_source_pool_size) + 1
+            source_pool_index = (
+                (normalized_cycle_start_offset + offset) % cycle_source_pool_size
+            ) + 1
             output_index = new_unique_count + offset + 1
 
             if source_pool_index <= existing_count:
@@ -381,19 +389,19 @@ def build_command_text_sequence_contract(
             "existing_valid_paraphrase_samples in payload order followed by "
             "newly_created_unique_command_texts in output order"
         ),
-        "cycle_reuse_strategy": "round_robin_from_first_source_pool_item",
+        "cycle_reuse_strategy": "round_robin_from_cycle_start_offset",
+        "cycle_start_offset_0_based": normalized_cycle_start_offset,
         "cycle_source_pool_size_after_new_unique": cycle_source_pool_size,
         "cycle_reuse_plan_1_based": cycle_reuse_plan,
         "hard_fail_conditions": [
             "cycle samples appear before all new_unique samples are created",
             "a new_unique output reuses an existing command_text",
             "a cycle output ignores cycle_reuse_plan_1_based",
-            "a cycle output repeatedly uses only source_pool_index_1_based=1",
+            "a cycle output repeatedly uses only source_pool_index_1_based=1 when cycle_reuse_plan_1_based specifies otherwise",
         ],
         "example": (
-            "if existing=2,new=5,cycle=5 then outputs 1-5 are new unique; "
-            "outputs 6-10 reuse source pool indexes [1,2,3,4,5], where "
-            "1-2 are existing samples and 3-5 are newly created unique outputs 1-3"
+            "if existing=7,new=0,cycle=5,cycle_start_offset=5 then outputs 1-5 "
+            "reuse source pool indexes [6,7,1,2,3]"
         ),
     }
 
@@ -404,6 +412,7 @@ def build_command_text_policy(
     other_split_reserved_command_texts: list[dict[str, str]],
     target_split: str,
     count_to_generate: int,
+    cycle_start_offset: int = 0,
 ) -> dict[str, Any]:
     target_split = normalize_target_split(target_split)
     pool_limit = get_expression_pool_limit(target_split)
@@ -426,6 +435,7 @@ def build_command_text_policy(
             existing_count=existing_count,
             new_unique_count=new_unique_count,
             cycle_count=cycle_count,
+            cycle_start_offset=cycle_start_offset,
         ),
         "rules": [
             "같은 split 안에서 command_text 표현 pool을 관리한다.",
@@ -627,6 +637,7 @@ def build_generation_payload(
     dataset_root: Path = DEFAULT_DATASET_ROOT,
     taxonomy_path: Path = DEFAULT_TAXONOMY_PATH,
     target_split: str = DEFAULT_TARGET_SPLIT,
+    cycle_start_offset: int = 0,
 ) -> dict[str, Any]:
     target_split = normalize_target_split(target_split)
 
@@ -677,6 +688,7 @@ def build_generation_payload(
         other_split_reserved_command_texts=other_split_reserved_command_texts,
         target_split=target_split,
         count_to_generate=parsed.count,
+        cycle_start_offset=cycle_start_offset,
     )
 
     return {
@@ -699,6 +711,121 @@ def build_generation_payload(
         "area_situation_contract": build_area_situation_contract(),
         "assistant_output_contract": build_output_contract(),
         "generation_constraints": build_generation_constraints(target_split),
+    }
+
+
+# mixed path request의 item에서 LLM이 읽어야 하는 path별 계약만 남긴다.
+def build_mixed_generation_item(
+    *,
+    mix_item_index_1_based: int,
+    payload: dict[str, Any],
+    cycle_start_offset: int,
+) -> dict[str, Any]:
+    return {
+        "mix_item_index_1_based": mix_item_index_1_based,
+        "request": payload["request"],
+        "target_split": payload["target_split"],
+        "selected_bucket": payload["selected_bucket"],
+        "existing_valid_paraphrase_samples": payload[
+            "existing_valid_paraphrase_samples"
+        ],
+        "other_split_reserved_command_texts": payload[
+            "other_split_reserved_command_texts"
+        ],
+        "command_text_policy": payload["command_text_policy"],
+        "count_to_generate": payload["count_to_generate"],
+        "cycle_start_offset_used": cycle_start_offset,
+    }
+
+
+# 서로 다른 두 path를 하나의 teacher payload 안에 넣는 mixed generation payload를 만든다.
+def build_mixed_generation_payload(
+    mixed_requests: list[dict[str, Any]],
+    dataset_root: Path = DEFAULT_DATASET_ROOT,
+    taxonomy_path: Path = DEFAULT_TAXONOMY_PATH,
+    target_split: str = DEFAULT_TARGET_SPLIT,
+) -> dict[str, Any]:
+    target_split = normalize_target_split(target_split)
+
+    if not mixed_requests:
+        raise ValueError("generation payload requires at least one path request")
+
+    item_payloads: list[dict[str, Any]] = []
+    total_count = 0
+
+    for index, item in enumerate(mixed_requests, start=1):
+        raw_request = item.get("request")
+        if not isinstance(raw_request, str) or not raw_request:
+            raise ValueError(f"mixed request item {index} has no request string")
+
+        cycle_start_offset = int(item.get("cycle_start_offset", 0))
+
+        payload = build_generation_payload(
+            raw_request=raw_request,
+            dataset_root=dataset_root,
+            taxonomy_path=taxonomy_path,
+            target_split=target_split,
+            cycle_start_offset=cycle_start_offset,
+        )
+
+        item_payloads.append(
+            build_mixed_generation_item(
+                mix_item_index_1_based=index,
+                payload=payload,
+                cycle_start_offset=cycle_start_offset,
+            )
+        )
+        total_count += int(payload["count_to_generate"])
+
+    path_keys = [
+        item["request"]["raw_request"].rsplit(".", 1)[0] for item in item_payloads
+    ]
+    if len(path_keys) != len(set(path_keys)):
+        raise ValueError("generation payload path requests must be distinct")
+
+    return {
+        "request": {
+            "count_to_generate": total_count,
+            "path_count": len(item_payloads),
+            "items": [
+                {
+                    "mix_item_index_1_based": item["mix_item_index_1_based"],
+                    "raw_request": item["request"]["raw_request"],
+                    "count_to_generate": item["count_to_generate"],
+                    "stable_path": item["request"]["stable_path"],
+                    "skill_stable_path": item["request"]["skill_stable_path"],
+                    "cycle_start_offset_used": item["cycle_start_offset_used"],
+                }
+                for item in item_payloads
+            ],
+        },
+        "target_split": target_split,
+        "mixed_generation_requests": item_payloads,
+        "count_to_generate": total_count,
+        "mixed_output_contract": {
+            "output_order": "generate all samples for mixed_generation_requests in array order; finish one item before starting the next item",
+            "per_item_rule": "Each mixed_generation_requests item is an independent generation contract.",
+            "count_rule": "The final JSON array length must equal top-level count_to_generate.",
+        },
+        "runtime_generation_contract": build_runtime_generation_contract(),
+        "area_situation_contract": build_area_situation_contract(),
+        "assistant_output_contract": build_output_contract(),
+        "generation_constraints": [
+            "mixed_generation_requests의 각 item을 독립된 generation contract로 처리한다.",
+            "각 item의 selected_bucket, existing_valid_paraphrase_samples, other_split_reserved_command_texts, command_text_policy를 해당 item sample에만 적용한다.",
+            "한 item의 계약 필드를 다른 item sample에 섞어 쓰지 않는다.",
+            "출력 array는 mixed_output_contract.output_order를 따른다.",
+            "각 sample.split은 자신이 속한 item의 target_split과 같아야 한다.",
+            "각 item의 command_text_policy.sequence_contract.cycle_reuse_plan_1_based를 그대로 따른다.",
+            "cycle source index를 다시 계산하지 않는다.",
+            "command_text를 재사용하더라도 area_situation, gold, output은 복사하지 않고 새로 구성한다.",
+            "taxonomy 밖 값을 만들지 않는다.",
+            "source_ref를 생성하지 않는다.",
+            "validator_result를 생성하지 않는다.",
+            "input.commandAnalysis와 commandAnalysis 하위 필드를 절대 생성하지 않는다.",
+            "input.input.area_situation을 완전한 전장 상태로 창작한다.",
+            "output은 처음부터 raw valid assistant output이어야 한다.",
+        ],
     }
 
 
@@ -726,8 +853,13 @@ def main() -> None:
     args = parser.parse_args()
 
     dataset_root = Path(args.dataset_root)
-    payload = build_generation_payload(
-        raw_request=args.request,
+    payload = build_mixed_generation_payload(
+        mixed_requests=[
+            {
+                "request": args.request,
+                "cycle_start_offset": 0,
+            }
+        ],
         dataset_root=dataset_root,
         taxonomy_path=Path(args.taxonomy),
         target_split=args.split,

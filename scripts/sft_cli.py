@@ -18,7 +18,7 @@ try:
     from sft_generation_request import (
         DEFAULT_TARGET_SPLIT,
         VALID_SPLITS,
-        build_generation_payload,
+        build_mixed_generation_payload,
         make_default_output_path,
         write_json,
     )
@@ -29,7 +29,7 @@ except ImportError:
     from sft_generation_request import (
         DEFAULT_TARGET_SPLIT,
         VALID_SPLITS,
-        build_generation_payload,
+        build_mixed_generation_payload,
         make_default_output_path,
         write_json,
     )
@@ -58,8 +58,13 @@ def run_report(dataset_root: Path, taxonomy_path: Path) -> None:
 
 def build_payload_or_print_error(args: argparse.Namespace) -> dict[str, Any] | None:
     try:
-        return build_generation_payload(
-            raw_request=args.request,
+        return build_mixed_generation_payload(
+            mixed_requests=[
+                {
+                    "request": args.request,
+                    "cycle_start_offset": 0,
+                }
+            ],
             dataset_root=Path(args.dataset_root),
             taxonomy_path=Path(args.taxonomy),
             target_split=getattr(args, "split", DEFAULT_TARGET_SPLIT),
@@ -109,6 +114,7 @@ def build_print_payload(payload: dict[str, Any]) -> dict[str, Any]:
 def print_payload_json(payload: dict[str, Any]) -> None:
     print(json.dumps(build_print_payload(payload), ensure_ascii=False, indent=2))
 
+
 def run_request(args: argparse.Namespace) -> None:
     dataset_root = Path(args.dataset_root)
 
@@ -136,42 +142,46 @@ def print_generation_plan(
     trace_output_path: Path,
 ) -> None:
     request_info = payload.get("request", {})
-    selected_bucket = payload.get("selected_bucket", {})
-
-    stable_path = request_info.get("stable_path")
-    skill_stable_path = request_info.get("skill_stable_path")
-    count_to_generate = payload.get("count_to_generate")
-    base_command_text = request_info.get("base_command_text")
     target_split = payload.get("target_split", DEFAULT_TARGET_SPLIT)
-    command_text_policy = payload.get("command_text_policy", {})
+    items = payload.get("mixed_generation_requests", [])
 
     print("request ok")
-    print(f"stable_path: {stable_path}")
-    if skill_stable_path:
-        print(f"skill_stable_path: {skill_stable_path}")
-    print(f"base_command_text: {base_command_text}")
-    print(f"count_to_generate: {count_to_generate}")
+    print(f"count_to_generate: {payload.get('count_to_generate')}")
     print(f"target_split: {target_split}")
+    print(f"path_count: {request_info.get('path_count')}")
 
-    if command_text_policy:
-        cycle_count = command_text_policy.get("samples_using_same_split_cycle")
+    if isinstance(items, list):
+        for index, item in enumerate(items, start=1):
+            if not isinstance(item, dict):
+                continue
 
-        print(
-            "command_text_policy: "
-            f"pool={command_text_policy.get('same_split_expression_pool_size')}, "
-            f"existing_same_split={command_text_policy.get('existing_same_split_expression_count')}, "
-            f"reserved_other_split={command_text_policy.get('other_split_reserved_expression_count')}, "
-            f"new={command_text_policy.get('new_unique_command_texts_to_create')}, "
-            f"cycle={cycle_count}"
-        )
+            item_request = item.get("request", {})
+            policy = item.get("command_text_policy", {})
+            sequence_contract = (
+                policy.get("sequence_contract", {})
+                if isinstance(policy, dict)
+                else {}
+            )
 
-    edge_flags = selected_bucket.get("edge_flags")
-    if edge_flags:
-        print(f"edge_flags: {edge_flags}")
+            print(f"item {index}:")
+            print(f"  raw_request: {item_request.get('raw_request')}")
+            print(f"  stable_path: {item_request.get('stable_path')}")
+            if item_request.get("skill_stable_path"):
+                print(f"  skill_stable_path: {item_request.get('skill_stable_path')}")
+            print(f"  base_command_text: {item_request.get('base_command_text')}")
+            print(f"  count_to_generate: {item.get('count_to_generate')}")
+            print(f"  cycle_start_offset_used: {item.get('cycle_start_offset_used')}")
 
-    skill_case = selected_bucket.get("skill_case")
-    if skill_case:
-        print(f"skill_case: {skill_case}")
+            if isinstance(policy, dict):
+                print(
+                    "  command_text_policy: "
+                    f"pool={policy.get('same_split_expression_pool_size')}, "
+                    f"existing_same_split={policy.get('existing_same_split_expression_count')}, "
+                    f"reserved_other_split={policy.get('other_split_reserved_expression_count')}, "
+                    f"new={policy.get('new_unique_command_texts_to_create')}, "
+                    f"cycle={policy.get('samples_using_same_split_cycle')}, "
+                    f"cycle_start_offset={sequence_contract.get('cycle_start_offset_0_based')}"
+                )
 
     print(f"request_file: {request_path}")
     print(f"raw_generation_file: {raw_output_path}")
@@ -230,7 +240,7 @@ def run_generate(args: argparse.Namespace) -> None:
         model_name=args.model,
         max_tokens=args.max_tokens,
         print_json=False,
-        #print_json=args.print_json, 이면 llm 출력 결과도 모두 보임
+        # print_json=args.print_json, 이면 llm 출력 결과도 모두 보임
         stream_output=args.stream_output,
     )
 

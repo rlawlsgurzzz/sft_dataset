@@ -24,9 +24,12 @@ SYSTEM_PROMPT = """
 
 출력은 반드시 JSON array 하나만 한다.
 array의 각 item은 raw master sample object 하나다.
-array item 수는 count_to_generate와 정확히 같아야 한다.
+array item 수는 top-level count_to_generate와 정확히 같아야 한다.
 마크다운, 코드블록, 주석, 사과문, 설명문, JSON 밖 텍스트를 출력하지 않는다.
-사용자가 제공한 selected_bucket, target_split, existing_valid_paraphrase_samples, other_split_reserved_command_texts, command_text_policy, count_to_generate를 따른다.
+
+사용자 payload의 mixed_generation_requests 배열을 순서대로 처리한다.
+각 item은 독립 생성 계약이며, item 안의 request, target_split, selected_bucket, existing_valid_paraphrase_samples, other_split_reserved_command_texts, command_text_policy, count_to_generate만 해당 item sample에 적용한다.
+최종 JSON array는 mixed_output_contract.output_order를 따르며, 전체 item 수는 top-level count_to_generate와 같아야 한다.
 
 너의 목적은 학생 SLM이 학습할 수 있는 raw master sample을 만드는 것이다.
 너는 전장 시나리오와 정답 output을 만든다.
@@ -85,7 +88,7 @@ skill_case 규칙:
 
 command_spec 규칙:
 - command_spec.command_text는 input.input.command와 정확히 같아야 한다.
-- command_spec.base_command_text는 반드시 user payload의 request.base_command_text와 정확히 같아야 하며, command_spec.command_text 자기 자신이나 새 paraphrase가 아니라 selected command slot을 대표하는 원형 명령문으로 보존한다.
+- command_spec.base_command_text는 현재 sample이 속한 mixed_generation_requests item의 request.base_command_text와 정확히 같아야 하며, command_spec.command_text 자기 자신이나 새 paraphrase가 아니라 selected command slot을 대표하는 원형 명령문으로 보존한다.
 - command_spec.slots는 명령의 의미 구조를 설명한다.
 - slots에는 가능한 한 actors, target, target_side_in_text, mentioned_units를 포함한다.
 - actors는 명령에서 행동 주체로 지목된 ally unitId 목록이다.
@@ -94,24 +97,22 @@ command_spec 규칙:
 - target_side_in_text는 ally, enemy, self, none 중 하나를 사용한다.
 - mentioned_units는 명령문에 직접 등장한 모든 unitId 목록이다.
 
-split과 command_text 표현 pool 규칙:
-- 각 sample.split은 반드시 target_split과 같아야 한다.
-- existing_valid_paraphrase_samples는 target_split과 같은 split의 기존 표현 pool이다.
-- other_split_reserved_command_texts는 다른 split에 이미 존재하는 command_text 목록이다.
-- command_text_policy.new_unique_command_texts_to_create 수만큼은 같은 split 표현 pool에 추가할 새 command_text를 만든다.
-- command_text_policy.sequence_contract가 있으면 command_text 생성 순서는 반드시 그 계약을 따른다.
-- 출력 array의 앞쪽 command_text_policy.new_unique_command_texts_to_create개 sample은 반드시 새 unique command_text여야 한다.
-- 새 unique 구간에서는 existing_valid_paraphrase_samples, other_split_reserved_command_texts, request.base_command_text, 같은 응답 안의 이전 command_text와 exact duplicate인 command_text를 쓰지 않는다.
-- cycle 구간은 새 unique 구간이 모두 끝난 뒤에만 시작한다.
-- cycle source pool은 existing_valid_paraphrase_samples의 command_text 순서 뒤에 이번 응답 앞쪽에서 새로 만든 unique command_text를 생성 순서대로 이어 붙인 목록이다.
-- cycle 구간의 각 sample은 command_text_policy.sequence_contract.cycle_reuse_plan_1_based의 output_index_1_based와 source_pool_index_1_based를 따른다.
-- cycle 구간에서 같은 command_text를 연속 반복하거나 첫 번째 source command_text만 반복하면 실패다.
-- 새 command_text는 existing_valid_paraphrase_samples의 command_text와 exact duplicate이면 안 된다.
-- 새 command_text는 other_split_reserved_command_texts의 command_text와 exact duplicate이면 안 된다.
-- command_text_policy.samples_using_same_split_cycle에 해당하는 sample은 같은 split 표현 pool 안에서 command_text를 순환 재사용할 수 있다.
-- 같은 요청에서 새로 만든 unique command_text도 이후 cycle source로 사용할 수 있다.
-- other_split_reserved_command_texts의 command_text는 cycle source로 사용할 수 없다.
+생성 item과 command_text 표현 pool 규칙:
+- mixed_generation_requests의 각 item은 독립 생성 계약이다.
+- 각 sample은 자신이 속한 item의 target_split, selected_bucket, existing_valid_paraphrase_samples, other_split_reserved_command_texts, command_text_policy를 따른다.
+- 한 item의 계약 필드를 다른 item sample에 섞어 쓰지 않는다.
+- 각 sample.split은 자신이 속한 item의 target_split과 같아야 한다.
+- 각 item의 existing_valid_paraphrase_samples는 해당 split의 기존 표현 pool이다.
+- 각 item의 other_split_reserved_command_texts는 다른 split의 중복 금지 표현 목록이다.
+- command_text_policy.new_unique_command_texts_to_create 수만큼 item 앞쪽 sample은 새 unique command_text를 만든다.
+새 unique command_text는 현재 item의 existing_valid_paraphrase_samples, other_split_reserved_command_texts, request.base_command_text, 같은 item 안의 이전 command_text와 exact duplicate이면 안 된다.
+- cycle 구간은 새 unique 구간 뒤에만 시작한다.
+- cycle source pool은 현재 item의 existing_valid_paraphrase_samples 뒤에 현재 item에서 새로 만든 unique command_text를 생성 순서대로 이어 붙인 목록이다.
+- cycle sample은 현재 item의 command_text_policy.sequence_contract.cycle_reuse_plan_1_based를 그대로 따른다.
+- cycle_reuse_plan_1_based는 Python이 path별 cursor를 반영해 계산한 최종 계획이다. teacher는 source index를 다시 계산하지 않는다.
+- cycle 구간의 command_text는 source command_text를 exact reuse한다.
 - command_text를 재사용하더라도 area_situation, gold, output은 복사하지 않고 새로 구성한다.
+- other_split_reserved_command_texts는 cycle source가 아니다.
 - train, validation, test의 표현 pool은 서로 섞지 않는다.
 
 command_text 생성 및 패러프레이징 스타일 규칙:
@@ -134,9 +135,9 @@ command_text 표현 다양성 강제 규칙:
 - "공격해", "쳐", "때려", "물어", "압박해", "끊어", "붙어서 패"처럼 실제 유저 표현을 바꾼다.
 - 표현을 다양화하더라도 selected_bucket의 actor/target/action 의미와 edge_flags는 유지한다.
 - new_unique 구간의 command_text는 paraphrase 생성 대상이다. unitId만 바꾸는 것은 실패이며, 문장 구조, 동사, 어미, 조사, 말투 중 최소 2개 이상을 바꾼다.
-- cycle 구간의 command_text는 paraphrase 생성 대상이 아니라 cycle source pool의 command_text를 exact reuse하는 대상이다.
-- cycle 구간의 다양성은 새 문장을 만드는 방식이 아니라, sequence_contract.cycle_reuse_plan_1_based에 따라 서로 다른 source command_text를 round-robin으로 재사용하는 방식으로 보장한다.
-- cycle 구간에서 source command_text를 재사용하더라도 area_situation, gold, output은 복사하지 않고 새로 만든다.
+- cycle 구간의 command_text는 paraphrase 대상이 아니며, 현재 item의 cycle_reuse_plan_1_based가 지정한 source command_text를 exact reuse한다.
+- cycle_reuse_plan_1_based는 Python이 계산한 최종 계획이다. teacher는 source index를 재계산하거나 1번부터 다시 시작하지 않는다.
+- command_text를 재사용해도 area_situation, gold, output은 새로 만든다.
 
 한국어 unitId 해석 규칙:
 - 콤마와 unitId 나열만 보고 actor/target을 기계적으로 판단하지 않는다.
@@ -626,7 +627,7 @@ commandAnalysis는 validator가 accepted 저장 시점에 계산해서 추가한
 
 예시는 schema shape와 생성 품질 기준만 보여준다.
 예시의 command_text, unitId 배치, metadata 값, 전장 상황, output 의미를 그대로 복사하지 않는다.
-실제 생성값은 반드시 user payload의 selected_bucket, existing_valid_paraphrase_samples, count_to_generate를 따른다.
+실제 생성값은 반드시 mixed_generation_requests 각 item의 selected_bucket, existing_valid_paraphrase_samples, command_text_policy, count_to_generate를 따른다.
 """.strip()
 
 
@@ -935,6 +936,7 @@ def run_teacher_generation(
 
     parsed = parse_teacher_json(raw_response)
     samples = normalize_samples(parsed)
+    validate_teacher_sample_count(samples, payload)
     force_request_base_command_text(samples, payload)
     assign_sample_ids(samples, output_path)
     append_jsonl(output_path, samples)
@@ -975,24 +977,107 @@ def run_teacher_generation(
         "total_token_count": timing["total_token_count"],
     }
 
-# request payload의 base command를 teacher 출력에 강제로 반영한다.
-# teacher가 paraphrase를 base_command_text에 잘못 넣어도 기준 command slot 원문으로 되돌린다.
+def expected_sample_count(payload: dict[str, Any]) -> int:
+    value = payload.get("count_to_generate")
+    if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+        raise ValueError("payload.count_to_generate must be a non-negative integer")
+    return value
+
+
+def expected_item_counts(payload: dict[str, Any]) -> list[int]:
+    items = payload.get("mixed_generation_requests")
+    if not isinstance(items, list) or not items:
+        raise ValueError("payload.mixed_generation_requests must be a non-empty list")
+
+    counts: list[int] = []
+    for index, item in enumerate(items, start=1):
+        if not isinstance(item, dict):
+            raise ValueError(f"mixed_generation_requests[{index}] must be an object")
+
+        count = item.get("count_to_generate")
+        if isinstance(count, bool) or not isinstance(count, int) or count < 0:
+            raise ValueError(
+                f"mixed_generation_requests[{index}].count_to_generate must be a non-negative integer"
+            )
+
+        counts.append(count)
+
+    return counts
+
+
+def validate_teacher_sample_count(
+    samples: list[dict[str, Any]],
+    payload: dict[str, Any],
+) -> None:
+    total_expected = expected_sample_count(payload)
+    item_counts = expected_item_counts(payload)
+
+    if sum(item_counts) != total_expected:
+        raise ValueError(
+            f"payload count mismatch: top-level={total_expected}, item_sum={sum(item_counts)}"
+        )
+
+    if len(samples) != total_expected:
+        raise ValueError(
+            f"teacher sample count mismatch: expected={total_expected}, actual={len(samples)}"
+        )
+
+# item별 request.base_command_text를 teacher 출력에 강제로 반영한다.
+# 출력 순서는 mixed_output_contract.output_order와 동일해야 한다.
 def force_request_base_command_text(
     samples: list[dict[str, Any]],
     payload: dict[str, Any],
 ) -> None:
-    request = payload.get("request")
-    if not isinstance(request, dict):
-        return
+    items = payload.get("mixed_generation_requests")
+    if not isinstance(items, list) or not items:
+        raise ValueError("payload.mixed_generation_requests must be a non-empty list")
 
-    base_command_text = request.get("base_command_text")
-    if not isinstance(base_command_text, str) or not base_command_text:
-        return
+    sample_index = 0
 
-    for sample in samples:
-        command_spec = sample.setdefault("command_spec", {})
-        if isinstance(command_spec, dict):
+    for item_index, item in enumerate(items, start=1):
+        if not isinstance(item, dict):
+            raise ValueError(f"mixed_generation_requests[{item_index}] must be an object")
+
+        request = item.get("request")
+        if not isinstance(request, dict):
+            raise ValueError(
+                f"mixed_generation_requests[{item_index}].request must be an object"
+            )
+
+        base_command_text = request.get("base_command_text")
+        if not isinstance(base_command_text, str) or not base_command_text:
+            raise ValueError(
+                f"mixed_generation_requests[{item_index}].request.base_command_text is missing"
+            )
+
+        count_to_generate = item.get("count_to_generate")
+        if (
+            isinstance(count_to_generate, bool)
+            or not isinstance(count_to_generate, int)
+            or count_to_generate < 0
+        ):
+            raise ValueError(
+                f"mixed_generation_requests[{item_index}].count_to_generate must be a non-negative integer"
+            )
+
+        item_samples = samples[sample_index : sample_index + count_to_generate]
+        if len(item_samples) != count_to_generate:
+            raise ValueError(
+                f"sample slice mismatch for item {item_index}: expected={count_to_generate}, actual={len(item_samples)}"
+            )
+
+        sample_index += count_to_generate
+
+        for sample in item_samples:
+            command_spec = sample.setdefault("command_spec", {})
+            if not isinstance(command_spec, dict):
+                raise ValueError("sample.command_spec must be an object")
             command_spec["base_command_text"] = base_command_text
+
+    if sample_index != len(samples):
+        raise ValueError(
+            f"unused samples after base_command_text assignment: assigned={sample_index}, actual={len(samples)}"
+        )
             
 def main() -> None:
     parser = argparse.ArgumentParser()
