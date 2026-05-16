@@ -25,7 +25,7 @@ try:
     from sft_generation_request import (
         DEFAULT_TARGET_SPLIT,
         VALID_SPLITS,
-        build_generation_payload,
+        build_mixed_generation_payload,
         write_json,
     )
     from sft_validate_automation_plans import validate_plans as validate_automation_plans
@@ -36,7 +36,7 @@ except ImportError:
     from sft_generation_request import (
         DEFAULT_TARGET_SPLIT,
         VALID_SPLITS,
-        build_generation_payload,
+        build_mixed_generation_payload,
         write_json,
     )
     from sft_validate_automation_plans import validate_plans as validate_automation_plans
@@ -173,6 +173,57 @@ def build_batch_tasks(items: list[PlanItem], max_per_request: int) -> list[Batch
     return tasks
 
 
+def build_task_payload(
+    *,
+    task: BatchTask,
+    dataset_root: Path,
+    taxonomy_path: Path,
+) -> dict[str, Any]:
+    return build_mixed_generation_payload(
+        mixed_requests=[
+            {
+                "request": task.request,
+                "cycle_start_offset": 0,
+            }
+        ],
+        dataset_root=dataset_root,
+        taxonomy_path=taxonomy_path,
+        target_split=task.split,
+    )
+
+
+def iter_payload_paths(payload: dict[str, Any]) -> list[str]:
+    items = payload.get("mixed_generation_requests")
+    if isinstance(items, list) and items:
+        paths: list[str] = []
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            request_info = item.get("request")
+            if not isinstance(request_info, dict):
+                continue
+            stable_path = request_info.get("stable_path")
+            skill_stable_path = request_info.get("skill_stable_path")
+            if not isinstance(stable_path, str) or not stable_path:
+                continue
+            if isinstance(skill_stable_path, str) and skill_stable_path:
+                paths.append(f"{stable_path}/{skill_stable_path}")
+            else:
+                paths.append(stable_path)
+        return paths
+
+    request_info = payload.get("request")
+    if not isinstance(request_info, dict):
+        return []
+
+    stable_path = request_info.get("stable_path")
+    skill_stable_path = request_info.get("skill_stable_path")
+    if not isinstance(stable_path, str) or not stable_path:
+        return []
+    if isinstance(skill_stable_path, str) and skill_stable_path:
+        return [f"{stable_path}/{skill_stable_path}"]
+    return [stable_path]
+
 def infer_plan_label(plan_path: Path) -> str:
     match = re.search(r"auto_generation_plan_(\d{4})", plan_path.stem)
     if match:
@@ -265,19 +316,7 @@ def compact_json(value: Any) -> str:
 
 
 def path_text_from_payload(payload: dict[str, Any]) -> str:
-    request_info = payload.get("request")
-    if not isinstance(request_info, dict):
-        return ""
-
-    stable_path = request_info.get("stable_path")
-    skill_stable_path = request_info.get("skill_stable_path")
-
-    if isinstance(stable_path, str) and stable_path:
-        if isinstance(skill_stable_path, str) and skill_stable_path:
-            return f"{stable_path}/{skill_stable_path}"
-        return stable_path
-
-    return ""
+    return ", ".join(iter_payload_paths(payload))
 
 
 def run_plan_preflight_validation(
@@ -316,11 +355,10 @@ def validate_tasks_for_dry_run(
     for task in tasks:
         started = time.monotonic()
         started_at = datetime.now().isoformat(timespec="seconds")
-        payload = build_generation_payload(
-            raw_request=task.request,
+        payload = build_task_payload(
+            task=task,
             dataset_root=dataset_root,
             taxonomy_path=taxonomy_path,
-            target_split=task.split,
         )
 
         records.append(
@@ -329,6 +367,8 @@ def validate_tasks_for_dry_run(
                 "source_plan_line": task.source_plan_line,
                 "split": task.split,
                 "path": path_text_from_payload(payload),
+                "request_prefix": task.request_prefix,
+                "request": task.request,
                 "requested_count": task.requested_count,
                 "request_payload_file": "",
                 "raw_generation_file": "",
@@ -348,6 +388,45 @@ def validate_tasks_for_dry_run(
 
     return records
 
+
+def aggregate_processed_requests(
+    records: list[dict[str, Any]],
+) -> list[tuple[str, str, int]]:
+    aggregated: dict[tuple[str, str], int] = {}
+    order: list[tuple[str, str]] = []
+
+    for record in records:
+        status = str(record.get("status", ""))
+        if status in {"dry_run_valid", "request_build_error"}:
+            continue
+
+        split = str(record.get("split", ""))
+        request_prefix = str(record.get("request_prefix", ""))
+        requested_count = int(record.get("requested_count", 0) or 0)
+        if not split or not request_prefix or requested_count <= 0:
+            continue
+
+        key = (split, request_prefix)
+        if key not in aggregated:
+            order.append(key)
+            aggregated[key] = 0
+        aggregated[key] += requested_count
+
+    return [
+        (split, request_prefix, aggregated[(split, request_prefix)])
+        for split, request_prefix in order
+    ]
+
+
+def print_processed_requests(records: list[dict[str, Any]]) -> None:
+    processed = aggregate_processed_requests(records)
+    if not processed:
+        print("processed_requests: none")
+        return
+
+    print("processed_requests:")
+    for split, request_prefix, count in processed:
+        print(f"{split} {request_prefix}.{count}")
 
 def summarize_path(records: list[dict[str, Any]]) -> dict[tuple[str, str], dict[str, Any]]:
     summary: dict[tuple[str, str], dict[str, Any]] = {}
@@ -796,21 +875,21 @@ def run_auto_generate(args: argparse.Namespace) -> int:
             task_start_monotonic = time.monotonic()
             task_started_at = datetime.now().isoformat(timespec="seconds")
             print("")
-            print(
-                f"[{task.task_index}/{selected_tasks[-1].task_index}] "
-                f"start split={task.split} request={task.request} line={task.source_plan_line}"
-            )
 
             request_path, raw_output_path, trace_output_path = make_batch_paths(raw_dir)
 
             try:
-                payload = build_generation_payload(
-                    raw_request=task.request,
+                payload = build_task_payload(
+                    task=task,
                     dataset_root=dataset_root,
                     taxonomy_path=taxonomy_path,
-                    target_split=task.split,
                 )
                 stable_path = path_text_from_payload(payload)
+                print(
+                    f"[{task.task_index}/{selected_tasks[-1].task_index}] "
+                    f"start split={task.split} request={task.request} "
+                    f"line={task.source_plan_line} path={stable_path}"
+                )
                 write_json(request_path, payload)
             except Exception as error:
                 task_finished_at = datetime.now().isoformat(timespec="seconds")
@@ -836,6 +915,8 @@ def run_auto_generate(args: argparse.Namespace) -> int:
                         "source_plan_line": task.source_plan_line,
                         "split": task.split,
                         "path": task.request_prefix,
+                        "request_prefix": task.request_prefix,
+                        "request": task.request,
                         "requested_count": task.requested_count,
                         "request_payload_file": relpath(request_path, dataset_root),
                         "raw_generation_file": relpath(raw_output_path, dataset_root),
@@ -895,6 +976,8 @@ def run_auto_generate(args: argparse.Namespace) -> int:
                         "source_plan_line": task.source_plan_line,
                         "split": task.split,
                         "path": stable_path,
+                        "request_prefix": task.request_prefix,
+                        "request": task.request,
                         "requested_count": task.requested_count,
                         "request_payload_file": relpath(request_path, dataset_root),
                         "raw_generation_file": relpath(raw_output_path, dataset_root),
@@ -954,6 +1037,8 @@ def run_auto_generate(args: argparse.Namespace) -> int:
                         "source_plan_line": task.source_plan_line,
                         "split": task.split,
                         "path": stable_path,
+                        "request_prefix": task.request_prefix,
+                        "request": task.request,
                         "requested_count": task.requested_count,
                         "request_payload_file": relpath(request_path, dataset_root),
                         "raw_generation_file": relpath(raw_output_path, dataset_root),
@@ -988,8 +1073,9 @@ def run_auto_generate(args: argparse.Namespace) -> int:
                         "source_plan_line": task.source_plan_line,
                         "split": task.split,
                         "path": stable_path,
-                        "requested_count": task.requested_count,
+                        "request_prefix": task.request_prefix,
                         "request": task.request,
+                        "requested_count": task.requested_count,
                         "request_payload_file": relpath(request_path, dataset_root),
                         "raw_generation_file": relpath(raw_output_path, dataset_root),
                         "trace_file": relpath(trace_output_path, dataset_root),
@@ -1004,6 +1090,8 @@ def run_auto_generate(args: argparse.Namespace) -> int:
                             "source_plan_line": task.source_plan_line,
                             "split": task.split,
                             "path": stable_path,
+                            "request_prefix": task.request_prefix,
+                            "request": task.request,
                             "requested_count": task.requested_count,
                             "request_payload_file": relpath(request_path, dataset_root),
                             "raw_generation_file": relpath(raw_output_path, dataset_root),
@@ -1053,6 +1141,7 @@ def run_auto_generate(args: argparse.Namespace) -> int:
         )
         print("")
         print("interrupted_by_keyboard")
+        print_processed_requests(records)
         print(f"result_document: {result_path}")
         return 130
 
