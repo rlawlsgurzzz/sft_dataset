@@ -67,13 +67,40 @@ class PlanItem:
 
 
 @dataclass(frozen=True)
-class BatchTask:
-    task_index: int
+class BatchTaskItem:
     source_plan_line: int
     split: str
     request_prefix: str
     requested_count: int
     request: str
+    cycle_start_offset: int
+
+
+@dataclass(frozen=True)
+class BatchTask:
+    task_index: int
+    items: tuple[BatchTaskItem, ...]
+
+    @property
+    def source_plan_line(self) -> str:
+        return ",".join(str(item.source_plan_line) for item in self.items)
+
+    @property
+    def split(self) -> str:
+        splits = [item.split for item in self.items]
+        return splits[0] if len(set(splits)) == 1 else ",".join(splits)
+
+    @property
+    def request_prefix(self) -> str:
+        return " + ".join(item.request_prefix for item in self.items)
+
+    @property
+    def requested_count(self) -> int:
+        return sum(item.requested_count for item in self.items)
+
+    @property
+    def request(self) -> str:
+        return " + ".join(item.request for item in self.items)
 
 
 def strip_inline_comment(line: str) -> str:
@@ -145,32 +172,78 @@ def read_plan(path: Path) -> list[PlanItem]:
     return items
 
 
-def build_batch_tasks(items: list[PlanItem], max_per_request: int) -> list[BatchTask]:
-    if max_per_request <= 0:
-        raise ValueError("max_per_request must be greater than zero")
-
-    tasks: list[BatchTask] = []
-    task_index = 1
+def build_batch_task_items(
+    items: list[PlanItem],
+    max_per_request: int,
+) -> list[BatchTaskItem]:
+    per_path_limit = max(1, max_per_request // 2)
+    chunks: list[BatchTaskItem] = []
 
     for item in items:
         remaining = item.count
+        cycle_start_offset = 0
         while remaining > 0:
-            requested_count = min(max_per_request, remaining)
-            request = f"{item.request_prefix}.{requested_count}"
-            tasks.append(
-                BatchTask(
-                    task_index=task_index,
+            requested_count = min(per_path_limit, remaining)
+            chunks.append(
+                BatchTaskItem(
                     source_plan_line=item.line_number,
                     split=item.split,
                     request_prefix=item.request_prefix,
                     requested_count=requested_count,
-                    request=request,
+                    request=f"{item.request_prefix}.{requested_count}",
+                    cycle_start_offset=cycle_start_offset,
                 )
             )
-            task_index += 1
+            cycle_start_offset += requested_count
             remaining -= requested_count
 
+    return chunks
+
+
+def build_batch_tasks(items: list[PlanItem], max_per_request: int) -> list[BatchTask]:
+    if max_per_request <= 0:
+        raise ValueError("max_per_request must be greater than zero")
+
+    pending = build_batch_task_items(items, max_per_request)
+    tasks: list[BatchTask] = []
+    task_index = 1
+
+    while pending:
+        first = pending.pop(0)
+        task_items = [first]
+
+        second_index = next(
+            (
+                index
+                for index, candidate in enumerate(pending)
+                if candidate.split == first.split
+                and candidate.request_prefix != first.request_prefix
+                and first.requested_count + candidate.requested_count <= max_per_request
+            ),
+            None,
+        )
+
+        if second_index is not None:
+            task_items.append(pending.pop(second_index))
+
+        tasks.append(BatchTask(task_index=task_index, items=tuple(task_items)))
+        task_index += 1
+
     return tasks
+
+
+def task_request_items(task: BatchTask) -> list[dict[str, Any]]:
+    return [
+        {
+            "source_plan_line": item.source_plan_line,
+            "split": item.split,
+            "request_prefix": item.request_prefix,
+            "request": item.request,
+            "requested_count": item.requested_count,
+            "cycle_start_offset": item.cycle_start_offset,
+        }
+        for item in task.items
+    ]
 
 
 def build_task_payload(
@@ -179,16 +252,24 @@ def build_task_payload(
     dataset_root: Path,
     taxonomy_path: Path,
 ) -> dict[str, Any]:
+    if not task.items:
+        raise ValueError("batch task must contain at least one request item")
+
+    splits = {item.split for item in task.items}
+    if len(splits) != 1:
+        raise ValueError("mixed batch task items must use the same split")
+
     return build_mixed_generation_payload(
         mixed_requests=[
             {
-                "request": task.request,
-                "cycle_start_offset": 0,
+                "request": item.request,
+                "cycle_start_offset": item.cycle_start_offset,
             }
+            for item in task.items
         ],
         dataset_root=dataset_root,
         taxonomy_path=taxonomy_path,
-        target_split=task.split,
+        target_split=task.items[0].split,
     )
 
 
@@ -369,6 +450,7 @@ def validate_tasks_for_dry_run(
                 "path": path_text_from_payload(payload),
                 "request_prefix": task.request_prefix,
                 "request": task.request,
+                "request_items": task_request_items(task),
                 "requested_count": task.requested_count,
                 "request_payload_file": "",
                 "raw_generation_file": "",
@@ -400,17 +482,27 @@ def aggregate_processed_requests(
         if status in {"dry_run_valid", "request_build_error"}:
             continue
 
-        split = str(record.get("split", ""))
-        request_prefix = str(record.get("request_prefix", ""))
-        requested_count = int(record.get("requested_count", 0) or 0)
-        if not split or not request_prefix or requested_count <= 0:
-            continue
+        request_items = record.get("request_items")
+        if isinstance(request_items, list) and request_items:
+            iterable = request_items
+        else:
+            iterable = [record]
 
-        key = (split, request_prefix)
-        if key not in aggregated:
-            order.append(key)
-            aggregated[key] = 0
-        aggregated[key] += requested_count
+        for item in iterable:
+            if not isinstance(item, dict):
+                continue
+
+            split = str(item.get("split", record.get("split", "")))
+            request_prefix = str(item.get("request_prefix", ""))
+            requested_count = int(item.get("requested_count", 0) or 0)
+            if not split or not request_prefix or requested_count <= 0:
+                continue
+
+            key = (split, request_prefix)
+            if key not in aggregated:
+                order.append(key)
+                aggregated[key] = 0
+            aggregated[key] += requested_count
 
     return [
         (split, request_prefix, aggregated[(split, request_prefix)])
@@ -644,7 +736,13 @@ def run_report(dataset_root: Path, taxonomy_path: Path) -> None:
 
 def print_plan_summary(tasks: list[BatchTask], plan_path: Path, max_per_request: int) -> None:
     total_requested = sum(task.requested_count for task in tasks)
-    unique_requests = len({(task.split, task.request_prefix) for task in tasks})
+    unique_requests = len(
+        {
+            (item.split, item.request_prefix)
+            for task in tasks
+            for item in task.items
+        }
+    )
 
     print("auto generation plan loaded")
     print(f"plan_file: {plan_path}")
@@ -917,6 +1015,7 @@ def run_auto_generate(args: argparse.Namespace) -> int:
                         "path": task.request_prefix,
                         "request_prefix": task.request_prefix,
                         "request": task.request,
+                        "request_items": task_request_items(task),
                         "requested_count": task.requested_count,
                         "request_payload_file": relpath(request_path, dataset_root),
                         "raw_generation_file": relpath(raw_output_path, dataset_root),
@@ -978,6 +1077,7 @@ def run_auto_generate(args: argparse.Namespace) -> int:
                         "path": stable_path,
                         "request_prefix": task.request_prefix,
                         "request": task.request,
+                        "request_items": task_request_items(task),
                         "requested_count": task.requested_count,
                         "request_payload_file": relpath(request_path, dataset_root),
                         "raw_generation_file": relpath(raw_output_path, dataset_root),
@@ -1039,6 +1139,7 @@ def run_auto_generate(args: argparse.Namespace) -> int:
                         "path": stable_path,
                         "request_prefix": task.request_prefix,
                         "request": task.request,
+                        "request_items": task_request_items(task),
                         "requested_count": task.requested_count,
                         "request_payload_file": relpath(request_path, dataset_root),
                         "raw_generation_file": relpath(raw_output_path, dataset_root),
@@ -1075,6 +1176,7 @@ def run_auto_generate(args: argparse.Namespace) -> int:
                         "path": stable_path,
                         "request_prefix": task.request_prefix,
                         "request": task.request,
+                        "request_items": task_request_items(task),
                         "requested_count": task.requested_count,
                         "request_payload_file": relpath(request_path, dataset_root),
                         "raw_generation_file": relpath(raw_output_path, dataset_root),
@@ -1092,6 +1194,7 @@ def run_auto_generate(args: argparse.Namespace) -> int:
                             "path": stable_path,
                             "request_prefix": task.request_prefix,
                             "request": task.request,
+                            "request_items": task_request_items(task),
                             "requested_count": task.requested_count,
                             "request_payload_file": relpath(request_path, dataset_root),
                             "raw_generation_file": relpath(raw_output_path, dataset_root),
