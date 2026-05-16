@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import random
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, Optional
@@ -66,36 +65,6 @@ SPLIT_EXPRESSION_POOL_LIMITS: dict[str, int] = {
     "validation": 3,
     "test": 3,
 }
-BATTLEFIELD_DIVERSITY_UNIT_IDS: tuple[str, ...] = tuple(
-    [f"A_{index:02d}" for index in range(1, 7)]
-    + [f"E_{index:02d}" for index in range(1, 7)]
-)
-
-BATTLEFIELD_DIVERSITY_OPTIONS: tuple[tuple[str, str, str], ...] = (
-    ("hpRatio", "높은", "0.75~1.00"),
-    ("hpRatio", "낮은", "0.05~0.35"),
-    ("attackRatioToAvg", "높은", "1.25~1.80"),
-    ("attackRatioToAvg", "낮은", "0.35~0.85"),
-)
-
-_BATTLEFIELD_DIVERSITY_RANDOM = random.SystemRandom()
-
-
-# cycle sample마다 area_situation scalar field를 흔들기 위한 teacher 입력용 hint를 만든다.
-def build_battlefield_diversity_hint() -> str:
-    picked_unit_ids = _BATTLEFIELD_DIVERSITY_RANDOM.sample(
-        BATTLEFIELD_DIVERSITY_UNIT_IDS,
-        3,
-    )
-
-    parts: list[str] = []
-    for unit_id in picked_unit_ids:
-        field_name, level_name, range_text = _BATTLEFIELD_DIVERSITY_RANDOM.choice(
-            BATTLEFIELD_DIVERSITY_OPTIONS
-        )
-        parts.append(f"{unit_id}는 {field_name}가 {level_name} 유닛이다({range_text}).")
-
-    return " ".join(parts)
 
 
 DEFAULT_SKILL_FLAGS: dict[str, dict[str, bool]] = {
@@ -393,7 +362,6 @@ def build_command_text_sequence_contract(
                     "source_pool_index_1_based": source_pool_index,
                     "source_kind": source_kind,
                     "source_index_1_based": source_index_1_based,
-                    "battlefield_diversity_hint": build_battlefield_diversity_hint(),
                 }
             )
 

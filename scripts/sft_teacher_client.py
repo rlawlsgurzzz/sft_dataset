@@ -138,11 +138,6 @@ command_text 표현 다양성 강제 규칙:
 - cycle 구간의 다양성은 새 문장을 만드는 방식이 아니라, sequence_contract.cycle_reuse_plan_1_based에 따라 서로 다른 source command_text를 round-robin으로 재사용하는 방식으로 보장한다.
 - cycle 구간에서 source command_text를 재사용하더라도 area_situation, gold, output은 복사하지 않고 새로 만든다.
 
-battlefield_diversity_hint 규칙:
-- cycle_reuse_plan_1_based item에 battlefield_diversity_hint가 있으면, 해당 output_index_1_based sample의 area_situation을 만들 때 지정된 unitId의 hpRatio 또는 attackRatioToAvg 조건을 반영한다.
-- battlefield_diversity_hint는 hpRatio와 attackRatioToAvg만 제한한다. isAlive, canBeTargeted, command_text, gold, action 가능성, selected_bucket 계약과 충돌하면 기존 계약을 우선한다.
-- battlefield_diversity_hint는 taxonomy가 아니며 raw sample output에 복사하지 않는다.
-
 한국어 unitId 해석 규칙:
 - 콤마와 unitId 나열만 보고 actor/target을 기계적으로 판단하지 않는다.
 - 문맥, 조사, 동사, 분류 기준을 함께 보고 actor와 target을 등록한다.
